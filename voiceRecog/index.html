@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>AI语音识别工具</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            color: #2d3748;
+        }
+        /* 顶部栏 */
+        .header {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .header h1 {
+            font-size: 20px;
+            color: #2b6cb0;
+            font-weight: 600;
+        }
+        .header select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e0;
+            background-color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .header select:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+        /* 主体 */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 20px;
+            gap: 20px;
+        }
+        /* 上部内容 */
+        .top-section {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            max-height: 500px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .result-area {
+            flex: 1;
+            background-color: rgba(247, 250, 252, 0.7);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #2d3748;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin-bottom: 20px;
+            border: 1px solid rgba(203, 213, 224, 0.3);
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #4299e1, #3182ce);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, #3182ce, #2b6cb0);
+        }
+        .btn-success {
+            background: linear-gradient(to right, #48bb78, #38a169);
+            color: white;
+        }
+        .btn-success:hover {
+            background: linear-gradient(to right, #38a169, #2f855a);
+        }
+        .btn-danger {
+            background: linear-gradient(to right, #f56565, #e53e3e);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: linear-gradient(to right, #e53e3e, #c53030);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        /* 下部内容 */
+        .bottom-section {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            flex-shrink: 0;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .prompt {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .sample-text {
+            font-size: 18px;
+            color: #2b6cb0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-weight: 500;
+            padding: 15px;
+            background-color: rgba(235, 248, 255, 0.5);
+            border-radius: 10px;
+        }
+        /* 状态提示 */
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        .recording {
+            color: #e53e3e;
+            font-weight: 600;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        /* 图标 */
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+<!-- 顶部栏 -->
+<div class="header">
+    <h1>AI语音识别工具</h1>
+    <select id="language">
+        <option value="1537">普通话</option>
+        <option value="1737">英语</option>
+        <option value="1637">粤语</option>
+        <option value="1837">四川话</option>
+    </select>
+</div>
+
+<!-- 主体 -->
+<div class="main">
+    <!-- 上部内容 -->
+    <div class="top-section">
+        <div class="result-area" id="result">识别结果将显示在这里……</div>
+        <div class="controls">
+            <button class="btn btn-primary" id="uploadBtn">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+                上传音频
+            </button>
+            <input type="file" id="audioFile" accept=".wav,.m4a,.amr,.pcm" style="display:none">
+            <button class="btn btn-success" id="recordBtn">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm4.39 3.06A7.5 7.5 0 0012 8.5a7.5 7.5 0 00-4.39 8.56 5.5 5.5 0 008.78 0z"/></svg>
+                开始录音
+            </button>
+            <button class="btn btn-danger" id="stopBtn" style="display:none">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg>
+                停止录音
+            </button>
+        </div>
+        <div class="status" id="status"></div>
+    </div>
+
+    <!-- 下部内容 -->
+    <div class="bottom-section">
+        <div class="prompt">尝试朗读以下句子：</div>
+        <div class="sample-text" id="sampleText">小蜡烛，光闪闪，黑夜里面把路暖。</div>
+        <button class="btn btn-primary" id="changeBtn">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            换一换
+        </button>
+    </div>
+</div>
+
+<script>
+    // 预置文本
+    const samples = [
+        "小蜡烛，光闪闪，黑夜里面把路暖。",
+        "莫愁前路无知己，天下谁人不识君。",
+        "露从今夜白，月是故乡明。",
+        "小猫咪，真可爱，追着毛线团玩耍。",
+        "儿童散学归来早，忙趁东风放纸鸢。",
+        "莫愁前路无知己，天下谁人不识君。",
+        "小水杯，装满水，喝了身体不疲惫。",
+        "洛阳亲友如相问，一片冰心在玉壶。",
+        "小书包，背身上，知识海洋里面闯。",
+        "小雨滴，淅沥沥，落在地上笑嘻嘻。",
+        "小云朵，飘天上，变来变去真漂亮。",
+        "小蜗牛，慢慢爬，背着房子去旅行。",
+        "小蚂蚁，排排队，齐心协力把食背。",
+    ];
+    let sampleIndex = 0;
+
+    // 后台代理配置
+    const SERVER_PROXY_URL = 'https://aiclassroom.braightidea.com/nodejsProxy';
+
+    // DOM
+    const languageSel = document.getElementById('language');
+    const resultDiv = document.getElementById('result');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const audioFile = document.getElementById('audioFile');
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusDiv = document.getElementById('status');
+    const sampleText = document.getElementById('sampleText');
+    const changeBtn = document.getElementById('changeBtn');
+    
+
+    // 调用语音识别
+    async function recognize({base64, len, fileExtension}) {
+        const body = JSON.stringify({
+            format: fileExtension,
+            rate: 16000,
+            channel: 1,
+            dev_pid: parseInt(languageSel.value),
+            speech: base64,
+            len: len
+        });
+        const res = await fetch(`${SERVER_PROXY_URL}/speech_recognition`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: body
+        });
+        const data = await res.json();
+        console.log('语音识别接口返回：', data);
+        if (data?.data?.err_no === 0) {
+            resultDiv.textContent = data?.data?.result[0];
+        } else {
+            resultDiv.textContent = '识别失败：' + data?.data?.err_msg;
+        }
+    }
+
+    // 上传音频
+    uploadBtn.addEventListener('click', () => audioFile.click());
+
+    async function getfileBase64(file) {
+        // 获取文件扩展名
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        console.log('文件格式:', fileExtension);
+        // 调用 /fileBase64 接口将文件转换为base64编码
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch(`${SERVER_PROXY_URL}/fileBase64`, {
+            method: 'POST',
+            headers: {},
+            body: formData
+        });
+        const data = await res.json();
+        console.log(' /fileBase64 接口返回：', data);
+        const base64 = data.data.base64;
+        const len = data.data.len;
+        return {base64, len, fileExtension};
+    }
+
+    audioFile.addEventListener('change', async e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        statusDiv.textContent = '正在识别……';
+        const data = await getfileBase64(file);
+        await recognize(data);
+        statusDiv.textContent = '';
+    });
+
+    async function convertToPCM(chunks) {
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        
+        // 将blob转换为ArrayBuffer
+        const arrayBuffer = await audioBlob.arrayBuffer();
+
+        // 创建AudioContext
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // 解码音频数据
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        // 提取PCM数据
+        const pcmData = audioBufferToPCM(audioBuffer);
+
+        const pcmBlob = new Blob([pcmData], { type: 'application/octet-stream' });
+        const pcmFile = new File([pcmBlob], 'audio.pcm', { type: 'application/octet-stream' });
+        return pcmFile;
+    }
+
+    function audioBufferToPCM(audioBuffer) {
+        // 百度语音识别要求：16000Hz采样率、16位、单声道
+        const targetSampleRate = 16000;
+        const channels = 1;
+
+        // 获取单声道数据（使用左声道）
+        let channelData = audioBuffer.getChannelData(0);
+        const originalSampleRate = audioBuffer.sampleRate;
+
+        // 如果采样率不是16000Hz，需要重采样
+        if (originalSampleRate !== targetSampleRate) {
+            channelData = resampleAudio(channelData, originalSampleRate, targetSampleRate);
+        }
+
+        // 转换为16位整数PCM数据
+        const pcmArray = new Int16Array(channelData.length);
+
+        for (let i = 0; i < channelData.length; i++) {
+            // 将浮点数(-1 to 1)转换为16位整数(-32768 to 32767)
+            const sample = Math.max(-1, Math.min(1, channelData[i]));
+            pcmArray[i] = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+        }
+
+        // 返回ArrayBuffer格式的PCM数据
+        return pcmArray.buffer;
+    }
+    // 音频重采样函数
+    function resampleAudio(sourceAudio, sourceRate, targetRate) {
+        if (sourceRate === targetRate) {
+            return sourceAudio;
+        }
+
+        const ratio = sourceRate / targetRate;
+        const outputLength = Math.round(sourceAudio.length / ratio);
+        const output = new Float32Array(outputLength);
+
+        for (let i = 0; i < outputLength; i++) {
+            const sourceIndex = i * ratio;
+            const lowerIndex = Math.floor(sourceIndex);
+            const upperIndex = Math.min(Math.ceil(sourceIndex), sourceAudio.length - 1);
+            const interpolation = sourceIndex - lowerIndex;
+
+            output[i] = sourceAudio[lowerIndex] * (1 - interpolation) +
+                sourceAudio[upperIndex] * interpolation;
+        }
+
+        return output;
+    }
+    
+    // 录音
+    let mediaRecorder, chunks = [], recordStartTime;
+    recordBtn.addEventListener('click', async () => {
+        // 检查支持的MIME类型
+        const mimeTypes = [
+            'audio/webm',
+            'audio/mp4',
+            'audio/wav',
+            'audio/ogg'
+        ];
+        mimeTypes.forEach(type => {
+            console.log(`${type}: ${MediaRecorder.isTypeSupported(type)}`);
+        });
+        
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        chunks = [];
+        mediaRecorder.ondataavailable = e => chunks.push(e.data);
+        mediaRecorder.onstop = async () => {
+            // 转换为PCM数据格式
+            const pcmFile = await convertToPCM(chunks);
+            console.log('pcmFile', pcmFile);
+            
+            let data = await getfileBase64(pcmFile);
+            statusDiv.textContent = '正在识别……';
+            await recognize(data);
+            statusDiv.textContent = '';
+            
+            stream.getTracks().forEach(t => t.stop());
+        };
+        mediaRecorder.start();
+        recordStartTime = Date.now();
+        recordBtn.style.display = 'none';
+        stopBtn.style.display = 'inline-flex';
+        statusDiv.textContent = '录音中（限制30秒）';
+        statusDiv.classList.add('recording');
+        // 30秒自动停止
+        setTimeout(() => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                recordBtn.style.display = 'inline-flex';
+                stopBtn.style.display = 'none';
+                statusDiv.textContent = '';
+                statusDiv.classList.remove('recording');
+            }
+        }, 30000);
+    });
+
+    stopBtn.addEventListener('click', () => {
+        mediaRecorder.stop();
+        recordBtn.style.display = 'inline-flex';
+        stopBtn.style.display = 'none';
+        statusDiv.textContent = '';
+        statusDiv.classList.remove('recording');
+    });
+
+    // 换一换
+    changeBtn.addEventListener('click', () => {
+        sampleIndex = (sampleIndex + 1) % samples.length;
+        sampleText.textContent = samples[sampleIndex];
+    });
+</script>
+</body>
+</html>

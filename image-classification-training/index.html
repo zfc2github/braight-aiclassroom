@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI图像分类训练平台</title>
+
+    <!-- Tailwind CSS -->
+    <script src="js/tailwindcss3.4.17.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- fonts.googleapis.com -->
+    <link href="css2.css" rel="stylesheet">
+
+    <!-- Core Libraries -->
+    <script src="js/tf.4.10.0.min.js"></script>
+<!--    <script src="js/p5.1.7.0.min.js"></script>-->
+<!--    <script src="js/ml5.min.js"></script>-->
+    <script src="js/anime.3.2.1.min.js"></script>
+    <script src="js/echarts.5.4.3.min.js"></script>
+    <script src="js/splide.min.js"></script>
+    <script src="js/matter.0.19.0.min.js"></script>
+    <script src="js/pixi.7.3.2.min.js"></script>
+    <script src="js/jszip.min.js"></script>
+
+    <!-- Splide CSS -->
+    <link rel="stylesheet" href="js/splide.min.css">
+
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-card: #3a3a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #4a9eff;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+        }
+
+        * {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        .font-serif {
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .hero-bg {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0f0f23 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('./resources/hero-bg.jpg') center/cover;
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .glass-card {
+            background: rgba(58, 58, 58, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(74, 158, 255, 0.2);
+            border-color: rgba(74, 158, 255, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #357abd 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 158, 255, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .input-field {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+        }
+
+        .tab-active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .progress-bar {
+            background: var(--bg-card);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--accent) 0%, #66b3ff 100%);
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .sample-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .sample-item {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .sample-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+        }
+
+        .sample-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(244, 67, 54, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sample-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .camera-preview {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .confidence-bar {
+            height: 20px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--error) 0%, var(--warning) 50%, var(--success) 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--bg-card);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-card);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100% !important;
+                margin-bottom: 20px;
+            }
+
+            .content-area {
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="text-xl font-serif font-bold text-white">🧠 AI分类器</div>
+                    <div class="text-sm text-gray-400">图像分类训练平台</div>
+                </div>
+                
+                <div class="flex space-x-1">
+                    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 tab-active" data-tab="dataset">
+                        📊 数据集
+                    </button>
+                    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300" data-tab="training">
+                        🚀 训练
+                    </button>
+                    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300" data-tab="testing">
+                        🔍 测试
+                    </button>
+                    <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300" data-tab="models">
+                        💾 模型
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero区域 -->
+    <section class="hero-bg pt-16 pb-8">
+        <div class="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                    智能图像分类训练
+                </h1>
+                <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                    使用先进的深度学习技术，轻松创建和训练您的专属图像分类模型。
+                    支持摄像头采集、本地图片上传，实时训练，即时预测。
+                </p>
+                <button class="btn-primary text-lg px-8 py-3" onclick="startTutorial()">
+                    🎯 查看引导教程
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主要内容区域 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 数据集管理面板 -->
+        <div id="dataset-tab" class="tab-content">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- 左侧：分类管理 -->
+                <div class="lg:w-2/5">
+                    <div class="glass-card p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center">
+                            📂 分类管理
+                        </h3>
+
+                        <div class="mb-4">
+                            <div class="flex gap-2 mb-4">
+                                <input type="text" id="new-class-input" placeholder="输入新分类名称"
+                                       class="input-field flex-1">
+                                <button class="btn-primary" onclick="addClass()">添加</button>
+                            </div>
+                        </div>
+
+                        <div id="class-list" class="space-y-2">
+                            <!-- 默认分类 -->
+                            <div class="class-item glass-card p-4 cursor-pointer border-2 border-blue-500 group"
+                                 data-class="分类1" onclick="selectClass('分类1')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3 flex-1">
+                                        <span class="class-name font-medium">分类1</span>
+                                        <input type="text" class="class-edit-input hidden flex-1 bg-transparent border border-blue-500 rounded px-2 py-1 text-sm"
+                                               value="分类1" onblur="saveClassEdit('分类1')" onkeydown="handleClassEditKeydown(event, '分类1')">
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-sm text-gray-400">0 样本</span>
+                                        <div class="class-actions opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <button class="edit-class-btn text-blue-400 hover:text-blue-300 p-1"
+                                                    onclick="editClassName('分类1', event)" title="编辑">
+                                                ✏️
+                                            </button>
+                                            <button class="delete-class-btn text-red-400 hover:text-red-300 p-1"
+                                                    onclick="deleteClass('分类1', event)" title="删除">
+                                                🗑️
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="class-item glass-card p-4 cursor-pointer border-2 border-transparent group"
+                                 data-class="分类2" onclick="selectClass('分类2')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3 flex-1">
+                                        <span class="class-name font-medium">分类2</span>
+                                        <input type="text" class="class-edit-input hidden flex-1 bg-transparent border border-blue-500 rounded px-2 py-1 text-sm"
+                                               value="分类2" onblur="saveClassEdit('分类2')" onkeydown="handleClassEditKeydown(event, '分类2')">
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-sm text-gray-400">0 样本</span>
+                                        <div class="class-actions opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <button class="edit-class-btn text-blue-400 hover:text-blue-300 p-1"
+                                                    onclick="editClassName('分类2', event)" title="编辑">
+                                                ✏️
+                                            </button>
+                                            <button class="delete-class-btn text-red-400 hover:text-red-300 p-1"
+                                                    onclick="deleteClass('分类2', event)" title="删除">
+                                                🗑️
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 样本收集 -->
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-semibold mb-4">📷 样本收集</h4>
+
+                        <div class="space-y-4">
+                            <div>
+                                <button class="btn-secondary w-full" onclick="toggleCamera()">
+                                    📷 摄像头采集
+                                </button>
+                                <div id="camera-container" class="mt-4 hidden">
+                                    <div class="camera-preview mx-auto">
+                                        <video id="camera-video" autoplay muted class="w-full h-full object-cover rounded-lg"></video>
+                                    </div>
+                                    <button class="btn-primary w-full mt-2" onclick="capturePhoto()">
+                                        📸 拍照
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="btn-secondary w-full text-center cursor-pointer">
+                                    📁 上传图片
+                                    <input type="file" id="image-upload" multiple accept="image/*" class="hidden" onchange="uploadImages(event)">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：样本展示 -->
+                <div class="lg:w-3/5">
+                    <div class="glass-card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">🖼️ 样本库</h3>
+                            <span id="selected-class-name" class="text-blue-400 font-medium">分类1</span>
+                        </div>
+
+                        <div id="sample-gallery" class="sample-grid">
+                            <!-- 示例图片 -->
+                            <div class="sample-item">
+                                <img src="./resources/sample-1.jpg" alt="示例1">
+                                <button class="delete-btn" onclick="removeSample(this)">×</button>
+                            </div>
+                            <div class="sample-item">
+                                <img src="./resources/sample-2.png" alt="示例2">
+                                <button class="delete-btn" onclick="removeSample(this)">×</button>
+                            </div>
+                            <div class="sample-item">
+                                <img src="./resources/sample-3.jpg" alt="示例3">
+                                <button class="delete-btn" onclick="removeSample(this)">×</button>
+                            </div>
+                            <div class="sample-item">
+                                <img src="./resources/sample-4.jpg" alt="示例4">
+                                <button class="delete-btn" onclick="removeSample(this)">×</button>
+                            </div>
+                            <div class="sample-item">
+                                <img src="./resources/sample-5.jpeg" alt="示例5">
+                                <button class="delete-btn" onclick="removeSample(this)">×</button>
+                            </div>
+                            <div class="sample-item">
+                                <img src="./resources/sample-6.png" alt="示例6">
+                                <button class="delete-btn" onclick="removeSample(this)">×</button>
+                            </div>
+                        </div>
+
+                        <div id="empty-state" class="text-center py-12 text-gray-400 hidden">
+                            <div class="text-4xl mb-4">📷</div>
+                            <p>还没有样本图片</p>
+                            <p class="text-sm">使用摄像头或上传图片开始收集样本</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 训练面板 -->
+        <div id="training-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- 训练参数 -->
+                <div class="lg:col-span-1">
+                    <div class="glass-card p-6">
+                        <h3 class="text-xl font-semibold mb-4">⚙️ 训练参数</h3>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">学习率</label>
+                                <input type="range" id="learning-rate" min="0.0001" max="0.01" step="0.0001" value="0.001"
+                                       class="w-full" oninput="updateLearningRate(this.value)">
+                                <span id="learning-rate-value" class="text-sm text-gray-400">0.001</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">训练轮数</label>
+                                <input type="range" id="epochs" min="10" max="200" step="10" value="50"
+                                       class="w-full" oninput="updateEpochs(this.value)">
+                                <span id="epochs-value" class="text-sm text-gray-400">50</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">批次大小</label>
+                                <select id="batch-size" class="input-field w-full">
+                                    <option value="16">16</option>
+                                    <option value="32" selected>32</option>
+                                    <option value="64">64</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">验证比例</label>
+                                <input type="range" id="validation-split" min="0.1" max="0.3" step="0.05" value="0.2"
+                                       class="w-full" oninput="updateValidationSplit(this.value)">
+                                <span id="validation-split-value" class="text-sm text-gray-400">0.2</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 space-y-3">
+                            <button id="start-training" class="btn-primary w-full" onclick="startTraining()">
+                                🚀 开始训练
+                            </button>
+                            <button id="stop-training" class="btn-secondary w-full hidden" onclick="stopTraining()">
+                                ⏹️ 停止训练
+                            </button>
+                            <button class="btn-secondary w-full" onclick="resetModel()">
+                                🔄 重置模型
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 训练进度 -->
+                <div class="lg:col-span-2">
+                    <div class="glass-card p-6">
+                        <h3 class="text-xl font-semibold mb-4">📊 训练进度</h3>
+
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium">总体进度</span>
+                                    <span id="progress-text" class="text-sm text-gray-400">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-blue-400" id="loss-value">0.000</div>
+                                    <div class="text-sm text-gray-400">损失值</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-green-400" id="accuracy-value">0.0%</div>
+                                    <div class="text-sm text-gray-400">准确率</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div id="training-chart" style="height: 300px;"></div>
+                            </div>
+
+                            <div id="training-status" class="text-center text-gray-400">
+                                等待开始训练...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 测试面板 -->
+        <div id="testing-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- 图片输入 -->
+                <div>
+                    <div class="glass-card p-6">
+                        <h3 class="text-xl font-semibold mb-4">🖼️ 测试图片</h3>
+
+                        <div class="space-y-4">
+                            <div class="camera-preview mx-auto">
+                                <video id="test-camera" autoplay muted class="w-full h-full object-cover rounded-lg hidden"></video>
+                                <img id="test-image" class="w-full h-full object-cover rounded-lg" style="display: none;">
+                                <div id="test-placeholder" class="text-gray-400 text-center">
+                                    <div class="text-4xl mb-2">📷</div>
+                                    <p>选择图片开始测试</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button id="open-camera" class="btn-secondary flex-1" onclick="startTestCamera()">
+                                    📷 摄像头
+                                </button>
+                                <button id="close-camera" class="btn-secondary flex-1 hidden" onclick="closeTestCamera()">
+                                    📷 关闭摄像头
+                                </button>
+                                <label class="btn-secondary flex-1 text-center cursor-pointer">
+                                    📁 上传
+                                    <input type="file" id="test-upload" accept="image/*" class="hidden" onchange="uploadTestImage(event)">
+                                </label>
+                                <button class="btn-primary flex-1" onclick="runPrediction()">
+                                    🔍 预测
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 预测结果 -->
+                <div>
+                    <div class="glass-card p-6">
+                        <h3 class="text-xl font-semibold mb-4">📋 预测结果</h3>
+
+                        <div id="prediction-results" class="space-y-4">
+                            <div class="text-center text-gray-400 py-8">
+                                <div class="text-4xl mb-2">🤖</div>
+                                <p>等待预测结果...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模型管理面板 -->
+        <div id="models-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- 模型操作 -->
+                <div>
+                    <div class="glass-card p-6">
+                        <h3 class="text-xl font-semibold mb-4">💾 模型管理</h3>
+
+                        <div class="space-y-4">
+
+                            <div>
+                                <button class="btn-secondary w-full" onclick="downloadModel()">
+                                    📥 下载模型
+                                </button>
+                            </div>
+
+                            <!--<div>
+                                <label class="btn-secondary w-full text-center cursor-pointer">
+                                    📤 加载模型
+                                    <input type="file" id="model-upload" accept=".json" class="hidden" onchange="loadModel(event)">
+                                </label>
+                            </div>-->
+                        </div>
+
+                        <div class="mt-6 p-4 bg-gray-800 rounded-lg">
+                            <h4 class="font-medium mb-2">模型信息</h4>
+                            <div class="text-sm text-gray-400 space-y-1">
+                                <div>状态: <span id="model-status">未训练</span></div>
+                                <div>分类数: <span id="model-classes">0</span></div>
+                                <div>样本总数: <span id="model-samples">0</span></div>
+                                <div>最后更新: <span id="model-updated">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 训练历史 -->
+                <div>
+                    <div class="glass-card p-6">
+                        <h3 class="text-xl font-semibold mb-4">📈 训练历史</h3>
+
+                        <div id="training-history" class="space-y-3">
+                            <div class="text-center text-gray-400 py-8">
+                                <div class="text-4xl mb-2">📊</div>
+                                <p>暂无训练记录</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-900 border-t border-gray-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p class="text-gray-400">
+                    © 2025 AI图像分类训练平台 - 基于 TensorFlow.js 构建
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 数据库管理器 -->
+    <script src="db-manager.js"></script>
+
+    <!-- 加载主要JavaScript -->
+    <script src="main.js"></script>
+</body>
+</html>

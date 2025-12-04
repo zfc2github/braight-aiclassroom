@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI声音克隆工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: 600px;
+        }
+
+        .left-panel {
+            flex: 1;
+            padding: 30px;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .right-panel {
+            width: 450px;
+            padding: 30px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #667eea;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 40px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+        }
+
+        .file-upload:hover .file-upload-label {
+            background: #f0f2ff;
+            border-color: #5a67d8;
+        }
+
+        .file-upload.dragover .file-upload-label {
+            background: #e8ebff;
+            border-color: #4c51bf;
+        }
+
+        .file-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-area {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+
+        .status-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .status-success {
+            border-left-color: #48bb78;
+        }
+
+        .status-error {
+            border-left-color: #f56565;
+        }
+
+        .status-warning {
+            border-left-color: #ed8936;
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .status-message {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .audio-player {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .voice-id-display {
+            background: #e8ebff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #4c51bf;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+
+        .requirements {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #c53030;
+        }
+
+        .requirements ul {
+            margin-left: 20px;
+            margin-top: 5px;
+        }
+
+        .requirements li {
+            margin-bottom: 3px;
+        }
+
+        .clone-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .clone-section .section-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎙️ AI声音克隆工具</h1>
+        <p>基于海螺（MINIMAX）的声音克隆服务</p>
+    </div>
+
+    <div class="main-content">
+        <div class="left-panel">
+            <div class="section">
+                <h2 class="section-title">上传复刻音频</h2>
+                <div class="form-group">
+                    <div class="file-upload" id="fileUpload">
+                        <input type="file" id="audioFile" accept=".mp3,.m4a,.wav">
+                        <label class="file-upload-label" for="audioFile">
+                            <div class="file-icon">📁</div>
+                            <div>点击或拖拽音频文件到此处</div>
+                            <div class="file-name" id="fileName" style="display: none;"></div>
+                        </label>
+                    </div>
+                    <div class="requirements">
+                        <strong>音频要求：</strong>
+                        <ul>
+                            <li>格式：mp3、m4a、wav</li>
+                            <li>时长：10秒 - 5分钟</li>
+                            <li>大小：不超过20MB</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">克隆参数设置</h2>
+                <div class="form-group">
+                    <label class="form-label" for="voiceId">音色ID（克隆后的音色标识）</label>
+                    <input type="text" id="voiceId" class="form-input" placeholder="例如：MyVoice001" maxlength="256">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="text">试听文本（可选）</label>
+                    <textarea id="text" class="form-input" rows="3" placeholder="输入要试听合成的文本（最多1000字符）" maxlength="1000"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="clone-section">
+                <h2 class="section-title">开始克隆</h2>
+                <button class="btn" id="cloneBtn">
+                    <span id="btnText">开始克隆</span>
+                    <span class="loading" id="btnLoading" style="display: none;"></span>
+                </button>
+            </div>
+
+            <div class="section" style="flex: 1; display: flex; flex-direction: column;">
+                <h2 class="section-title">进度及状态</h2>
+                <div class="status-area" id="statusArea">
+                    <div class="status-item">
+                        <div class="status-title">准备就绪</div>
+                        <div class="status-message">请上传音频文件并设置参数，然后点击"开始克隆"按钮</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // API配置
+    const API_KEY = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJHcm91cE5hbWUiOiLlvKDlj5HmiJAiLCJVc2VyTmFtZSI6IuW8oOWPkeaIkCIsIkFjY291bnQiOiIiLCJTdWJqZWN0SUQiOiIxOTg0MTg5NjQzMjEzNTA4NjM2IiwiUGhvbmUiOiIxNTg1Njk2NzExNCIsIkdyb3VwSUQiOiIxOTg0MTg5NjQzMjA5MzE0MzMyIiwiUGFnZU5hbWUiOiIiLCJNYWlsIjoiIiwiQ3JlYXRlVGltZSI6IjIwMjUtMTAtMzEgMTc6NDQ6NDQiLCJUb2tlblR5cGUiOjEsImlzcyI6Im1pbmltYXgifQ.y_2nMDSBTipZtXwi7MZRbPg34jH7tpj4WGzmm7JP20ljQXufd_K5mP6Gvkke14Jbx8a8oZXEjDPVXGxqcWi6My2U-uhicNqk8PYRLLzAfHcyldhgCF9KVHv6Q41P5HWi7sEIStSGdxcg0yVfVnCEIz9u4-vsNUoSqLZPoME57ynSZ_Q0XIceJ6pzpEsm_pm1rhAMw5MNq_usFds-wlX4R44oL2-jtWTT6Hcf_DeAYV2lW4rddTkYHYyw5u8HHPnbXUXXi_8GfSHW82Vm49cLQ2tJV4jyvzyTwEEGqZlemb7oytkkZcFUDxsjmkF-pp0daZkXjZ6pZgdyltSGw_TW1A';
+    const UPLOAD_URL = 'https://api.minimaxi.com/v1/files/upload';
+    const CLONE_URL = 'https://api.minimaxi.com/v1/voice_clone';
+
+    // 状态管理
+    let selectedFile = null;
+    let isProcessing = false;
+
+    // DOM元素
+    const fileInput = document.getElementById('audioFile');
+    const fileUpload = document.getElementById('fileUpload');
+    const fileName = document.getElementById('fileName');
+    const voiceIdInput = document.getElementById('voiceId');
+    const textInput = document.getElementById('text');
+    const cloneBtn = document.getElementById('cloneBtn');
+    const btnText = document.getElementById('btnText');
+    const btnLoading = document.getElementById('btnLoading');
+    const statusArea = document.getElementById('statusArea');
+
+    // 文件上传处理
+    fileInput.addEventListener('change', handleFileSelect);
+
+    // 拖拽上传
+    fileUpload.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUpload.classList.add('dragover');
+    });
+
+    fileUpload.addEventListener('dragleave', () => {
+        fileUpload.classList.remove('dragover');
+    });
+
+    fileUpload.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUpload.classList.remove('dragover');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+
+    function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (file) {
+            handleFile(file);
+        }
+    }
+
+    function handleFile(file) {
+        // 验证文件类型
+        const validTypes = ['audio/mp3', 'audio/m4a', 'audio/wav', 'audio/x-wav'];
+        if (!validTypes.includes(file.type) && !file.name.match(/\.(mp3|m4a|wav)$/i)) {
+            showStatus('文件类型错误', '请选择 mp3、m4a 或 wav 格式的音频文件', 'error');
+            return;
+        }
+
+        // 验证文件大小
+        if (file.size > 20 * 1024 * 1024) {
+            showStatus('文件过大', '音频文件大小不能超过20MB', 'error');
+            return;
+        }
+
+        selectedFile = file;
+        fileName.textContent = file.name;
+        fileName.style.display = 'block';
+
+        showStatus('文件已选择', `已选择文件：${file.name}`, 'success');
+    }
+
+    // 克隆按钮点击
+    cloneBtn.addEventListener('click', async () => {
+        if (isProcessing) return;
+
+        // 验证输入
+        if (!selectedFile) {
+            showStatus('请选择文件', '请先上传音频文件', 'warning');
+            return;
+        }
+
+        const voiceId = voiceIdInput.value.trim();
+        if (!voiceId) {
+            showStatus('请输入音色ID', '请为克隆的音色设置一个ID', 'warning');
+            return;
+        }
+
+        // 验证voiceId格式
+        if (!/^[a-zA-Z][a-zA-Z0-9_-]{7,255}$/.test(voiceId)) {
+            showStatus('音色ID格式错误', '音色ID必须以字母开头，长度8-256字符，只能包含字母、数字、-和_', 'error');
+            return;
+        }
+
+        if (!/^[a-zA-Z0-9]$/.test(voiceId[voiceId.length - 1])) {
+            showStatus('音色ID格式错误', '音色ID不能以-或_结尾', 'error');
+            return;
+        }
+
+        await startClone();
+    });
+
+    async function startClone() {
+        isProcessing = true;
+        cloneBtn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline-block';
+
+        try {
+            // 第一步：上传音频文件
+            showStatus('正在上传音频...', '请稍候，正在上传音频文件', 'warning');
+
+            const fileId = await uploadAudio();
+
+            // 第二步：进行声音克隆
+            showStatus('正在克隆声音...', '音频上传成功，正在进行声音克隆', 'warning');
+
+            const result = await cloneVoice(fileId);
+
+            // 显示成功结果
+            showSuccessResult(result);
+
+        } catch (error) {
+            showStatus('克隆失败', error.message || '发生未知错误', 'error');
+        } finally {
+            isProcessing = false;
+            cloneBtn.disabled = false;
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+        }
+    }
+
+    async function uploadAudio() {
+        const formData = new FormData();
+        formData.append('purpose', 'voice_clone');
+        formData.append('file', selectedFile);
+
+        const response = await fetch(UPLOAD_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`上传失败: ${data.base_resp?.status_msg || '未知错误'}`);
+        }
+
+        if (data.base_resp?.status_code !== 0) {
+            const errorMsg = getErrorMessage(data.base_resp?.status_code);
+            throw new Error(`上传失败: ${errorMsg}`);
+        }
+
+        return data.file.file_id;
+    }
+
+    async function cloneVoice(fileId) {
+        const voiceId = voiceIdInput.value.trim();
+        const text = textInput.value.trim();
+
+        const requestBody = {
+            file_id: parseInt(fileId),
+            voice_id: voiceId,
+            model: 'speech-2.6-turbo',
+            need_noise_reduction: false,
+            need_volume_normalization: false,
+            aigc_watermark: false
+        };
+
+        if (text) {
+            requestBody.text = text;
+        }
+
+        const response = await fetch(CLONE_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`克隆失败: ${data.base_resp?.status_msg || '未知错误'}`);
+        }
+
+        if (data.base_resp?.status_code !== 0) {
+            const errorMsg = getErrorMessage(data.base_resp?.status_code);
+            throw new Error(`克隆失败: ${errorMsg}`);
+        }
+
+        return data;
+    }
+
+    function getErrorMessage(statusCode) {
+        const errorMap = {
+            1002: '触发限流，请稍后再试',
+            1004: '账号鉴权失败，请检查API-Key',
+            1008: '账号余额不足',
+            1026: '音频描述涉及敏感内容',
+            2013: '传入参数异常，请检查参数是否按要求填写',
+            2049: '无效的API Key'
+        };
+        return errorMap[statusCode] || `错误代码：${statusCode}`;
+    }
+
+    function showStatus(title, message, type = 'info') {
+        const statusItem = document.createElement('div');
+        statusItem.className = `status-item status-${type}`;
+        statusItem.innerHTML = `
+                <div class="status-title">${title}</div>
+                <div class="status-message">${message}</div>
+            `;
+
+        statusArea.innerHTML = '';
+        statusArea.appendChild(statusItem);
+    }
+
+    function showSuccessResult(result) {
+        const voiceId = voiceIdInput.value.trim();
+        let html = `
+                <div class="status-item status-success">
+                    <div class="status-title">🎉 声音克隆成功！</div>
+                    <div class="status-message">
+                        <p>您的音色已成功克隆，音色ID为：</p>
+                        <div class="voice-id-display">${voiceId}</div>
+                    </div>
+                </div>
+            `;
+
+        if (result.demo_audio) {
+            html += `
+                    <div class="status-item status-success">
+                        <div class="status-title">🎵 试听音频</div>
+                        <div class="status-message">
+                            <p>以下是使用克隆音色生成的试听音频：</p>
+                            <audio class="audio-player" controls src="${result.demo_audio}"></audio>
+                        </div>
+                    </div>
+                `;
+        }
+
+        statusArea.innerHTML = html;
+    }
+</script>
+</body>
+</html>

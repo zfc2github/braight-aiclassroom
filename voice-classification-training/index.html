@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>声音分类训练</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="anime.min.js"></script>
+    <script src="matter.min.js"></script>
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>-->
+    <script src="p5.min.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>-->
+    <script src="echarts.min.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>-->
+    <script src="splide.min.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.13.0/dist/tf.min.js"></script>-->
+    <script src="tf.min.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/ml5@0.12.2/dist/ml5.min.js"></script>-->
+<!--    <script src="ml5.min.js"></script>-->
+    <link href="splitting.css" rel="stylesheet">
+    <link href="css2.css" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #64748b, #475569);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(100, 116, 139, 0.2);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #06b6d4, #3b82f6);
+            border-radius: 8px;
+            transition: width 0.3s ease;
+        }
+        
+        .audio-visualizer {
+            width: 100%;
+            height: 60px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sample-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .sample-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .recording-pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+        
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .dropdown-menu {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .confidence-bar {
+            background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .category-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .category-card:hover {
+            border-left-color: #06b6d4;
+            transform: translateX(4px);
+        }
+        
+        .microphone-btn {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            transition: all 0.3s ease;
+        }
+        
+        .microphone-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+        
+        .microphone-btn.recording {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body class="text-gray-100">
+    <!-- 浮动粒子背景 -->
+    <div class="floating-particles" id="particles"></div>
+    
+    <!-- 头部 -->
+    <header class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-700/50 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <h1 class="text-3xl font-bold gradient-text text-center">声音分类训练</h1>
+        </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="container mx-auto px-6 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- 左侧：分类管理区 -->
+            <div class="lg:col-span-1">
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-cyan-400">分类管理</h2>
+                        <button id="addCategoryBtn" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">
+                            + 添加分类
+                        </button>
+                    </div>
+                    
+                    <div id="categoriesList" class="space-y-4">
+                        <!-- 分类1 -->
+                        <div class="category-card glass-card p-4" data-category-id="1">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="category-name font-medium text-gray-100">分类1</span>
+                                    <button class="edit-category-btn text-cyan-400 hover:text-cyan-300 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="relative">
+                                    <button class="category-menu-btn text-gray-400 hover:text-gray-200 transition-colors">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-menu absolute right-0 mt-2 w-48 py-2 hidden z-10">
+                                        <button class="clear-samples w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-slate-700/50 transition-colors">清空样本</button>
+                                        <button class="delete-category w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700/50 transition-colors">删除类别</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <button class="microphone-btn w-12 h-12 rounded-full flex items-center justify-center text-white">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="text-sm text-gray-400">
+                                        <span class="sample-count">0</span> 个样本
+                                    </div>
+                                </div>
+                                <div class="samples-container flex flex-wrap justify-end max-w-24">
+                                    <!-- 样本图标将在这里动态添加 -->
+                                </div>
+                            </div>
+                            
+                            <!-- 录制组件 -->
+                            <div class="recording-component mt-4 hidden">
+                                <div class="glass-card p-4 bg-slate-800/50">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-sm font-medium text-cyan-400">录制音频 (2秒)</span>
+                                        <button class="close-recording text-gray-400 hover:text-gray-200">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <button class="start-recording bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                            开始录制
+                                        </button>
+                                        <div class="flex-1">
+                                            <div class="bg-slate-700 rounded-full h-2 overflow-hidden">
+                                                <div class="recording-progress bg-gradient-to-r from-red-500 to-red-400 h-full rounded-full transition-all duration-100" style="width: 0%"></div>
+                                            </div>
+                                            <div class="text-xs text-gray-400 mt-1">
+                                                <span class="recording-time">00:00</span> / 00:02
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 分类2 -->
+                        <div class="category-card glass-card p-4" data-category-id="2">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="category-name font-medium text-gray-100">分类2</span>
+                                    <button class="edit-category-btn text-cyan-400 hover:text-cyan-300 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="relative">
+                                    <button class="category-menu-btn text-gray-400 hover:text-gray-200 transition-colors">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-menu absolute right-0 mt-2 w-48 py-2 hidden z-10">
+                                        <button class="clear-samples w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-slate-700/50 transition-colors">清空样本</button>
+                                        <button class="delete-category w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700/50 transition-colors">删除类别</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <button class="microphone-btn w-12 h-12 rounded-full flex items-center justify-center text-white">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="text-sm text-gray-400">
+                                        <span class="sample-count">0</span> 个样本
+                                    </div>
+                                </div>
+                                <div class="samples-container flex flex-wrap justify-end max-w-24">
+                                    <!-- 样本图标将在这里动态添加 -->
+                                </div>
+                            </div>
+                            
+                            <!-- 录制组件 -->
+                            <div class="recording-component mt-4 hidden">
+                                <div class="glass-card p-4 bg-slate-800/50">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-sm font-medium text-cyan-400">录制音频 (2秒)</span>
+                                        <button class="close-recording text-gray-400 hover:text-gray-200">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <button class="start-recording bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                            开始录制
+                                        </button>
+                                        <div class="flex-1">
+                                            <div class="bg-slate-700 rounded-full h-2 overflow-hidden">
+                                                <div class="recording-progress bg-gradient-to-r from-red-500 to-red-400 h-full rounded-full transition-all duration-100" style="width: 0%"></div>
+                                            </div>
+                                            <div class="text-xs text-gray-400 mt-1">
+                                                <span class="recording-time">00:00</span> / 00:02
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 中部：训练区 -->
+            <div class="lg:col-span-1">
+                <div class="glass-card p-6 mb-6">
+                    <h2 class="text-xl font-semibold text-cyan-400 mb-6">模型训练</h2>
+                    
+                    <div class="space-y-6">
+                        <!-- 训练按钮 -->
+                        <button id="startTrainingBtn" class="btn-primary w-full py-4 rounded-lg text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                            开始训练
+                        </button>
+                        
+                        <!-- 训练进度 -->
+                        <div id="trainingProgress" class="hidden">
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm text-gray-400 mb-2">
+                                    <span id="trainingStatus">准备训练...</span>
+                                    <span id="trainingPercentage">0%</span>
+                                </div>
+                                <div class="bg-slate-700 rounded-full h-3 overflow-hidden">
+                                    <div id="trainingProgressBar" class="progress-bar h-full rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- 训练图表 -->
+                            <div id="trainingChart" class="bg-slate-800/50 rounded-lg p-4" style="height: 200px;"></div>
+                        </div>
+                        
+                        <!-- 音频可视化 -->
+                        <div class="audio-visualizer" id="audioVisualizer">
+                            <canvas id="visualizerCanvas" class="w-full h-full"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧：模型使用区 -->
+            <div class="lg:col-span-1">
+                <div class="glass-card p-6">
+                    <h2 class="text-xl font-semibold text-cyan-400 mb-6">使用训练模型</h2>
+                    
+                    <div id="modelUsage">
+                        <!-- 未训练状态 -->
+                        <div id="noModelState" class="text-center py-12">
+                            <div class="text-gray-400 mb-4">
+                                <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                <p class="text-lg font-medium">至少训练一个模型</p>
+                                <p class="text-sm">才能查看训练结果</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 已训练状态 -->
+                        <div id="modelReadyState" class="hidden">
+                            <div class="space-y-6">
+                                <!-- 麦克风控制 -->
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-300">麦克风</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="microphoneToggle" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                                    </label>
+                                </div>
+                                
+                                <!-- 实时检测结果 -->
+                                <div id="detectionResults" class="space-y-4">
+                                    <h3 class="text-lg font-medium text-gray-200">检测结果</h3>
+                                    <div id="resultContainer">
+                                        <!-- 动态添加检测结果 -->
+                                    </div>
+                                </div>
+                                
+                                <!-- 置信度图表 -->
+                                <div id="confidenceChart" class="bg-slate-800/50 rounded-lg p-4" style="height: 200px;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 下载模型按钮 -->
+                        <div class="mt-8 pt-6 border-t border-slate-700/50">
+                            <button id="downloadModelBtn" class="btn-secondary w-full py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                下载模型
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-slate-900/50 backdrop-blur-sm border-t border-slate-700/50 mt-16" style="position: absolute;width: 100%;bottom: 0;">
+        <div class="container mx-auto px-6 py-6">
+            <div class="text-center text-gray-400">
+                <p>&copy; 2025 声音分类训练应用. 基于 TensorFlow.js 和 SpeechCommonds 构建</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 在 HTML 中添加以下脚本引用 -->
+    <script src="jszip.min.js"></script>
+    <script src="speech-commands.min.js"></script>
+
+    <script src="main.js"></script>
+</body>
+</html>

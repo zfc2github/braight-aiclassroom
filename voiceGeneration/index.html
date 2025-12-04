@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI语音合成工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e2e8f0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 1px solid rgba(94, 234, 212, 0.2);
+        }
+
+        .header {
+            background: linear-gradient(45deg, #0ea5e9, #0d9488);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.3), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 600px;
+        }
+
+        .input-section {
+            padding: 40px;
+            background: rgba(15, 23, 42, 0.5);
+            border-bottom: 1px solid rgba(94, 234, 212, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #94a3b8;
+            font-size: 1.1em;
+        }
+
+        .voice-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(15, 23, 42, 0.8);
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .voice-select:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
+        .voice-select option {
+            padding: 10px;
+            background: #1e293b;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.8);
+            color: #e2e8f0;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
+        .char-counter {
+            text-align: right;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .char-counter.warning {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .char-counter.error {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #0ea5e9, #0d9488);
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #0d9488, #0ea5e9);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn-primary:hover::before {
+            opacity: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #8b5cf6, #7c3aed);
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-secondary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #7c3aed, #8b5cf6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn-secondary:hover::before {
+            opacity: 1;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn:disabled::before {
+            display: none;
+        }
+
+        .btn .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .output-section {
+            flex: 1;
+            padding: 40px;
+            background: rgba(15, 23, 42, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-area {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 10px;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .status-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .status-message {
+            color: #cbd5e1;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .status-message.success {
+            color: #10b981;
+        }
+
+        .status-message.error {
+            color: #ef4444;
+        }
+
+        .status-message.warning {
+            color: #f59e0b;
+        }
+
+        .audio-player-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 10px;
+            border: 2px dashed #334155;
+            transition: all 0.3s ease;
+        }
+
+        .audio-player-area.has-audio {
+            border-color: #0ea5e9;
+            background: rgba(14, 165, 233, 0.05);
+        }
+
+        .audio-placeholder {
+            text-align: center;
+            color: #64748b;
+        }
+
+        .audio-placeholder .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .audio-player {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .audio-player audio {
+            width: 100%;
+            border-radius: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .audio-info {
+            margin-top: 15px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #334155;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #0ea5e9, #0d9488);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .api-key-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 10px;
+            border: 1px solid #334155;
+        }
+
+        .api-key-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.8);
+            color: #e2e8f0;
+        }
+
+        .api-key-input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
+        .voice-filter {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .voice-filter div {
+            width: 30%;
+            margin-right: 30px;
+        }
+        
+        .voice-filter input {
+            width: 30%;
+            padding: 8px 15px;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.8);
+            color: #e2e8f0;
+        }
+
+        .voice-filter input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
+        .voice-category {
+            margin-bottom: 10px;
+        }
+
+        .voice-category select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #334155;
+            border-radius: 6px;
+            font-size: 14px;
+            background: rgba(15, 23, 42, 0.8);
+            color: #e2e8f0;
+        }
+
+        .voice-category select:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            border: 1px solid rgba(94, 234, 212, 0.2);
+            box-shadow: 0 8px 32px rgba(2, 8, 20, 0.4);
+        }
+
+        .glass-title {
+            background: linear-gradient(45deg, #0ea5e9, #0d9488);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .input-section, .output-section {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎙️ AI语音合成工具</h1>
+        <p>基于阿里云语音合成接口</p>
+    </div>
+
+    <div class="main-content">
+        <div class="input-section">
+
+            <div class="form-group">
+                <label for="voice">🎭 选择音色</label>
+                <div class="voice-filter">
+                    <div class="voice-category">
+                        <select id="voiceCategory">
+                            <option value="all">📋 所有音色</option>
+                            <option value="chinese">🇨🇳 中文音色</option>
+                            <option value="english">🇬🇧 英文音色</option>
+                            <option value="custom">⭐ 自定义音色</option>
+                        </select>
+                    </div>
+                    <div class="voice-category">
+                        <select id="voice" class="voice-select" required>
+                            <option value="">请选择音色...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="text">📝 语音文本</label>
+                <textarea id="text" class="text-input" placeholder="请输入要合成的文本内容（不超过500字符）" maxlength="500" required></textarea>
+                <div class="char-counter" id="charCounter">0 / 500</div>
+            </div>
+
+            <div class="button-group">
+                <button id="synthesizeBtn" class="btn btn-primary">
+                    <span id="btnText">🎵 开始合成</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <div class="status-area">
+                <div class="status-title">📊 状态信息</div>
+                <div class="status-message" id="statusMessage">请输入文本并选择音色，然后点击"开始合成"按钮</div>
+            </div>
+
+            <div class="audio-player-area" id="audioPlayerArea">
+                <div class="audio-player hidden" id="audioPlayer">
+                    <audio id="audioElement" controls></audio>
+                    <div class="audio-info" id="audioInfo"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    class VoiceSynthesisApp {
+        constructor() {
+            this.voices = [];
+            this.customVoices = [];
+            this.listVoiceUrl = 'https://aiclassroom.braightidea.com/nodejsProxy/listVoice';
+            this.speechGenerationUrl = 'https://aiclassroom.braightidea.com/nodejsProxy/speech_generation';
+
+            this.init();
+        }
+
+        init() {
+            this.setupEventListeners();
+            this.loadVoices();
+            this.setupTextCounter();
+        }
+
+        setupEventListeners() {
+            // 合成按钮
+            document.getElementById('synthesizeBtn').addEventListener('click', () => this.handleSynthesize());
+
+            // 音色分类
+            document.getElementById('voiceCategory').addEventListener('change', (e) => this.filterVoicesByCategory(e.target.value));
+
+            // 文本输入限制
+            document.getElementById('text').addEventListener('input', () => this.updateTextCounter());
+            
+        }
+
+        async loadVoices() {
+            const defaultVoices = [
+                { name: '龙应笑', id: 'longyingxiao', category: 'chinese' },
+                { name: '龙机器', id: 'longjiqi', category: 'chinese' },
+                { name: '龙猴哥', id: 'longhouge', category: 'chinese' },
+                { name: '龙机心', id: 'longjixin', category: 'chinese' },
+                { name: '龙安粤', id: 'longanyue', category: 'chinese' },
+                { name: '龙陕哥', id: 'longshange', category: 'chinese' },
+                { name: '龙安敏', id: 'longanmin', category: 'chinese' },
+                { name: '龙黛玉', id: 'longdaiyu', category: 'chinese' },
+                { name: '龙高僧', id: 'longgaoseng', category: 'chinese' },
+                { name: '龙安莉', id: 'longanli', category: 'chinese' },
+                { name: '龙安朗', id: 'longanlang', category: 'chinese' },
+                { name: '龙安温', id: 'longanwen', category: 'chinese' },
+                { name: '龙安昀', id: 'longanyun', category: 'chinese' },
+                { name: 'YUMI', id: 'longyumi_v2', category: 'chinese' },
+                { name: '龙小淳', id: 'longxiaochun_v2', category: 'chinese' },
+                { name: '龙小夏', id: 'longxiaoxia_v2', category: 'chinese' },
+                { name: '龙逸尘', id: 'longyichen', category: 'chinese' },
+                { name: '龙婉君', id: 'longwanjun', category: 'chinese' },
+                { name: '龙老伯', id: 'longlaobo', category: 'chinese' },
+                { name: '龙老姨', id: 'longlaoyi', category: 'chinese' },
+                { name: '龙白芷', id: 'longbaizhi', category: 'chinese' },
+                { name: '龙三叔', id: 'longsanshu', category: 'chinese' },
+                { name: '龙修', id: 'longxiu_v2', category: 'chinese' },
+                { name: '龙妙', id: 'longmiao_v2', category: 'chinese' },
+                { name: '龙悦', id: 'longyue_v2', category: 'chinese' },
+                { name: '龙楠', id: 'longnan_v2', category: 'chinese' },
+                { name: '龙媛', id: 'longyuan_v2', category: 'chinese' },
+                { name: '龙安亲', id: 'longanqin', category: 'chinese' },
+                { name: '龙安雅', id: 'longanya', category: 'chinese' },
+                { name: '龙安朔', id: 'longanshuo', category: 'chinese' },
+                { name: '龙安灵', id: 'longanling', category: 'chinese' },
+                { name: '龙安智', id: 'longanzhi', category: 'chinese' },
+                { name: '龙安柔', id: 'longanrou', category: 'chinese' },
+                { name: '龙嫱', id: 'longqiang_v2', category: 'chinese' },
+                { name: '龙寒', id: 'longhan_v2', category: 'chinese' },
+                { name: '龙星', id: 'longxing_v2', category: 'chinese' },
+                { name: '龙华', id: 'longhua_v2', category: 'chinese' },
+                { name: '龙婉', id: 'longwan_v2', category: 'chinese' },
+                { name: '龙橙', id: 'longcheng_v2', category: 'chinese' },
+                { name: '龙菲菲', id: 'longfeifei_v2', category: 'chinese' },
+                { name: '龙小诚', id: 'longxiaocheng_v2', category: 'chinese' },
+                { name: '龙哲', id: 'longzhe_v2', category: 'chinese' },
+                { name: '龙颜', id: 'longyan_v2', category: 'chinese' },
+                { name: '龙天', id: 'longtian_v2', category: 'chinese' },
+                { name: '龙泽', id: 'longze_v2', category: 'chinese' },
+                { name: '龙邵', id: 'longshao_v2', category: 'chinese' },
+                { name: '龙浩', id: 'longhao_v2', category: 'chinese' },
+                { name: '龙深', id: 'kabuleshen_v2', category: 'chinese' },
+                { name: '龙呼呼', id: 'longhuhu', category: 'chinese' },
+                { name: '龙安培', id: 'longanpei', category: 'chinese' },
+                { name: '龙汪汪', id: 'longwangwang', category: 'chinese' },
+                { name: '龙泡泡', id: 'longpaopao', category: 'chinese' },
+                { name: '龙闪闪', id: 'longshanshan', category: 'chinese' },
+                { name: '龙牛牛', id: 'longniuniu', category: 'chinese' },
+                { name: '龙应沐', id: 'longyingmu', category: 'chinese' },
+                { name: '龙应询', id: 'longyingxun', category: 'chinese' },
+                { name: '龙应催', id: 'longyingcui', category: 'chinese' },
+                { name: '龙应答', id: 'longyingda', category: 'chinese' },
+                { name: '龙应静', id: 'longyingjing', category: 'chinese' },
+                { name: '龙应严', id: 'longyingyan', category: 'chinese' },
+                { name: '龙应甜', id: 'longyingtian', category: 'chinese' },
+                { name: '龙应冰', id: 'longyingbing', category: 'chinese' },
+                { name: '龙应桃', id: 'longyingtao', category: 'chinese' },
+                { name: '龙应聆', id: 'longyingling', category: 'chinese' },
+                { name: '龙安燃', id: 'longanran', category: 'chinese' },
+                { name: '龙安宣', id: 'longanxuan', category: 'chinese' },
+                { name: '龙安冲', id: 'longanchong', category: 'chinese' },
+                { name: '龙安萍', id: 'longanping', category: 'chinese' },
+                { name: '龙杰力豆', id: 'longjielidou_v2', category: 'chinese' },
+                { name: '龙铃', id: 'longling_v2', category: 'chinese' },
+                { name: '龙可', id: 'longke_v2', category: 'chinese' },
+                { name: '龙仙', id: 'longxian_v2', category: 'chinese' },
+                { name: '龙老铁', id: 'longlaotie_v2', category: 'chinese' },
+                { name: '龙嘉怡', id: 'longjiayi_v2', category: 'chinese' },
+                { name: '龙桃', id: 'longtao_v2', category: 'chinese' },
+                { name: '龙飞', id: 'longfei_v2', category: 'chinese' },
+                { name: '李白', id: 'libai_v2', category: 'chinese' },
+                { name: '龙津', id: 'longjin_v2', category: 'chinese' },
+                { name: '龙书', id: 'longshu_v2', category: 'chinese' },
+                { name: 'Bella2.0', id: 'loongbella_v2', category: 'english' },
+                { name: '龙硕', id: 'longshuo_v2', category: 'chinese' },
+                { name: '龙小白', id: 'longxiaobai_v2', category: 'chinese' },
+                { name: '龙婧', id: 'longjing_v2', category: 'chinese' },
+                { name: 'loongstella', id: 'loongstella_v2', category: 'english' },
+                { name: 'loongyuuna', id: 'loongyuuna_v2', category: 'english' },
+                { name: 'loongyuuma', id: 'loongyuuma_v2', category: 'english' },
+                { name: 'loongjihun', id: 'loongjihun_v2', category: 'english' },
+                { name: 'loongeva', id: 'loongeva_v2', category: 'english' },
+                { name: 'loongbrian', id: 'loongbrian_v2', category: 'english' },
+                { name: 'loongluna', id: 'loongluna_v2', category: 'english' },
+                { name: 'loongluca', id: 'loongluca_v2', category: 'english' },
+                { name: 'loongemily', id: 'loongemily_v2', category: 'english' },
+                { name: 'loongeric', id: 'loongeric_v2', category: 'english' },
+                { name: 'loongabby', id: 'loongabby_v2', category: 'english' },
+                { name: 'loongannie', id: 'loongannie_v2', category: 'english' },
+                { name: 'loongandy', id: 'loongandy_v2', category: 'english' },
+                { name: 'loongava', id: 'loongava_v2', category: 'english' },
+                { name: 'loongbeth', id: 'loongbeth_v2', category: 'english' },
+                { name: 'loongbetty', id: 'loongbetty_v2', category: 'english' },
+                { name: 'loongcindy', id: 'loongcindy_v2', category: 'english' },
+                { name: 'loongcally', id: 'loongcally_v2', category: 'english' },
+                { name: 'loongdavid', id: 'loongdavid_v2', category: 'english' },
+                { name: 'loongdonna', id: 'loongdonna_v2', category: 'english' },
+                { name: 'loongkyong', id: 'loongkyong_v2', category: 'english' },
+                { name: 'loongtomoka', id: 'loongtomoka_v2', category: 'english' },
+                { name: 'loongtomoya', id: 'loongtomoya_v2', category: 'english' }
+            ];
+            await this.loadCustomVoices();
+
+            this.voices = [...defaultVoices, ...this.customVoices];
+            this.populateVoiceSelect();
+            this.updateStatus('✅ 音色加载完成', 'success');
+        }
+
+        populateVoiceSelect() {
+            const voiceSelect = document.getElementById('voice');
+            const currentValue = voiceSelect.value;
+
+            voiceSelect.innerHTML = '<option value="">请选择音色...</option>';
+
+            this.voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.id;
+                option.textContent = `${voice.name} (${voice.id})`;
+                option.dataset.category = voice.category;
+                voiceSelect.appendChild(option);
+            });
+
+            // 恢复之前的选择
+            if (currentValue) {
+                voiceSelect.value = currentValue;
+            }
+        }
+
+        filterVoicesByCategory(category) {
+            const voiceSelect = document.getElementById('voice');
+            const options = voiceSelect.querySelectorAll('option:not([value=""])');
+
+            options.forEach(option => {
+                const optionCategory = option.dataset.category;
+                const match = category === 'all' || optionCategory === category;
+                option.style.display = match ? 'block' : 'none';
+            });
+        }
+
+        async loadCustomVoices() {
+            this.updateStatus('🔄 正在加载自定义音色...', 'warning');
+
+            try {
+                const response = await fetch(this.listVoiceUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prefix: 'biVoice'
+                    })
+                });
+
+                if (!response.ok) {
+                    console.log(`HTTP错误! 状态: ${response.status}`);
+                    this.updateStatus('🔄 加载自定义音色失败', 'danger');
+                    this.customVoices = [];
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('自定义音色列表:', data);
+
+                if (data?.data?.output?.voice_list) {
+                    this.customVoices = data?.data?.output?.voice_list
+                        .filter(voice => voice.status === 'OK')
+                        .map(voice => ({
+                            name: voice.voice_id,
+                            id: voice.voice_id,
+                            category: 'custom'
+                        }));
+
+                    this.updateStatus(`✅ 成功加载 ${this.customVoices.length} 个自定义音色`, 'success');
+                } else {
+                    this.updateStatus('ℹ️ 没有找到自定义音色', 'warning');
+                }
+            } catch (error) {
+                console.error('加载自定义音色失败:', error);
+                this.updateStatus(`❌ 加载自定义音色失败: ${error.message}`, 'error');
+            } finally {
+            }
+        }
+
+        setupTextCounter() {
+            this.updateTextCounter();
+        }
+
+        updateTextCounter() {
+            const textInput = document.getElementById('text');
+            const counter = document.getElementById('charCounter');
+            const length = textInput.value.length;
+
+            counter.textContent = `${length} / 500`;
+
+            // 更新计数器样式
+            counter.classList.remove('warning', 'error');
+            if (length > 450) {
+                counter.classList.add('error');
+            } else if (length > 400) {
+                counter.classList.add('warning');
+            }
+        }
+
+        async handleSynthesize() {
+            const voice = document.getElementById('voice').value;
+            const text = document.getElementById('text').value.trim();
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.classList.add('hidden');
+
+            // 验证输入
+            if (!voice) {
+                this.updateStatus('❌ 请选择音色', 'error');
+                document.getElementById('voice').focus();
+                return;
+            }
+
+            if (!text) {
+                this.updateStatus('❌ 请输入要合成的文本', 'error');
+                document.getElementById('text').focus();
+                return;
+            }
+
+            if (text.length > 500) {
+                this.updateStatus('❌ 文本长度不能超过500字符', 'error');
+                return;
+            }
+
+            this.setLoading(true, 'synthesizeBtn');
+            this.updateStatus('🔄 正在连接语音合成服务...', 'warning');
+
+            try {
+                // 使用WebSocket连接进行语音合成
+                await this.synthesizeSpeech(voice, text);
+            } catch (error) {
+                console.error('语音合成失败:', error);
+                this.updateStatus(`❌ 语音合成失败: ${error.message}`, 'error');
+            } finally {
+                this.setLoading(false, 'synthesizeBtn');
+            }
+        }
+
+        async synthesizeSpeech(voice, text) {
+            // 由于浏览器安全限制，WebSocket连接需要服务器支持
+            // 这里使用模拟的HTTP请求来演示功能
+            this.updateStatus('🔄 正在合成语音...', 'warning');
+
+            try {
+                // 实际应用中，这里应该使用WebSocket连接
+                // 由于演示目的，我们使用HTTP请求来模拟
+                const response = await fetch(this.speechGenerationUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        voice_id: voice,
+                        text: text
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP错误! 状态: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('语音合成结果:', data);
+
+                if (data?.data) {
+                    this.displayAudio(data.data, voice, text);
+                    this.updateStatus('✅ 语音合成完成！', 'success');
+                } else {
+                    throw new Error('响应格式错误：未找到音频URL');
+                }
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        displayAudio(audioUrl) {
+            const audioElement = document.getElementById('audioElement');
+            const audioPlayer = document.getElementById('audioPlayer');
+            // 设置音频源
+            audioElement.src = audioUrl;
+
+            // 显示音频播放器
+            audioPlayer.classList.remove('hidden');
+        }
+
+        updateStatus(message, type = 'info') {
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            statusElement.className = `status-message ${type}`;
+        }
+
+        setLoading(loading, buttonId = 'synthesizeBtn') {
+            const button = document.getElementById(buttonId);
+            const btnText = button.querySelector('#btnText, span');
+
+            if (loading) {
+                button.disabled = true;
+                const originalText = btnText.textContent;
+                btnText.innerHTML = '<span class="loading"></span>处理中...';
+                button.dataset.originalText = originalText;
+            } else {
+                button.disabled = false;
+                btnText.textContent = button.dataset.originalText || '开始合成';
+            }
+        }
+
+        showConfetti() {
+            // 简单的庆祝动画
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd'];
+
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-10px';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.borderRadius = '50%';
+                    confetti.style.pointerEvents = 'none';
+                    confetti.style.zIndex = '9999';
+                    confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }, i * 50);
+            }
+
+            // 添加下落动画
+            const style = document.createElement('style');
+            style.textContent = `
+                    @keyframes fall {
+                        to {
+                            transform: translateY(100vh) rotate(360deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // 初始化应用
+    document.addEventListener('DOMContentLoaded', () => {
+        new VoiceSynthesisApp();
+    });
+
+    // 添加一些全局样式
+    const globalStyle = document.createElement('style');
+    globalStyle.textContent = `
+            .hidden {
+                display: none !important;
+            }
+            
+            .fade-in {
+                animation: fadeIn 0.5s ease-in;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .pulse {
+                animation: pulse 2s infinite;
+            }
+            
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.02); }
+                100% { transform: scale(1); }
+            }
+            
+            .loading {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border: 3px solid rgba(255,255,255,0.3);
+                border-radius: 50%;
+                border-top-color: white;
+                animation: spin 1s ease-in-out infinite;
+                margin-right: 10px;
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        `;
+    document.head.appendChild(globalStyle);
+</script>
+</body>
+</html>

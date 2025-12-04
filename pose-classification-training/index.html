@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>姿态分类训练 - AI Pose Classifier</title>
+    <script src="js/tailwindcss3.4.17.js"></script>
+    <script src="js/anime.3.2.1.min.js"></script>
+    <script src="js/p5.1.7.0.min.js"></script>
+    <script src="js/echarts.5.4.3.min.js"></script>
+    <script src="js/jszip.min.js"></script>
+    <script src="js/tf-1.7.4.min.js"></script>
+    <script src="js/ml5-0.12.2.min.js"></script>
+    <link href="js/css2.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hover-glow:hover {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .sample-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 8px;
+        }
+        
+        .sample-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .sample-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            transition: stroke-dashoffset 0.5s ease-in-out;
+        }
+        
+        #p5-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        
+        .dropdown-menu {
+            transform: translateY(-10px);
+            opacity: 0;
+            display: none;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-menu.show {
+            transform: translateY(0);
+            opacity: 1;
+            display: block;
+        }
+    </style>
+    <style>
+        .glass-card:hover {
+            z-index: 20;
+        }
+        /* 在 CSS 中添加 */
+        #camera-overlay, #camera-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 确保不会阻挡视频控件 */
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="text-white overflow-x-hidden">
+    <!-- P5.js Background Canvas -->
+    <div id="p5-container"></div>
+    
+    <!-- Header -->
+    <header class="relative z-10 p-6">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-4xl font-bold gradient-text text-center">姿态分类训练</h1>
+            <p class="text-center text-gray-300 mt-2">AI Pose Classifier Training</p>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-7xl mx-auto p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Panel - Classification Management -->
+            <div class="space-y-6">
+                <div class="glass-card rounded-xl p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <span class="mr-2">🏷️</span> 分类管理
+                    </h2>
+                    
+                    <!-- Class List -->
+                    <div id="class-list" class="space-y-4 mb-6">
+                        <!-- Classes will be dynamically added here -->
+                    </div>
+                    
+                    <!-- Add Class Button -->
+                    <button id="add-class-btn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 hover-glow">
+                        <span class="mr-2">+</span> 添加新分类
+                    </button>
+                </div>
+                
+                <!-- Sample Collection Guide -->
+                <div class="glass-card rounded-xl p-6">
+                    <h3 class="text-lg font-medium mb-3 flex items-center">
+                        <span class="mr-2">📸</span> 样本采集指南
+                    </h3>
+                    <div class="text-sm text-gray-300 space-y-2">
+                        <p>• 每个分类建议收集15-30张样本</p>
+                        <p>• 保持光线充足，背景简洁</p>
+                        <p>• 多角度拍摄同一姿态</p>
+                        <p>• 确保身体关键部位清晰可见</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Center Panel - Training Control -->
+            <div class="space-y-6">
+                <div class="glass-card rounded-xl p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <span class="mr-2">🧠</span> 模型训练
+                    </h2>
+                    
+                    <!-- Training Parameters -->
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">训练轮数 (Epochs)</label>
+                            <input type="range" id="epochs-slider" min="10" max="100" value="50" class="w-full">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>10</span>
+                                <span id="epochs-value">50</span>
+                                <span>100</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">学习率</label>
+                            <select id="learning-rate" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
+                                <option value="0.0001">0.0001</option>
+                                <option value="0.001" selected>0.001</option>
+                                <option value="0.01">0.01</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">批次大小</label>
+                            <select id="batch-size" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
+                                <option value="8">8</option>
+                                <option value="16" selected>16</option>
+                                <option value="32">32</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Training Button -->
+                    <button id="train-btn" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="mr-2">🚀</span> 开始训练
+                    </button>
+                    
+                    <!-- Training Progress -->
+                    <div id="training-progress" class="hidden mt-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium">训练进度</span>
+                            <span id="progress-text" class="text-sm text-cyan-400">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div id="progress-bar" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div id="training-status" class="text-center text-sm text-gray-400 mt-2">
+                            准备训练中...
+                        </div>
+                    </div>
+                    
+                    <!-- Training Results -->
+                    <div id="training-results" class="hidden mt-6 p-4 bg-gray-800 rounded-lg">
+                        <h4 class="font-medium mb-2">训练结果</h4>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-400">最终准确率:</span>
+                                <span id="final-accuracy" class="text-green-400 font-medium ml-1">--</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">训练时间:</span>
+                                <span id="training-time" class="text-cyan-400 font-medium ml-1">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Model Info -->
+                <div class="glass-card rounded-xl p-6 hidden">
+                    <h3 class="text-lg font-medium mb-3 flex items-center">
+                        <span class="mr-2">ℹ️</span> 模型信息
+                    </h3>
+                    <div class="text-sm text-gray-300 space-y-1">
+                        <div>基础模型: MoveNet</div>
+                        <div>特征维度: 34 (17关键点 × 2坐标)</div>
+                        <div>分类器: 自定义全连接层</div>
+                        <div>优化器: Adam</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel - Model Usage -->
+            <div class="space-y-6">
+                <div class="glass-card rounded-xl p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <span class="mr-2">🔍</span> 模型使用
+                    </h2>
+                    
+                    <!-- Model Status -->
+                    <div id="model-status" class="mb-6 p-4 bg-gray-800 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm">模型状态:</span>
+                            <span id="status-badge" class="px-2 py-1 bg-red-600 text-xs rounded-full">未训练</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Detection Controls -->
+                    <div class="space-y-4 mb-6">
+                        <button id="start-detection-btn" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <span class="mr-2">📷</span> 开始实时检测（摄像头）
+                        </button>
+                        
+                        <button id="download-model-btn" class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <span class="mr-2">💾</span> 下载模型
+                        </button>
+                    </div>
+                    
+                    <!-- Detection Results -->
+                    <div id="detection-results" class="hidden">
+                        <h4 class="font-medium mb-3">检测结果</h4>
+                        <div id="prediction-list" class="space-y-2">
+                            <!-- Predictions will be shown here -->
+                        </div>
+                        
+                        <!-- Video Preview -->
+                        <div class="mt-4">
+                            <video id="detection-video" class="w-full rounded-lg" autoplay muted></video>
+                            <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-cyan-400 transition-colors cursor-pointer" id="detection-upload-zone">
+                                <p class="text-gray-400 mb-2">上传图片进行检测（点击选择图片或拖拽图片到此处）</p>
+                                <p class="text-sm text-gray-500">支持 JPG、PNG 格式</p>
+                                <input type="file" id="detection-file-input" accept="image/*" class="hidden">
+                            </div>
+                            <canvas id="detection-canvas" class="hidden"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- No Model Message -->
+                    <div id="no-model-message" class="text-center text-gray-400 py-8">
+                        <div class="text-4xl mb-2">🤖</div>
+                        <p>请先训练模型以启用检测功能</p>
+                    </div>
+                </div>
+                
+                <!-- Performance Stats -->
+                <div class="glass-card rounded-xl p-6">
+                    <h3 class="text-lg font-medium mb-3 flex items-center">
+                        <span class="mr-2">📊</span> 统计信息
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">总分类数:</span>
+                            <span id="total-classes" class="text-cyan-400">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">总样本数:</span>
+                            <span id="total-samples" class="text-green-400">0</span>
+                        </div>
+                        <div class="flex justify-between hidden">
+                            <span class="text-gray-400">训练次数:</span>
+                            <span id="training-count" class="text-purple-400">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Camera Modal -->
+    <div id="camera-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+            <div class="glass-card rounded-xl p-6 max-w-2xl w-full">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold">摄像头采集</h3>
+                    <button id="close-camera-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                
+                <div class="relative">
+                    <video id="camera-video"   width="640" height="480" class="w-full rounded-lg bg-black" autoplay muted></video>
+                    <canvas id="camera-canvas" width="640" height="480"  class=""></canvas>
+                </div>
+                
+                <div class="flex justify-center mt-4 space-x-4">
+                    <button id="capture-btn" class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-medium py-2 px-6 rounded-lg transition-all duration-300">
+                        📸 拍照
+                    </button>
+                    <button id="switch-camera-btn" class="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-medium py-2 px-6 rounded-lg transition-all duration-300">
+                        🔄 切换摄像头
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+            <div class="glass-card rounded-xl p-6 max-w-2xl w-full">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold">上传图片</h3>
+                    <button id="close-upload-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                
+                <div id="upload-drop-zone" class="border-2 border-dashed border-gray-400 rounded-lg p-12 text-center hover:border-cyan-400 transition-colors cursor-pointer">
+                    <div class="text-4xl mb-4">📁</div>
+                    <p class="text-lg mb-2">拖拽图片到此处或点击选择</p>
+                    <p class="text-sm text-gray-400">支持 JPG, PNG, GIF 格式</p>
+                    <input type="file" id="file-input" class="hidden" multiple accept="image/*">
+                </div>
+                
+                <div id="upload-preview" class="hidden mt-4">
+                    <h4 class="font-medium mb-2">预览</h4>
+                    <div id="preview-grid" class="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto">
+                        <!-- Preview images will be shown here -->
+                    </div>
+                    <button id="confirm-upload" class="w-full mt-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
+                        确认上传
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="relative z-10 text-center py-8 text-gray-400 text-sm">
+        <p>&copy; 2025 AI 姿态分类训练平台. 基于 TensorFlow.js and ml5.js 构建</p>
+    </footer>
+    
+    <script src="sketch.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
