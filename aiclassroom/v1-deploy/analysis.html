@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课堂分析 - 父亲、树林和鸟</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Coda&family=Hedvig+Letters+Sans&family=Jersey+15&family=Jersey+20+Charted&family=Liter&family=Luckiest+Guy&family=Oranienbaum&family=Press+Start+2P&family=Quattrocento+Sans&family=Sorts+Mill+Goudy&family=Unna&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F8F6F0;
+            --primary-color: #2D5016;
+            --secondary-color: #5A7C47;
+            --accent-color: #D4A574;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Oranienbaum', serif;
+            color: var(--primary-color);
+        }
+        
+        .chart-container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(45, 80, 22, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(45, 80, 22, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(45, 80, 22, 0.1);
+        }
+        
+        .evaluation-section {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(45, 80, 22, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        
+        .pros-cons-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-top: 24px;
+        }
+        
+        .pro-item, .con-item {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .pro-item {
+            background: rgba(92, 184, 92, 0.1);
+            border-left: 4px solid #5cb85c;
+        }
+        
+        .con-item {
+            background: rgba(217, 83, 79, 0.1);
+            border-left: 4px solid #d9534f;
+        }
+        
+        .improvement-item {
+            background: rgba(240, 173, 78, 0.1);
+            border-left: 4px solid #f0ad4e;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold" style="color: var(--primary-color); font-family: 'Sorts Mill Goudy', serif;">
+                        语文教学展示
+                    </h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="text-gray-600 hover:text-green-700 px-3 py-2 text-sm font-medium transition-colors">课程概览</a>
+                        <a href="process.html" class="text-gray-600 hover:text-green-700 px-3 py-2 text-sm font-medium transition-colors">教学流程</a>
+                        <a href="#" class="text-gray-900 hover:text-green-700 px-3 py-2 text-sm font-medium transition-colors">课堂分析</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="pt-24 pb-12 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6" style="color: var(--primary-color); font-family: 'Sorts Mill Goudy', serif;">
+                课堂分析
+            </h1>
+            <p class="text-xl opacity-80 max-w-2xl mx-auto" style="color: var(--secondary-color);">
+                深度分析课堂教学效果，从提问统计、教学优缺点到改进建议，全面评估教学质量。
+            </p>
+        </div>
+    </section>
+
+    <!-- Statistics Overview -->
+    <section class="px-4 pb-12">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-6 mb-12">
+                <div class="stat-card rounded-2xl p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" style="color: var(--accent-color);">33</div>
+                    <div class="text-sm opacity-80">课堂提问总数</div>
+                </div>
+                <div class="stat-card rounded-2xl p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" style="color: var(--secondary-color);">40</div>
+                    <div class="text-sm opacity-80">课程时长（分钟）</div>
+                </div>
+                <div class="stat-card rounded-2xl p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" style="color: var(--primary-color);">10</div>
+                    <div class="text-sm opacity-80">教学环节数</div>
+                </div>
+                <div class="stat-card rounded-2xl p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" style="color: var(--accent-color);">6</div>
+                    <div class="text-sm opacity-80">核心知识点</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Question Analysis -->
+    <section class="px-4 pb-12">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold mb-8 text-center" style="color: var(--primary-color); font-family: 'Sorts Mill Goudy', serif;">
+                课堂提问统计分析
+            </h2>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Question Type Distribution -->
+                <div class="chart-container">
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--secondary-color);">提问类型分布</h3>
+                    <div id="questionTypeChart" style="height: 300px;"></div>
+                </div>
+                
+                <!-- Question Level Analysis -->
+                <div class="chart-container">
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--secondary-color);">认知层次分析</h3>
+                    <div id="questionLevelChart" style="height: 300px;"></div>
+                </div>
+            </div>
+
+            <!-- Question Details Table -->
+            <div class="chart-container">
+                <h3 class="text-xl font-bold mb-6" style="color: var(--secondary-color);">提问类型详细分析</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-3 px-4 font-bold" style="color: var(--primary-color);">提问类型</th>
+                                <th class="text-left py-3 px-4 font-bold" style="color: var(--primary-color);">次数</th>
+                                <th class="text-left py-3 px-4 font-bold" style="color: var(--primary-color);">占比</th>
+                                <th class="text-left py-3 px-4 font-bold" style="color: var(--primary-color);">举例</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 px-4 font-medium">认知记忆</td>
+                                <td class="py-3 px-4">6</td>
+                                <td class="py-3 px-4">18%</td>
+                                <td class="py-3 px-4">"黎还能组什么词？""滹沱河在哪里？"</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 px-4 font-medium">理解应用</td>
+                                <td class="py-3 px-4">16</td>
+                                <td class="py-3 px-4">48%</td>
+                                <td class="py-3 px-4">"去掉雾蒙蒙可以吗？""连用两个修饰词有什么作用？"</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 px-4 font-medium">分析推理</td>
+                                <td class="py-3 px-4">7</td>
+                                <td class="py-3 px-4">21%</td>
+                                <td class="py-3 px-4">"为什么鸟最快活的时刻最容易被打中？""父亲如何通过叶子发现鸟？"</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 font-medium">评价创造</td>
+                                <td class="py-3 px-4">4</td>
+                                <td class="py-3 px-4">12%</td>
+                                <td class="py-3 px-4">"你觉得父亲是怎样的人？""请用所有修饰词说一段话。"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teaching Effectiveness Evaluation -->
+    <section class="px-4 pb-12">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold mb-8 text-center" style="color: var(--primary-color); font-family: 'Sorts Mill Goudy', serif;">
+                授课效果评估
+            </h2>
+            
+            <div class="evaluation-section">
+                <div class="pros-cons-grid">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #5cb85c;">
+                            <span class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-sm mr-2">✓</span>
+                            优点
+                        </h3>
+                        <div class="pro-item">
+                            <h4 class="font-bold mb-2">单元整体设计连贯</h4>
+                            <p class="text-sm opacity-80">三站"探秘大自然"情境让学生有持续期待。</p>
+                        </div>
+                        <div class="pro-item">
+                            <h4 class="font-bold mb-2">词语教学扎实</h4>
+                            <p class="text-sm opacity-80">随文正音、形近字辨析、结构归类、当堂练写，一步到位。</p>
+                        </div>
+                        <div class="pro-item">
+                            <h4 class="font-bold mb-2">朗读梯度清晰</h4>
+                            <p class="text-sm opacity-80">听录音→想象画面→去词比较→动作表演，学生情绪投入高。</p>
+                        </div>
+                        <div class="pro-item">
+                            <h4 class="font-bold mb-2">读写结合落地</h4>
+                            <p class="text-sm opacity-80">现场示范"摘抄四要素"，把单元语文要素落到笔头。</p>
+                        </div>
+                        <div class="pro-item">
+                            <h4 class="font-bold mb-2">悬念设置巧妙</h4>
+                            <p class="text-sm opacity-80">父亲身份之谜激发二次阅读兴趣，为下节课思辨埋下伏笔。</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #d9534f;">
+                            <span class="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-sm mr-2">!</span>
+                            不足与改进
+                        </h3>
+                        <div class="con-item">
+                            <h4 class="font-bold mb-2">时间偏紧</h4>
+                            <p class="text-sm opacity-80">写字环节仅1字1描1仿，缺乏互评与二次修正；可留课后，省出3 min用于深度讨论。</p>
+                        </div>
+                        <div class="con-item">
+                            <h4 class="font-bold mb-2">提问层次偏高</h4>
+                            <p class="text-sm opacity-80">理解应用类问题占比48%，偏高，可增加2—3个开放性问题。</p>
+                        </div>
+                        <div class="con-item">
+                            <h4 class="font-bold mb-2">个别学生跟进不足</h4>
+                            <p class="text-sm opacity-80">两次出现"还没画完的同学请等一等"，说明默读圈画时间不足，可再延长1 min。</p>
+                        </div>
+                        <div class="con-item">
+                            <h4 class="font-bold mb-2">积累方式单一</h4>
+                            <p class="text-sm opacity-80">摘抄以教师示范为主，可让学生现场用iPad拍照上传喜欢的句子，实现数字化归类。</p>
+                        </div>
+                        <div class="con-item">
+                            <h4 class="font-bold mb-2">道德渗透略显仓促</h4>
+                            <p class="text-sm opacity-80">父亲"不是猎人"一句带过，可在下节课补充"护鸟法律"微视频，强化生态意识。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Improvement Suggestions -->
+            <div class="evaluation-section">
+                <h3 class="text-xl font-bold mb-6" style="color: var(--secondary-color);">具体改进措施</h3>
+                <div class="space-y-4">
+                    <div class="improvement-item">
+                        <h4 class="font-bold mb-2">时间优化</h4>
+                        <p class="text-sm opacity-80">将写字环节留作课后作业，省出3分钟用于深度讨论，增加学生思辨时间。</p>
+                    </div>
+                    <div class="improvement-item">
+                        <h4 class="font-bold mb-2">提问层次优化</h4>
+                        <p class="text-sm opacity-80">增加2-3个开放性问题，如"如果你在现场，会怎样提醒鸟儿？"培养学生的创造性思维。</p>
+                    </div>
+                    <div class="improvement-item">
+                        <h4 class="font-bold mb-2">个别化指导</h4>
+                        <p class="text-sm opacity-80">默读圈画时间延长1分钟，确保所有学生都能完成基本任务，体现差异化教学。</p>
+                    </div>
+                    <div class="improvement-item">
+                        <h4 class="font-bold mb-2">数字化整合</h4>
+                        <p class="text-sm opacity-80">让学生用iPad拍照上传喜欢的句子，实现数字化归类，提高学习效率。</p>
+                    </div>
+                    <div class="improvement-item">
+                        <h4 class="font-bold mb-2">生态教育深化</h4>
+                        <p class="text-sm opacity-80">下节课补充"护鸟法律"微视频，强化生态保护意识，实现语文课程的德育价值。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overall Evaluation -->
+            <div class="evaluation-section">
+                <h3 class="text-xl font-bold mb-6" style="color: var(--secondary-color);">总评</h3>
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border border-green-200">
+                    <p class="text-lg leading-relaxed" style="color: var(--primary-color);">
+                        本课节奏明快，方法多样，成功把"感受生动语言"的单元要素转化为"圈—读—想—抄"的可操作路径。教学设计体现了教师对语文教育本质的深刻理解，通过多维度的教学活动，让学生在感受语言魅力的同时，培养了观察力、思维力和表达力。课堂氛围活跃，学生参与度高，教学目标达成度较好。若能再增加开放提问与写字反刍，将更显厚重与灵动。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-gray-200" style="background: rgba(45, 80, 22, 0.05);">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-sm opacity-70" style="color: var(--secondary-color);">
+                © 2024 语文教学展示 - 《父亲、树林和鸟》教学案例
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 初始化图表
+        document.addEventListener('DOMContentLoaded', function() {
+            initQuestionTypeChart();
+            initQuestionLevelChart();
+            initAnimations();
+        });
+
+        // 提问类型分布图表
+        function initQuestionTypeChart() {
+            const chart = echarts.init(document.getElementById('questionTypeChart'));
+            
+            const option = {
+                color: ['#5A7C47', '#D4A574', '#2D5016', '#8FBC8F'],
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    textStyle: {
+                        color: '#2D5016'
+                    }
+                },
+                series: [
+                    {
+                        name: '提问类型',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '18',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            {value: 16, name: '理解应用'},
+                            {value: 7, name: '分析推理'},
+                            {value: 6, name: '认知记忆'},
+                            {value: 4, name: '评价创造'}
+                        ]
+                    }
+                ]
+            };
+            
+            chart.setOption(option);
+            
+            // 响应式
+            window.addEventListener('resize', function() {
+                chart.resize();
+            });
+        }
+
+        // 认知层次分析图表
+        function initQuestionLevelChart() {
+            const chart = echarts.init(document.getElementById('questionLevelChart'));
+            
+            const option = {
+                color: ['#2D5016'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['认知记忆', '理解应用', '分析推理', '评价创造'],
+                    axisLabel: {
+                        color: '#2D5016'
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        color: '#2D5016'
+                    }
+                },
+                series: [
+                    {
+                        name: '提问次数',
+                        type: 'bar',
+                        data: [6, 16, 7, 4],
+                        itemStyle: {
+                            color: function(params) {
+                                const colors = ['#8FBC8F', '#5A7C47', '#2D5016', '#D4A574'];
+                                return colors[params.dataIndex];
+                            }
+                        },
+                        label: {
+                            show: true,
+                            position: 'top',
+                            formatter: '{c}次'
+                        }
+                    }
+                ]
+            };
+            
+            chart.setOption(option);
+            
+            // 响应式
+            window.addEventListener('resize', function() {
+                chart.resize();
+            });
+        }
+
+        // 初始化动画
+        function initAnimations() {
+            // 统计卡片动画
+            anime({
+                targets: '.stat-card',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 800,
+                easing: 'easeOutExpo',
+                delay: anime.stagger(100, {start: 300})
+            });
+            
+            // 图表容器动画
+            anime({
+                targets: '.chart-container',
+                opacity: [0, 1],
+                translateY: [50, 0],
+                duration: 1000,
+                easing: 'easeOutExpo',
+                delay: anime.stagger(200, {start: 600})
+            });
+            
+            // 评估区域动画
+            anime({
+                targets: '.evaluation-section',
+                opacity: [0, 1],
+                translateY: [50, 0],
+                duration: 1000,
+                easing: 'easeOutExpo',
+                delay: anime.stagger(300, {start: 1000})
+            });
+            
+            // 优点缺点项目动画
+            anime({
+                targets: '.pro-item, .con-item, .improvement-item',
+                opacity: [0, 1],
+                translateX: function(el) {
+                    return el.classList.contains('pro-item') ? [-30, 0] : [30, 0];
+                },
+                duration: 600,
+                easing: 'easeOutExpo',
+                delay: anime.stagger(150, {start: 1200})
+            });
+        }
+    </script>
+</body>
+</html>

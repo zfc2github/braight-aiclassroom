@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>父亲、树林和鸟 - 教学展示</title>
+    <script src="cdn.tailwindcss3.4.17.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="css2.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F8F6F0;
+            --primary-color: #2D5016;
+            --secondary-color: #5A7C47;
+            --accent-color: #D4A574;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Oranienbaum', serif;
+            color: var(--primary-color);
+            scroll-behavior: smooth;
+        }
+        
+        .section-title {
+            font-family: 'Sorts Mill Goudy', serif;
+            color: var(--primary-color);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(45, 80, 22, 0.15);
+        }
+        
+        .knowledge-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(45, 80, 22, 0.1);
+        }
+        
+        .timeline-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+            border: 1px solid #E8EAED;
+            border-radius: 8px;
+        }
+        
+        .timeline-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(45, 80, 22, 0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .timeline-item.active {
+            border-color: var(--accent-color);
+            background-color: rgba(212, 165, 116, 0.05);
+        }
+        
+        .time-indicator {
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            height: 4px;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        
+        .detail-panel {
+            background: white;
+            border: 1px solid #E8EAED;
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .detail-panel.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chart-container {
+            background: white;
+            border: 1px solid #E8EAED;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            border: 1px solid #E8EAED;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(45, 80, 22, 0.15);
+        }
+        
+        .pro-item, .con-item {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .pro-item {
+            background: rgba(92, 184, 92, 0.1);
+            border-left: 4px solid #5cb85c;
+        }
+        
+        .con-item {
+            background: rgba(217, 83, 79, 0.1);
+            border-left: 4px solid #d9534f;
+        }
+        
+        .improvement-item {
+            background: rgba(240, 173, 78, 0.1);
+            border-left: 4px solid #f0ad4e;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(45, 80, 22, 0.1), rgba(212, 165, 116, 0.05));
+            min-height: 40vh;
+        }
+        
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            margin: 60px 0;
+        }
+        
+        .nav-link {
+            color: var(--secondary-color);
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+        }
+        
+        .md\:text-8xl {
+            line-height: 1.3 !important;
+        }
+        .md\:text-5xl {
+            line-height: 1.3 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold" style="color: var(--primary-color); font-family: 'Sorts Mill Goudy', serif;">
+                        语文教学展示
+                    </h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a onclick="scrollToSection('overview')" class="nav-link active">课程概览</a>
+                        <a onclick="scrollToSection('process')" class="nav-link">教学流程</a>
+                        <a onclick="scrollToSection('analysis')" class="nav-link">课堂分析</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section pt-24 pb-12 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="mb-8">
+                <img src="resources/hero-forest.png" alt="森林背景" class="w-full h-48 object-cover rounded-2xl opacity-80 mb-6">
+                <h1 class="section-title text-4xl md:text-5xl font-bold mb-4">
+                    父亲、树林和鸟
+                </h1>
+                <p class="text-xl mb-2" style="color: var(--secondary-color);">
+                    三年级语文第七单元精读课教学展示
+                </p>
+                <p class="text-lg" style="color: var(--secondary-color);">
+                    探秘大自然第三站 · 感受生动语言 · 体会人物形象 · 培养阅读策略
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Course Overview Section -->
+    <section id="overview" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="section-title text-4xl md:text-5xl font-bold mb-6">
+                    课程核心知识点
+                </h2>
+                <p class="text-lg max-w-2xl mx-auto" style="color: var(--secondary-color);">
+                    本课程围绕《父亲、树林和鸟》展开，通过多维度的教学设计，让学生在感受语言魅力的同时，培养观察力和思辨能力。
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Knowledge Point 1 -->
+                <div class="knowledge-card card-hover p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">字词识写</h3>
+                    <p class="text-sm mb-4" style="color: var(--secondary-color);">会认8个生字，会写5个"多横平行等距"结构的字，掌握雨字头、艹字头写法。</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-800">黎滹沱幽</span>
+                        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-800">蒙凝畅抖</span>
+                    </div>
+                </div>
+
+                <!-- Knowledge Point 2 -->
+                <div class="knowledge-card card-hover p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">生动语言积累</h3>
+                    <p class="text-sm mb-4" style="color: var(--secondary-color);">修饰词连用和比喻句的学习，提升语言表达能力。</p>
+                    <div class="text-xs" style="color: var(--secondary-color);">
+                        <p>• 幽深的、雾蒙蒙的、浓浓的</p>
+                        <p>• 像树一般兀立</p>
+                    </div>
+                </div>
+
+                <!-- Knowledge Point 3 -->
+                <div class="knowledge-card card-hover p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">朗读策略</h3>
+                    <p class="text-sm mb-4" style="color: var(--secondary-color);">想象画面+动作朗读，把静态文字转化为视听嗅觉多重体验。</p>
+                    <div class="text-xs" style="color: var(--secondary-color);">
+                        <p>• 画面想象</p>
+                        <p>• 动作配合</p>
+                        <p>• 多重感官体验</p>
+                    </div>
+                </div>
+
+                <!-- Knowledge Point 4 -->
+                <div class="knowledge-card card-hover p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">4</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">内容理解</h3>
+                    <p class="text-sm mb-4" style="color: var(--secondary-color);">深入理解父亲、树林和鸟三个核心意象的特点和内涵。</p>
+                    <div class="text-xs" style="color: var(--secondary-color);">
+                        <p>• 父亲：知鸟、爱鸟、观察细致</p>
+                        <p>• 树林：幽深、雾浓、草木气息</p>
+                    </div>
+                </div>
+
+                <!-- Knowledge Point 5 -->
+                <div class="knowledge-card card-hover p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">5</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">阅读方法</h3>
+                    <p class="text-sm mb-4" style="color: var(--secondary-color);">用不同符号分类勾画，摘抄本"四要素"记录法。</p>
+                    <div class="text-xs" style="color: var(--secondary-color);">
+                        <p>• 横线/波浪线/括号分类</p>
+                        <p>• 词句+归类+感受+出处</p>
+                    </div>
+                </div>
+
+                <!-- Knowledge Point 6 -->
+                <div class="knowledge-card card-hover p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">6</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">悬念设置</h3>
+                    <p class="text-sm mb-4" style="color: var(--secondary-color);">父亲到底是不是猎人？激发学生的思辨和探究兴趣。</p>
+                    <div class="text-xs" style="color: var(--secondary-color);">
+                        <p>• 引发思考</p>
+                        <p>• 促进讨论</p>
+                        <p>• 培养批判思维</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Teaching Process Section -->
+    <section id="process" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="section-title text-4xl md:text-5xl font-bold mb-6">
+                    教学流程设计
+                </h2>
+                <p class="text-lg max-w-2xl mx-auto" style="color: var(--secondary-color);">
+                    40分钟精读课的精心设计，每个环节都经过周密安排，确保教学目标的有效达成。
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-12">
+                <!-- Timeline Column -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-2xl font-bold mb-8" style="color: var(--primary-color);">
+                        教学时间轴
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <!-- 情境导入 -->
+                        <div class="timeline-item p-4" onclick="showDetail(0)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">2'</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg mb-1" style="color: var(--primary-color);">情境导入</h4>
+                                    <p class="text-sm" style="color: var(--secondary-color);">单元三站旅程，板书课题，抛出两大疑问</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：5%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 听录音初读 -->
+                        <div class="timeline-item p-4" onclick="showDetail(1)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">3'</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg mb-1" style="color: var(--primary-color);">听录音初读</h4>
+                                    <p class="text-sm" style="color: var(--secondary-color);">正音、整体感知，解决"滹沱河"读音</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：7.5%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 默读圈画 -->
+                        <div class="timeline-item p-4" onclick="showDetail(2)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">4'</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg mb-1" style="color: var(--primary-color);">默读圈画</h4>
+                                    <p class="text-sm" style="color: var(--secondary-color);">第一次分类画句子，教师巡视提醒坐姿</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：10%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 字词讲练 -->
+                        <div class="timeline-item p-4" onclick="showDetail(3)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">8'</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg mb-1" style="color: var(--primary-color);">字词讲练</h4>
+                                    <p class="text-sm" style="color: var(--secondary-color);">黎-梨辨析、雨字头"雾"、平行等距写"蒙"</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：20%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 精读树林 -->
+                        <div class="timeline-item p-4" onclick="showDetail(4)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">6'</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg mb-1" style="color: var(--primary-color);">精读树林</h4>
+                                    <p class="text-sm" style="color: var(--secondary-color);">去词比较、朗读训练、积累修饰词</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：15%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 精读父亲 -->
+                        <div class="timeline-item p-4" onclick="showDetail(5)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">5'</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg mb-1" style="color: var(--primary-color);">精读父亲</h4>
+                                    <p class="text-sm" style="color: var(--secondary-color);">角色朗读、凝神静气释义、比喻体会</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：12.5%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 精读鸟群 -->
+                        <div class="timeline-item p-4" onclick="showDetail(6)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">4'</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg mb-1" style="color: var(--primary-color);">精读鸟群</h4>
+                                    <p class="text-sm" style="color: var(--secondary-color);">动作朗读、分组合作读、连用修饰词仿说</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：10%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 语言综合运用 -->
+                        <div class="timeline-item p-4" onclick="showDetail(7)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">3'</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg mb-1" style="color: var(--primary-color);">语言综合运用</h4>
+                                    <p class="text-sm" style="color: var(--secondary-color);">用所有修饰词口头描述"父亲+树林+鸟"</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：7.5%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 摘抄方法+悬念 -->
+                        <div class="timeline-item p-4" onclick="showDetail(8)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">3'</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg mb-1" style="color: var(--primary-color);">摘抄方法+悬念</h4>
+                                    <p class="text-sm" style="color: var(--secondary-color);">交流平台四步法，留疑"父亲是不是猎人"</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：7.5%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 作业布置 -->
+                        <div class="timeline-item p-4" onclick="showDetail(9)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">2'</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-lg mb-1" style="color: var(--primary-color);">作业布置</h4>
+                                    <p class="text-sm" style="color: var(--secondary-color);">熟读课文，完成自然笔记摘抄</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：5%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Panel Column -->
+                <div>
+                    <div id="detailPanel" class="detail-panel">
+                        <h3 class="text-2xl font-bold mb-4" style="color: var(--primary-color);">
+                            点击左侧时间轴查看详细信息
+                        </h3>
+                        <p style="color: var(--secondary-color);">
+                            每个教学环节都有详细的教学目标、活动设计和评价标准。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mt-12">
+                <div class="bg-gray-200 rounded-full h-2 mb-4">
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-sm" style="color: var(--secondary-color);">
+                    <span>0分钟</span>
+                    <span>20分钟</span>
+                    <span>40分钟</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Analysis Section -->
+    <section id="analysis" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="section-title text-4xl md:text-5xl font-bold mb-6">
+                    课堂分析
+                </h2>
+                <p class="text-lg max-w-2xl mx-auto" style="color: var(--secondary-color);">
+                    深度分析课堂教学效果，从提问统计、教学优缺点到改进建议，全面评估教学质量。
+                </p>
+            </div>
+
+            <!-- Statistics Overview -->
+            <div class="grid md:grid-cols-4 gap-6 mb-12">
+                <div class="stat-card p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" style="color: var(--accent-color);">33</div>
+                    <div class="text-sm" style="color: var(--secondary-color);">课堂提问总数</div>
+                </div>
+                <div class="stat-card p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" style="color: var(--secondary-color);">40</div>
+                    <div class="text-sm" style="color: var(--secondary-color);">课程时长（分钟）</div>
+                </div>
+                <div class="stat-card p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" style="color: var(--primary-color);">10</div>
+                    <div class="text-sm" style="color: var(--secondary-color);">教学环节数</div>
+                </div>
+                <div class="stat-card p-6 text-center">
+                    <div class="text-3xl font-bold mb-2" style="color: var(--accent-color);">6</div>
+                    <div class="text-sm" style="color: var(--secondary-color);">核心知识点</div>
+                </div>
+            </div>
+
+            <!-- Question Analysis -->
+            <div class="grid lg:grid-cols-2 gap-8 mb-12">
+                <!-- Question Type Distribution -->
+                <div class="chart-container">
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--secondary-color);">提问类型分布</h3>
+                    <div id="questionTypeChart" style="height: 300px;"></div>
+                </div>
+                
+                <!-- Question Level Analysis -->
+                <div class="chart-container">
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--secondary-color);">认知层次分析</h3>
+                    <div id="questionLevelChart" style="height: 300px;"></div>
+                </div>
+            </div>
+
+            <!-- Question Details Table -->
+            <div class="chart-container mb-12">
+                <h3 class="text-xl font-bold mb-6" style="color: var(--secondary-color);">提问类型详细分析</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-3 px-4 font-bold" style="color: var(--primary-color);">提问类型</th>
+                                <th class="text-left py-3 px-4 font-bold" style="color: var(--primary-color);">次数</th>
+                                <th class="text-left py-3 px-4 font-bold" style="color: var(--primary-color);">占比</th>
+                                <th class="text-left py-3 px-4 font-bold" style="color: var(--primary-color);">举例</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 px-4 font-medium">认知记忆</td>
+                                <td class="py-3 px-4">6</td>
+                                <td class="py-3 px-4">18%</td>
+                                <td class="py-3 px-4">"黎还能组什么词？""滹沱河在哪里？"</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 px-4 font-medium">理解应用</td>
+                                <td class="py-3 px-4">16</td>
+                                <td class="py-3 px-4">48%</td>
+                                <td class="py-3 px-4">"去掉雾蒙蒙可以吗？""连用两个修饰词有什么作用？"</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 px-4 font-medium">分析推理</td>
+                                <td class="py-3 px-4">7</td>
+                                <td class="py-3 px-4">21%</td>
+                                <td class="py-3 px-4">"为什么鸟最快活的时刻最容易被打中？""父亲如何通过叶子发现鸟？"</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 font-medium">评价创造</td>
+                                <td class="py-3 px-4">4</td>
+                                <td class="py-3 px-4">12%</td>
+                                <td class="py-3 px-4">"你觉得父亲是怎样的人？""请用所有修饰词说一段话。"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Teaching Effectiveness Evaluation -->
+            <div class="grid lg:grid-cols-2 gap-8 mb-12">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #5cb85c;">
+                        <span class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-sm mr-2">✓</span>
+                        优点
+                    </h3>
+                    <div class="pro-item">
+                        <h4 class="font-bold mb-2">单元整体设计连贯</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">三站"探秘大自然"情境让学生有持续期待。</p>
+                    </div>
+                    <div class="pro-item">
+                        <h4 class="font-bold mb-2">词语教学扎实</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">随文正音、形近字辨析、结构归类、当堂练写，一步到位。</p>
+                    </div>
+                    <div class="pro-item">
+                        <h4 class="font-bold mb-2">朗读梯度清晰</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">听录音→想象画面→去词比较→动作表演，学生情绪投入高。</p>
+                    </div>
+                    <div class="pro-item">
+                        <h4 class="font-bold mb-2">读写结合落地</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">现场示范"摘抄四要素"，把单元语文要素落到笔头。</p>
+                    </div>
+                    <div class="pro-item">
+                        <h4 class="font-bold mb-2">悬念设置巧妙</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">父亲身份之谜激发二次阅读兴趣，为下节课思辨埋下伏笔。</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center" style="color: #d9534f;">
+                        <span class="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-sm mr-2">!</span>
+                        不足与改进
+                    </h3>
+                    <div class="con-item">
+                        <h4 class="font-bold mb-2">时间偏紧</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">写字环节仅1字1描1仿，缺乏互评与二次修正；可留课后，省出3 min用于深度讨论。</p>
+                    </div>
+                    <div class="con-item">
+                        <h4 class="font-bold mb-2">提问层次偏高</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">理解应用类问题占比48%，偏高，可增加2—3个开放性问题。</p>
+                    </div>
+                    <div class="con-item">
+                        <h4 class="font-bold mb-2">个别学生跟进不足</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">两次出现"还没画完的同学请等一等"，说明默读圈画时间不足，可再延长1 min。</p>
+                    </div>
+                    <div class="con-item">
+                        <h4 class="font-bold mb-2">积累方式单一</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">摘抄以教师示范为主，可让学生现场用iPad拍照上传喜欢的句子，实现数字化归类。</p>
+                    </div>
+                    <div class="con-item">
+                        <h4 class="font-bold mb-2">道德渗透略显仓促</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">父亲"不是猎人"一句带过，可在下节课补充"护鸟法律"微视频，强化生态意识。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Improvement Suggestions -->
+            <div class="chart-container">
+                <h3 class="text-xl font-bold mb-6" style="color: var(--secondary-color);">具体改进措施</h3>
+                <div class="space-y-4">
+                    <div class="improvement-item">
+                        <h4 class="font-bold mb-2">时间优化</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">将写字环节留作课后作业，省出3分钟用于深度讨论，增加学生思辨时间。</p>
+                    </div>
+                    <div class="improvement-item">
+                        <h4 class="font-bold mb-2">提问层次优化</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">增加2-3个开放性问题，如"如果你在现场，会怎样提醒鸟儿？"培养学生的创造性思维。</p>
+                    </div>
+                    <div class="improvement-item">
+                        <h4 class="font-bold mb-2">个别化指导</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">默读圈画时间延长1分钟，确保所有学生都能完成基本任务，体现差异化教学。</p>
+                    </div>
+                    <div class="improvement-item">
+                        <h4 class="font-bold mb-2">数字化整合</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">让学生用iPad拍照上传喜欢的句子，实现数字化归类，提高学习效率。</p>
+                    </div>
+                    <div class="improvement-item">
+                        <h4 class="font-bold mb-2">生态教育深化</h4>
+                        <p class="text-sm" style="color: var(--secondary-color);">下节课补充"护鸟法律"微视频，强化生态保护意识，实现语文课程的德育价值。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-gray-200" style="background: rgba(45, 80, 22, 0.05);">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-sm" style="color: var(--secondary-color);">
+                © 2024 语文教学展示 - 《父亲、树林和鸟》教学案例
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 教学环节详细数据
+        const teachingDetails = [
+            {
+                title: "情境导入",
+                time: "2分钟",
+                percentage: "5%",
+                objectives: [
+                    "激发学生学习兴趣",
+                    "建立单元整体认知",
+                    "引出本课核心问题"
+                ],
+                activities: [
+                    "回顾单元主题'探秘大自然'",
+                    "板书课题《父亲、树林和鸟》",
+                    "提出两个核心问题：父亲是怎样的一个人？树林和鸟有什么特点？"
+                ],
+                evaluation: "观察学生参与度和专注度"
+            },
+            {
+                title: "听录音初读",
+                time: "3分钟",
+                percentage: "7.5%",
+                objectives: [
+                    "正音纠错",
+                    "整体感知课文内容",
+                    "解决生字词读音"
+                ],
+                activities: [
+                    "播放课文录音",
+                    "学生跟读",
+                    "重点指导'滹沱河'等难读词语"
+                ],
+                evaluation: "检查学生读音准确性"
+            },
+            {
+                title: "默读圈画",
+                time: "4分钟",
+                percentage: "10%",
+                objectives: [
+                    "培养阅读习惯",
+                    "学会分类标记",
+                    "提高阅读效率"
+                ],
+                activities: [
+                    "学生默读课文",
+                    "用不同符号圈画重点内容",
+                    "教师巡视指导阅读姿势"
+                ],
+                evaluation: "检查圈画质量和分类准确性"
+            },
+            {
+                title: "字词讲练",
+                time: "8分钟",
+                percentage: "20%",
+                objectives: [
+                    "掌握生字新词",
+                    "理解字词结构",
+                    "提高书写能力"
+                ],
+                activities: [
+                    "黎-梨形近字辨析",
+                    "雨字头'雾'字写法指导",
+                    "平行等距结构'蒙'字练习"
+                ],
+                evaluation: "当堂检测字词掌握情况"
+            },
+            {
+                title: "精读树林",
+                time: "6分钟",
+                percentage: "15%",
+                objectives: [
+                    "感受环境描写",
+                    "积累修饰词语",
+                    "体会语言特色"
+                ],
+                activities: [
+                    "去词比较感受表达效果",
+                    "朗读训练",
+                    "积累修饰词"
+                ],
+                evaluation: "观察学生朗读表现和理解程度"
+            },
+            {
+                title: "精读父亲",
+                time: "5分钟",
+                percentage: "12.5%",
+                objectives: [
+                    "理解人物形象",
+                    "体会人物情感",
+                    "学习描写方法"
+                ],
+                activities: [
+                    "角色朗读",
+                    "凝神静气词义理解",
+                    "比喻句赏析"
+                ],
+                evaluation: "评价学生对人物形象的理解"
+            },
+            {
+                title: "精读鸟群",
+                time: "4分钟",
+                percentage: "10%",
+                objectives: [
+                    "了解鸟类特点",
+                    "学习动作描写",
+                    "培养观察能力"
+                ],
+                activities: [
+                    "动作朗读表演",
+                    "分组合作阅读",
+                    "修饰词仿说练习"
+                ],
+                evaluation: "观察学生参与度和表达能力"
+            },
+            {
+                title: "语言综合运用",
+                time: "3分钟",
+                percentage: "7.5%",
+                objectives: [
+                    "整合所学内容",
+                    "提升表达能力",
+                    "培养创新思维"
+                ],
+                activities: [
+                    "运用所有修饰词",
+                    "口头描述综合场景",
+                    "学生互相评价"
+                ],
+                evaluation: "评价语言表达的完整性和生动性"
+            },
+            {
+                title: "摘抄方法+悬念",
+                time: "3分钟",
+                percentage: "7.5%",
+                objectives: [
+                    "掌握摘抄方法",
+                    "设置学习悬念",
+                    "培养阅读习惯"
+                ],
+                activities: [
+                    "交流平台四步法介绍",
+                    "摘抄本使用方法",
+                    "父亲身份悬念设置"
+                ],
+                evaluation: "检查学生摘抄方法掌握情况"
+            },
+            {
+                title: "作业布置",
+                time: "2分钟",
+                percentage: "5%",
+                objectives: [
+                    "巩固课堂所学",
+                    "延伸学习内容",
+                    "培养自主学习能力"
+                ],
+                activities: [
+                    "熟读课文要求",
+                    "自然笔记摘抄任务",
+                    "下节课预习指导"
+                ],
+                evaluation: "确保学生明确作业要求"
+            }
+        ];
+
+        let currentDetailIndex = -1;
+
+        // 显示详细信息
+        function showDetail(index) {
+            // 移除所有活跃状态
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 添加活跃状态
+            document.querySelectorAll('.timeline-item')[index].classList.add('active');
+            
+            // 更新进度条
+            const progress = ((index + 1) / teachingDetails.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // 显示详细信息
+            const detail = teachingDetails[index];
+            const panel = document.getElementById('detailPanel');
+            
+            panel.innerHTML = `
+                <h3 class="text-2xl font-bold mb-4" style="color: var(--primary-color);">
+                    ${detail.title}
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <h4 class="font-bold mb-2 text-lg" style="color: var(--secondary-color);">时间安排</h4>
+                        <p class="mb-2"><span class="font-medium">时长：</span>${detail.time}</p>
+                        <p><span class="font-medium">占比：</span>${detail.percentage}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-2 text-lg" style="color: var(--secondary-color);">教学目标</h4>
+                        <ul class="space-y-1">
+                            ${detail.objectives.map(obj => `<li class="text-sm">• ${obj}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <h4 class="font-bold mb-3 text-lg" style="color: var(--secondary-color);">教学活动</h4>
+                    <div class="space-y-2">
+                        ${detail.activities.map(activity => `
+                            <div class="flex items-start space-x-3">
+                                <div class="w-2 h-2 rounded-full mt-2 flex-shrink-0" style="background-color: var(--accent-color);"></div>
+                                <span class="text-sm">${activity}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2 text-lg" style="color: var(--secondary-color);">评价方式</h4>
+                    <p class="text-sm" style="color: var(--secondary-color);">${detail.evaluation}</p>
+                </div>
+            `;
+            
+            panel.classList.add('show');
+            currentDetailIndex = index;
+            
+            // 添加动画
+            anime({
+                targets: panel,
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        // 平滑滚动到指定区域
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        // 初始化图表
+        function initCharts() {
+            // 提问类型分布图表
+            const questionTypeChart = echarts.init(document.getElementById('questionTypeChart'));
+            
+            const questionTypeOption = {
+                color: ['#5A7C47', '#D4A574', '#2D5016', '#8FBC8F'],
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    textStyle: {
+                        color: '#2D5016'
+                    }
+                },
+                series: [
+                    {
+                        name: '提问类型',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '18',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            {value: 16, name: '理解应用'},
+                            {value: 7, name: '分析推理'},
+                            {value: 6, name: '认知记忆'},
+                            {value: 4, name: '评价创造'}
+                        ]
+                    }
+                ]
+            };
+            
+            questionTypeChart.setOption(questionTypeOption);
+
+            // 认知层次分析图表
+            const questionLevelChart = echarts.init(document.getElementById('questionLevelChart'));
+            
+            const questionLevelOption = {
+                color: ['#2D5016'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['认知记忆', '理解应用', '分析推理', '评价创造'],
+                    axisLabel: {
+                        color: '#2D5016'
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        color: '#2D5016'
+                    }
+                },
+                series: [
+                    {
+                        name: '提问次数',
+                        type: 'bar',
+                        data: [6, 16, 7, 4],
+                        itemStyle: {
+                            color: function(params) {
+                                const colors = ['#8FBC8F', '#5A7C47', '#2D5016', '#D4A574'];
+                                return colors[params.dataIndex];
+                            }
+                        },
+                        label: {
+                            show: true,
+                            position: 'top',
+                            formatter: '{c}次'
+                        }
+                    }
+                ]
+            };
+            
+            questionLevelChart.setOption(questionLevelOption);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化动画
+            anime({
+                targets: '.knowledge-card',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 800,
+                easing: 'easeOutExpo',
+                delay: anime.stagger(100, {start: 300})
+            });
+            
+            anime({
+                targets: '.timeline-item',
+                opacity: [0, 1],
+                translateX: [-50, 0],
+                duration: 600,
+                easing: 'easeOutExpo',
+                delay: anime.stagger(100, {start: 600})
+            });
+            
+            anime({
+                targets: '.stat-card',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 800,
+                easing: 'easeOutExpo',
+                delay: anime.stagger(100, {start: 900})
+            });
+            
+            // 默认显示第一个详情
+            setTimeout(() => {
+                showDetail(0);
+            }, 1000);
+            
+            // 初始化图表
+            initCharts();
+        });
+    </script>
+</body>
+</html>

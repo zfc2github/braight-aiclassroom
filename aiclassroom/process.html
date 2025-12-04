@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教学流程 - 父亲、树林和鸟</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FAFBFC;
+            --primary-color: #1A73E8;
+            --secondary-color: #5F6368;
+            --accent-color: #34A853;
+            --text-color: #202124;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Noto Sans SC', sans-serif;
+            color: var(--text-color);
+        }
+        
+        .timeline-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+            border: 1px solid #E8EAED;
+            border-radius: 8px;
+        }
+        
+        .timeline-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .timeline-item.active {
+            border-color: var(--primary-color);
+            background-color: rgba(26, 115, 232, 0.05);
+        }
+        
+        .progress-bar {
+            background: var(--primary-color);
+            height: 4px;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        
+        .time-indicator {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .detail-panel {
+            background: white;
+            border: 1px solid #E8EAED;
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .detail-panel.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .unit-journey {
+            background: white;
+            border: 1px solid #E8EAED;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .nav-link {
+            color: var(--secondary-color);
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white border-b border-gray-200 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold" style="color: var(--primary-color);">
+                        部编版三年级语文教学
+                    </h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="nav-link">课程概览</a>
+                        <a href="#" class="nav-link active">教学流程</a>
+                        <a href="analysis.html" class="nav-link">课堂分析</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="pt-24 pb-12 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6" style="color: var(--primary-color);">
+                教学流程设计
+            </h1>
+            <p class="text-xl max-w-2xl mx-auto" style="color: var(--secondary-color);">
+                45分钟精读课的精心设计，每个环节都经过周密安排，确保教学目标的有效达成。
+            </p>
+        </div>
+    </section>
+
+    <!-- Unit Journey -->
+    <section class="px-4 pb-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="unit-journey">
+                <h3 class="text-xl font-bold mb-6 text-center" style="color: var(--primary-color);">探秘大自然单元旅程</h3>
+                <div class="flex justify-center items-center space-x-8 text-sm">
+                    <div class="text-center">
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center mb-2" style="background-color: #E8F0FE;">
+                            <span class="font-bold" style="color: var(--primary-color);">1</span>
+                        </div>
+                        <p class="font-medium">第一站：声音</p>
+                    </div>
+                    <div style="color: var(--secondary-color);">→</div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center mb-2" style="background-color: #E8F0FE;">
+                            <span class="font-bold" style="color: var(--primary-color);">2</span>
+                        </div>
+                        <p class="font-medium">第二站：大书</p>
+                    </div>
+                    <div style="color: var(--secondary-color);">→</div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center mb-2" style="background-color: var(--accent-color);">
+                            <span class="text-white font-bold">3</span>
+                        </div>
+                        <p class="font-medium text-white">第三站：父亲、树林和鸟</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Bar -->
+    <section class="px-4 mb-12">
+        <div class="max-w-6xl mx-auto">
+            <div class="bg-gray-200 rounded-full h-2 mb-4">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-sm" style="color: var(--secondary-color);">
+                <span>0分钟</span>
+                <span>22分钟</span>
+                <span>45分钟</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section class="px-4 pb-20">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Timeline Column -->
+                <div>
+                    <h2 class="text-2xl font-bold mb-8" style="color: var(--primary-color);">
+                        教学时间轴
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <!-- 单元回顾+导入 -->
+                        <div class="timeline-item p-4" onclick="showDetail(0)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">1'</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg mb-1" style="color: var(--text-color);">单元回顾+导入</h3>
+                                    <p class="text-sm" style="color: var(--secondary-color);">第一站"声音"、第二站"大书"，引出第三站课题</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：2%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 初读课文，随文识字 -->
+                        <div class="timeline-item p-4" onclick="showDetail(1)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">6'</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg mb-1" style="color: var(--text-color);">初读课文，随文识字</h3>
+                                    <p class="text-sm" style="color: var(--secondary-color);">师生合作读，生字词正音，辨析"黎—梨"</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：13%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 分类积累词语 -->
+                        <div class="timeline-item p-4" onclick="showDetail(2)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">5'</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg mb-1" style="color: var(--text-color);">分类积累词语</h3>
+                                    <p class="text-sm" style="color: var(--secondary-color);">把9组词语按"树林/父亲/鸟"分类，初步把握内容</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：11%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 精读"树林"句群 -->
+                        <div class="timeline-item p-4" onclick="showDetail(3)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">8'</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg mb-1" style="color: var(--text-color);">精读"树林"句群</h3>
+                                    <p class="text-sm" style="color: var(--secondary-color);">画句子→想象画面→朗读→去词比较→学写"蒙"</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：18%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 精读"父亲"句群 -->
+                        <div class="timeline-item p-4" onclick="showDetail(4)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">10'</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg mb-1" style="color: var(--text-color);">精读"父亲"句群</h3>
+                                    <p class="text-sm" style="color: var(--secondary-color);">做"父亲"角色读，体会"懂鸟"形象，完成课后判断题</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：22%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 精读"鸟"句群 -->
+                        <div class="timeline-item p-4" onclick="showDetail(5)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">6'</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg mb-1" style="color: var(--text-color);">精读"鸟"句群</h3>
+                                    <p class="text-sm" style="color: var(--secondary-color);">动作朗读，发现修饰词连用，感受鸟的欢快</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：13%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 自然笔记积累 -->
+                        <div class="timeline-item p-4" onclick="showDetail(6)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">6'</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg mb-1" style="color: var(--text-color);">自然笔记积累</h3>
+                                    <p class="text-sm" style="color: var(--secondary-color);">学生摘抄好词好句，教师提醒坐姿、格式</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：13%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 悬念结课+作业 -->
+                        <div class="timeline-item p-4" onclick="showDetail(7)">
+                            <div class="flex items-center space-x-4">
+                                <div class="time-indicator text-sm">3'</div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg mb-1" style="color: var(--text-color);">悬念结课+作业</h3>
+                                    <p class="text-sm" style="color: var(--secondary-color);">"父亲到底是不是猎人？"留疑；布置熟读+摘抄</p>
+                                    <div class="text-xs mt-1" style="color: var(--secondary-color);">占比：7%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Panel Column -->
+                <div>
+                    <div id="detailPanel" class="detail-panel">
+                        <h3 class="text-2xl font-bold mb-4" style="color: var(--primary-color);">
+                            点击左侧时间轴查看详细信息
+                        </h3>
+                        <p style="color: var(--secondary-color);">
+                            每个教学环节都有详细的教学目标、活动设计和评价标准。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teaching Process Image -->
+    <section class="px-4 pb-20">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-8" style="color: var(--primary-color);">
+                教学流程可视化
+            </h2>
+            <img src="resources/teaching-process-new.png" alt="教学流程图" class="w-full rounded-2xl shadow-lg">
+            <p class="mt-6 text-lg" style="color: var(--secondary-color);">
+                教学流程环环相扣，从导入到总结，每个环节都有明确的目标和时间安排。
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-gray-200" style="background: rgba(26, 115, 232, 0.05);">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-sm" style="color: var(--secondary-color);">
+                © 2024 部编版三年级语文教学展示 - 《父亲、树林和鸟》教学案例
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 教学环节详细数据
+        const teachingDetails = [
+            {
+                title: "单元回顾+导入",
+                time: "1分钟",
+                percentage: "2%",
+                objectives: [
+                    "回顾单元整体脉络",
+                    "建立三站旅程认知",
+                    "激发第三站学习兴趣"
+                ],
+                activities: [
+                    "回顾第一站'声音'学习内容",
+                    "回顾第二站'大书'学习收获",
+                    "板书第三站课题《父亲、树林和鸟》",
+                    "引导学生进入学习情境"
+                ],
+                evaluation: "观察学生参与度和专注度"
+            },
+            {
+                title: "初读课文，随文识字",
+                time: "6分钟",
+                percentage: "13%",
+                objectives: [
+                    "正音纠错",
+                    "整体感知课文内容",
+                    "解决生字词读音"
+                ],
+                activities: [
+                    "师生合作朗读课文",
+                    "重点指导生字词读音",
+                    "辨析"黎—梨"形近字",
+                    "初步理解课文大意"
+                ],
+                evaluation: "检查学生读音准确性"
+            },
+            {
+                title: "分类积累词语",
+                time: "5分钟",
+                percentage: "11%",
+                objectives: [
+                    "培养分类思维",
+                    "积累修饰词语",
+                    "把握内容要点"
+                ],
+                activities: [
+                    "出示9组重点词语",
+                    "按"树林/父亲/鸟"分类整理",
+                    "初步感受词语特点",
+                    "为精读学习铺垫"
+                ],
+                evaluation: "检查分类准确性和理解程度"
+            },
+            {
+                title: "精读"树林"句群",
+                time: "8分钟",
+                percentage: "18%",
+                objectives: [
+                    "感受环境描写",
+                    "积累修饰词语",
+                    "体会语言特色"
+                ],
+                activities: [
+                    "画出描写树林的句子",
+                    "想象画面，感受氛围",
+                    "去词比较体会表达效果",
+                    "指导书写"蒙"字"
+                ],
+                evaluation: "观察学生朗读表现和理解程度"
+            },
+            {
+                title: "精读"父亲"句群",
+                time: "10分钟",
+                percentage: "22%",
+                objectives: [
+                    "理解人物形象",
+                    "体会人物情感",
+                    "学习描写方法"
+                ],
+                activities: [
+                    "角色朗读，体会父亲形象",
+                    "分析父亲懂鸟的具体表现",
+                    "完成课后判断题",
+                    "总结父亲形象特点"
+                ],
+                evaluation: "评价学生对人物形象的理解"
+            },
+            {
+                title: "精读"鸟"句群",
+                time: "6分钟",
+                percentage: "13%",
+                objectives: [
+                    "了解鸟类特点",
+                    "学习动作描写",
+                    "培养观察能力"
+                ],
+                activities: [
+                    "动作朗读表演",
+                    "发现修饰词连用特点",
+                    "感受鸟的欢快心情",
+                    "体会语言表达效果"
+                ],
+                evaluation: "观察学生参与度和表达能力"
+            },
+            {
+                title: "自然笔记积累",
+                time: "6分钟",
+                percentage: "13%",
+                objectives: [
+                    "培养积累习惯",
+                    "落实读写结合",
+                    "提高书写质量"
+                ],
+                activities: [
+                    "教师示范自然笔记格式",
+                    "学生摘抄好词好句",
+                    "提醒正确坐姿和格式",
+                    "展示优秀作品"
+                ],
+                evaluation: "检查摘抄质量和书写规范"
+            },
+            {
+                title: "悬念结课+作业",
+                time: "3分钟",
+                percentage: "7%",
+                objectives: [
+                    "设置学习悬念",
+                    "激发探究兴趣",
+                    "明确课后任务"
+                ],
+                activities: [
+                    "提出核心悬念问题",
+                    "引发学生思考和讨论",
+                    "布置熟读课文任务",
+                    "安排自然笔记摘抄"
+                ],
+                evaluation: "确保学生明确作业要求"
+            }
+        ];
+
+        let currentDetailIndex = -1;
+
+        // 显示详细信息
+        function showDetail(index) {
+            // 移除所有活跃状态
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 添加活跃状态
+            document.querySelectorAll('.timeline-item')[index].classList.add('active');
+            
+            // 更新进度条
+            const progress = ((index + 1) / teachingDetails.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // 显示详细信息
+            const detail = teachingDetails[index];
+            const panel = document.getElementById('detailPanel');
+            
+            panel.innerHTML = `
+                <h3 class="text-2xl font-bold mb-4" style="color: var(--primary-color);">
+                    ${detail.title}
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <h4 class="font-bold mb-2 text-lg" style="color: var(--secondary-color);">时间安排</h4>
+                        <p class="mb-2"><span class="font-medium">时长：</span>${detail.time}</p>
+                        <p><span class="font-medium">占比：</span>${detail.percentage}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-2 text-lg" style="color: var(--secondary-color);">教学目标</h4>
+                        <ul class="space-y-1">
+                            ${detail.objectives.map(obj => `<li class="text-sm">• ${obj}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <h4 class="font-bold mb-3 text-lg" style="color: var(--secondary-color);">教学活动</h4>
+                    <div class="space-y-2">
+                        ${detail.activities.map(activity => `
+                            <div class="flex items-start space-x-3">
+                                <div class="w-2 h-2 rounded-full mt-2 flex-shrink-0" style="background-color: var(--accent-color);"></div>
+                                <span class="text-sm">${activity}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2 text-lg" style="color: var(--secondary-color);">评价方式</h4>
+                    <p class="text-sm" style="color: var(--secondary-color);">${detail.evaluation}</p>
+                </div>
+            `;
+            
+            panel.classList.add('show');
+            currentDetailIndex = index;
+            
+            // 添加动画
+            anime({
+                targets: panel,
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 时间轴项目动画
+            anime({
+                targets: '.timeline-item',
+                opacity: [0, 1],
+                translateX: [-50, 0],
+                duration: 600,
+                easing: 'easeOutExpo',
+                delay: anime.stagger(100, {start: 300})
+            });
+            
+            // 默认显示第一个详情
+            setTimeout(() => {
+                showDetail(0);
+            }, 800);
+        });
+    </script>
+</body>
+</html>

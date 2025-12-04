@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>父亲、树林和鸟 - 教学展示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Coda&family=Hedvig+Letters+Sans&family=Jersey+15&family=Jersey+20+Charted&family=Liter&family=Luckiest+Guy&family=Oranienbaum&family=Press+Start+2P&family=Quattrocento+Sans&family=Sorts+Mill+Goudy&family=Unna&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F8F6F0;
+            --primary-color: #2D5016;
+            --secondary-color: #5A7C47;
+            --accent-color: #D4A574;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Oranienbaum', serif;
+            color: var(--primary-color);
+        }
+        
+        .hero-title {
+            font-family: 'Sorts Mill Goudy', serif;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(45, 80, 22, 0.15);
+        }
+        
+        .knowledge-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(45, 80, 22, 0.1);
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .suspense-button {
+            transition: all 0.3s ease;
+        }
+        
+        .suspense-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(212, 165, 116, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold" style="color: var(--primary-color); font-family: 'Sorts Mill Goudy', serif;">
+                        语文教学展示
+                    </h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#" class="text-gray-900 hover:text-green-700 px-3 py-2 text-sm font-medium transition-colors">课程概览</a>
+                        <a href="process.html" class="text-gray-600 hover:text-green-700 px-3 py-2 text-sm font-medium transition-colors">教学流程</a>
+                        <a href="analysis.html" class="text-gray-600 hover:text-green-700 px-3 py-2 text-sm font-medium transition-colors">课堂分析</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden" style="margin-top: 64px;">
+        <div class="absolute inset-0 z-0">
+            <img src="resources/hero-forest.png" alt="森林背景" class="w-full h-full object-cover opacity-30">
+        </div>
+        
+        <div class="relative z-10 text-center max-w-4xl mx-auto px-4">
+            <div class="floating-element">
+                <h1 class="hero-title text-6xl md:text-8xl font-bold mb-6">
+                    父亲、树林和鸟
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 opacity-80" style="color: var(--secondary-color);">
+                    三年级语文第七单元精读课教学展示
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="process.html" class="px-8 py-3 rounded-full text-white font-medium transition-all hover:scale-105" 
+                       style="background-color: var(--primary-color);">
+                        查看教学流程
+                    </a>
+                    <a href="analysis.html" class="px-8 py-3 rounded-full border-2 font-medium transition-all hover:scale-105" 
+                       style="border-color: var(--secondary-color); color: var(--secondary-color);">
+                        课堂分析
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Course Overview -->
+    <section class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 gradient-text" style="font-family: 'Sorts Mill Goudy', serif;">
+                    课程核心知识点
+                </h2>
+                <p class="text-lg opacity-80 max-w-2xl mx-auto" style="color: var(--secondary-color);">
+                    本课程围绕《父亲、树林和鸟》展开，通过多维度的教学设计，让学生在感受语言魅力的同时，培养观察力和思辨能力。
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Knowledge Point 1 -->
+                <div class="knowledge-card card-hover rounded-2xl p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">字词识写</h3>
+                    <p class="text-sm opacity-80 mb-4">会认8个生字，会写5个"多横平行等距"结构的字，掌握雨字头、艹字头写法。</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-800">黎滹沱幽</span>
+                        <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-800">蒙凝畅抖</span>
+                    </div>
+                </div>
+
+                <!-- Knowledge Point 2 -->
+                <div class="knowledge-card card-hover rounded-2xl p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">生动语言积累</h3>
+                    <p class="text-sm opacity-80 mb-4">修饰词连用和比喻句的学习，提升语言表达能力。</p>
+                    <div class="text-xs opacity-70">
+                        <p>• 幽深的、雾蒙蒙的、浓浓的</p>
+                        <p>• 像树一般兀立</p>
+                    </div>
+                </div>
+
+                <!-- Knowledge Point 3 -->
+                <div class="knowledge-card card-hover rounded-2xl p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">朗读策略</h3>
+                    <p class="text-sm opacity-80 mb-4">想象画面+动作朗读，把静态文字转化为视听嗅觉多重体验。</p>
+                    <div class="text-xs opacity-70">
+                        <p>• 画面想象</p>
+                        <p>• 动作配合</p>
+                        <p>• 多重感官体验</p>
+                    </div>
+                </div>
+
+                <!-- Knowledge Point 4 -->
+                <div class="knowledge-card card-hover rounded-2xl p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">4</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">内容理解</h3>
+                    <p class="text-sm opacity-80 mb-4">深入理解父亲、树林和鸟三个核心意象的特点和内涵。</p>
+                    <div class="text-xs opacity-70">
+                        <p>• 父亲：知鸟、爱鸟、观察细致</p>
+                        <p>• 树林：幽深、雾浓、草木气息</p>
+                    </div>
+                </div>
+
+                <!-- Knowledge Point 5 -->
+                <div class="knowledge-card card-hover rounded-2xl p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">5</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">阅读方法</h3>
+                    <p class="text-sm opacity-80 mb-4">用不同符号分类勾画，摘抄本"四要素"记录法。</p>
+                    <div class="text-xs opacity-70">
+                        <p>• 横线/波浪线/括号分类</p>
+                        <p>• 词句+归类+感受+出处</p>
+                    </div>
+                </div>
+
+                <!-- Knowledge Point 6 -->
+                <div class="knowledge-card card-hover rounded-2xl p-6">
+                    <div class="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span class="text-white font-bold text-xl">6</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3" style="color: var(--primary-color);">悬念设置</h3>
+                    <p class="text-sm opacity-80 mb-4">父亲到底是不是猎人？激发学生的思辨和探究兴趣。</p>
+                    <div class="text-xs opacity-70">
+                        <p>• 引发思考</p>
+                        <p>• 促进讨论</p>
+                        <p>• 培养批判思维</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teaching Features -->
+    <section class="py-20 px-4" style="background: rgba(45, 80, 22, 0.05);">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 gradient-text" style="font-family: 'Sorts Mill Goudy', serif;">
+                    教学特色与创新
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <img src="resources/classroom-scene.png" alt="教学场景" class="rounded-2xl shadow-lg w-full">
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1" style="background-color: var(--accent-color);">
+                            <span class="text-white text-sm font-bold">✓</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2" style="color: var(--primary-color);">单元整体设计连贯</h3>
+                            <p class="text-sm opacity-80">三站"探秘大自然"情境让学生有持续期待，教学设计环环相扣。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1" style="background-color: var(--accent-color);">
+                            <span class="text-white text-sm font-bold">✓</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2" style="color: var(--primary-color);">词语教学扎实</h3>
+                            <p class="text-sm opacity-80">随文正音、形近字辨析、结构归类、当堂练写，一步到位。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1" style="background-color: var(--accent-color);">
+                            <span class="text-white text-sm font-bold">✓</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2" style="color: var(--primary-color);">朗读梯度清晰</h3>
+                            <p class="text-sm opacity-80">听录音→想象画面→去词比较→动作表演，学生情绪投入高。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1" style="background-color: var(--accent-color);">
+                            <span class="text-white text-sm font-bold">✓</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2" style="color: var(--primary-color);">读写结合落地</h3>
+                            <p class="text-sm opacity-80">现场示范"摘抄四要素"，把单元语文要素落到笔头。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Suspense Section -->
+    <section class="py-20 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="mb-12">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 gradient-text" style="font-family: 'Sorts Mill Goudy', serif;">
+                    悬念设置
+                </h2>
+                <p class="text-xl opacity-80 mb-8" style="color: var(--secondary-color);">
+                    父亲到底是不是猎人？
+                </p>
+                <div class="bg-white/80 backdrop-blur-md rounded-2xl p-8 border border-gray-200">
+                    <p class="text-lg leading-relaxed mb-6" style="color: var(--primary-color);">
+                        这个悬念的设置激发了学生的思辨兴趣，为下节课的深度讨论埋下伏笔。通过这个问题，学生不仅学会了观察文本细节，更培养了批判性思维能力。
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <button onclick="showAnswer('yes')" class="suspense-button px-6 py-3 rounded-full border-2 font-medium" 
+                                style="border-color: var(--secondary-color); color: var(--secondary-color);">
+                            是猎人
+                        </button>
+                        <button onclick="showAnswer('no')" class="suspense-button px-6 py-3 rounded-full border-2 font-medium" 
+                                style="border-color: var(--secondary-color); color: var(--secondary-color);">
+                            不是猎人
+                        </button>
+                    </div>
+                    <div id="answer-result" class="mt-6 text-lg font-medium" style="display: none; color: var(--accent-color);">
+                        答案将在下节课揭晓，敬请期待！
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-gray-200" style="background: rgba(45, 80, 22, 0.05);">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-sm opacity-70" style="color: var(--secondary-color);">
+                © 2024 语文教学展示 - 《父亲、树林和鸟》教学案例
+            </p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
