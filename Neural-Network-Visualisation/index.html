@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNIST MLP – 推理的可视化</title>
+  <script type="module" crossorigin src="./assets/main.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/main.css">
+</head>
+<body>
+
+    <!-- 2D Grid Overlay -->
+    <div id="overlay2d" class="overlay-2d">
+      <div class="container">
+        <div id="gridContainer" class="grid-container"></div>
+      </div>
+    </div>
+
+    <!-- Reset Button -->
+    <div id="resetButtonContainer" class="reset-button-container">
+        <button id="resetBtn">✖</button>
+    </div>
+
+    <!-- Prediction Chart Overlay -->
+    <div id="predictionOverlay" class="prediction-overlay">
+        <div class="prediction-container">
+            <div id="predictionChart"></div>
+        </div>
+        <div id="networkInfoPanel" class="network-info-panel"></div>
+    </div>
+
+    <!-- Instructions Overlay -->
+    <div id="instructionsOverlay" class="instructions-overlay">
+        <div class="instructions-container">
+            <div class="instructions-content">
+                <p><strong>画:</strong> 点击并拖动网格（右键删除）</p>
+                <p><strong>3D-控制:</strong> • 左键+拖动=旋转 • 右键+拖动=移动 • 滚轮=缩放</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Instructions Overlay -->
+    <div id="mobileInstructionsOverlay" class="mobile-instructions-overlay">
+        <div class="mobile-instructions-content">
+            <div class="mobile-instructions-title">触控作</div>
+            <ul class="mobile-gesture-list">
+                <li><strong>画:</strong> 在网格上轻触并拖动</li>
+                <li><strong>转:</strong> 用一根手指拖拽</li>
+                <li><strong>推迟:</strong> 用两根手指移动</li>
+                <li><strong>缩放:</strong> 捏或张开手指</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Floating Controls -->
+    <div class="floating-controls">
+        <button
+            id="advancedSettingsButton"
+            class="floating-button advanced-settings-button"
+            aria-haspopup="dialog"
+            aria-controls="advancedSettingsModal"
+            type="button"
+        >
+            <span>⚙</span>
+        </button>
+        <button
+            id="infoButton"
+            class="floating-button info-button"
+            aria-haspopup="dialog"
+            aria-controls="infoModal"
+            type="button"
+        >
+            <span>i</span>
+        </button>
+    </div>
+
+    <!-- MNIST Sample Images - Bottom Edge -->
+    <div id="mnistImagesContainer" class="mnist-images-container"></div>
+
+    <!-- Neuron Detail Panel -->
+    <div id="neuronDetailPanel" class="neuron-detail-panel" aria-live="polite"></div>
+
+    <!-- Training Timeline Slider -->
+    <div id="timelineOverlay" class="timeline-overlay hidden">
+        <div class="timeline-container">
+            <div class="timeline-header">
+                <span class="timeline-title">训练程序</span>
+                <span id="timelineSummary" class="timeline-summary"></span>
+            </div>
+            <input
+                id="timelineSlider"
+                class="timeline-slider"
+                type="range"
+                min="0"
+                value="0"
+                step="1"
+                disabled
+                aria-label="Trainingsfortschritt"
+            >
+            <div class="timeline-meta">
+                <span id="timelineLabel" class="timeline-label"></span>
+                <span id="timelineMetrics" class="timeline-metrics timeline-metrics--empty"></span>
+            </div>
+        </div>
+    </div>
+
+    <a
+      href="https://github.com/DFin/Neural-Network-Visualisation"
+      class="github-link"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      https://github.com/DFin/Neural-Network-Visualisation
+    </a>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="info-modal">
+        <div class="info-modal-content">
+            <div class="info-modal-header">
+                <h3>MNIST-数字分类——推理可视化</h3>
+                <button id="closeInfoModal" class="close-modal-btn">×</button>
+            </div>
+            <div class="info-modal-body">
+                <p><strong>神经网络的交互式可视化</strong></p>
+                <p>本应用展示了一个紧凑的多层感知器（MLP），该模型在MNIST数据集上训练。通过在2D栅格上绘制数字，您可以实时观察其在3D空间中的传播方式。</p>
+                
+                <h4>操作说明:</h4>
+                <ul>
+                    <li><strong>画:</strong> 在2D网格（左上角）点击并拖动，绘制数字</li>
+                    <li><strong>观察:</strong> 跟随您的绘制，查看其在3D空间中的传播</li>
+                    <li><strong>预测:</strong> 查看每个数字（0-9）的概率（顶部右侧）</li>
+                </ul>
+
+                <h4>网络架构（标准导出）:</h4>
+                <ul>
+                    <li><strong>输入层:</strong> 28×28 像素网格（你的绘画）</li>
+                    <li><strong>全连接层 1:</strong> 784 → 64 神经元，ReLU 激活</li>
+                    <li><strong>全连接层 2:</strong> 64 → 32 神经元，ReLU 激活</li>
+                    <li><strong>输出层:</strong> 32 → 10 个 Logits → Softmax 概率</li>
+                </ul>
+
+                <h4>3D-控制:</h4>
+                <ul>
+                    <li><strong>旋转:</strong> 按住左键并拖动</li>
+                    <li><strong>移动:</strong> 按住右键并拖动</li>
+                    <li><strong>缩放:</strong> 用鼠标滚轮或双指缩放</li>
+                </ul>
+
+                <h4>颜色编码:</h4>
+                <ul>
+                    <li><strong>神经元:</strong> 颜色显示激活强度（深色蓝色表示低/负激活，强烈的珊瑚颜色表示高/正激活）</li>
+                    <li><strong>连接:</strong> 暖颜色表示强正贡献，冷颜色表示负贡献，褪色的线表示几乎无影响。</li>
+                </ul>
+
+                <h4>训练您自己的模型:</h4>
+                <ul>
+                    <li><code>python training/mlp_train.py</code> 训练MLP（包括Apple Metal加速，如有）.</li>
+                    <li>剧本写道 <code>exports/mlp_weights.json</code>, 可视化工具在加载时读取.</li>
+                    <li>您可以通过修改 <code>training/mlp_train.py</code> 中的 CLI-选项来改变隐藏神经元数量、训练轮数或导出路径。</li>
+                </ul>
+
+                <h4>实时功能:</h4>
+                <ul>
+                    <li><strong>层激活:</strong> 每个神经元实例显示激活强度（深色蓝色表示低/负激活，强烈的珊瑚颜色表示高/正激活）。</li>
+                    <li><strong>重要连接:</strong> 每个目标神经元实例显示其最强的输入权重（暖颜色表示强正贡献，冷颜色表示负贡献）。</li>
+                    <li><strong>实时概率:</strong> 顶部的柱状图实时更新 Logits → Softmax 值。</li>
+                </ul>
+
+                <p>该网络被设计为紧凑，以确保流畅的实时显示。您可以根据需要重新训练它，保持架构简洁，以确保3D视图的响应速度。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Settings Modal -->
+    <div id="advancedSettingsModal" class="advanced-modal" role="dialog" aria-modal="true" aria-labelledby="advancedSettingsTitle">
+        <div class="advanced-modal-content">
+            <div class="advanced-modal-header">
+                <h3 id="advancedSettingsTitle">高级设置</h3>
+                <button id="closeAdvancedSettings" class="close-modal-btn" type="button">×</button>
+            </div>
+            <div class="advanced-modal-body">
+                <div class="advanced-control">
+                    <label for="connectionLimitSlider" class="advanced-label">
+                        每个神经元最多显示的连接数
+                    </label>
+                    <div class="advanced-slider">
+                        <input
+                            id="connectionLimitSlider"
+                            type="range"
+                            min="1"
+                            max="64"
+                            step="1"
+                            value="24"
+                        >
+                        <span id="connectionLimitValue" class="advanced-value">24</span>
+                    </div>
+                    <p class="advanced-hint">
+                        控制每个目标神经元实例最多显示的输入连接数；较高的值可能会导致性能下降。
+                    </p>
+                </div>
+                <div class="advanced-control">
+                    <label for="connectionThresholdSlider" class="advanced-label">
+                        隐藏弱连接
+                    </label>
+                    <div class="advanced-slider">
+                        <input
+                            id="connectionThresholdSlider"
+                            type="range"
+                            min="0"
+                            max="0.5"
+                            step="0.0005"
+                            value="0"
+                        >
+                        <span id="connectionThresholdValue" class="advanced-value">0.0000</span>
+                    </div>
+                    <p class="advanced-hint">
+                        隐藏权重绝对值低于此阈值的连接；0显示所有连接。
+                    </p>
+                </div>
+                <div class="advanced-control">
+                    <label for="connectionThicknessSlider" class="advanced-label">
+                        连接厚度
+                    </label>
+                    <div class="advanced-slider">
+                        <input
+                            id="connectionThicknessSlider"
+                            type="range"
+                            min="0.001"
+                            max="0.03"
+                            step="0.001"
+                        >
+                        <span id="connectionThicknessValue" class="advanced-value"></span>
+                    </div>
+                    <p class="advanced-hint">
+                        调整连接圆柱体的半径；较高的值会使所有连接线更明显。
+                    </p>
+                </div>
+                <div class="advanced-control">
+                    <label for="brushThicknessSlider" class="advanced-label">
+                        画笔粗细
+                    </label>
+                    <div class="advanced-slider">
+                        <input
+                            id="brushThicknessSlider"
+                            type="range"
+                            min="0.4"
+                            max="4"
+                            step="0.1"
+                            value="1.4"
+                        >
+                        <span id="brushThicknessValue" class="advanced-value">1.4</span>
+                    </div>
+                    <p class="advanced-hint">
+                        调整绘制连接的画笔粗细；较小的值会创建更细的线，较大的值会更快地填充网格。
+                    </p>
+                </div>
+                <div class="advanced-control">
+                    <label for="brushStrengthSlider" class="advanced-label">
+                        画笔强度
+                    </label>
+                    <div class="advanced-slider">
+                        <input
+                            id="brushStrengthSlider"
+                            type="range"
+                            min="0.3"
+                            max="1"
+                            step="0.05"
+                            value="0.95"
+                        >
+                        <span id="brushStrengthValue" class="advanced-value">95%</span>
+                    </div>
+                    <p class="advanced-hint">
+                        调整绘制连接时画笔的强度；较高的值会使连接更明显。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+
+
+
+    <!-- 100% privacy-first analytics -->
+    <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+  
+</body>
+</html>
