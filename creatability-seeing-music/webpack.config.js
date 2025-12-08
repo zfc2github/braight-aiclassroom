@@ -21,7 +21,7 @@ module.exports = env => {
 				fetch : 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
 			}),
 			new HtmlWebpackPlugin({
-				title : 'Seeing Music',
+				title : '观看音乐',
 				filename: 'index.html',
 				chunks : ['seeing-music'],
 				template : './src/template.html',
@@ -38,12 +38,12 @@ module.exports = env => {
 		},
 		module : {
 			rules : [
-				{ 
-					test : /\.js$/, 
-					exclude : /node_modules/, 
-					loader : 'babel-loader' 
+				{
+					test : /\.js$/,
+					exclude : /node_modules/,
+					loader : 'babel-loader'
 				},
-				{ 
+				{
 					test : /\.scss$/,
 					use : [{
 						loader : 'style-loader'
@@ -63,10 +63,10 @@ module.exports = env => {
 						}
 					}]
 				},
-				{ 
-					test : /\.(svg|png)$/, 
-					exclude : /node_modules/, 
-					loader : 'url-loader' 
+				{
+					test : /\.(svg|png)$/,
+					exclude : /node_modules/,
+					loader : 'url-loader'
 				},
 			]
 		},
