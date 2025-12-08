@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semi-Conductor</title>
+    <meta name="description" content="">
+    <meta name="author" content="Google Creative Lab">
+    <meta itemprop="name" content="Semi-Conductor">
+    <meta itemprop="description" content="An AI experiment to conduct an orchestra inside your web browser.">
+    <meta itemprop="image" content="https://semiconductor.withgoogle.com/static/share_image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@google">
+    <meta name="twitter:title" content="Semi-Conductor">
+    <meta name="twitter:description" content="An AI experiment to conduct an orchestra inside your web browser.">
+    <meta name="twitter:creator" content="@google">
+    <meta name="twitter:image:src" content="https://semiconductor.withgoogle.com/static/share_image.jpg">
+    <meta property="og:title" content="Semi-Conductor">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://semiconductor.withgoogle.com">
+    <meta property="og:image" content="http://semiconductor.withgoogle.com/static/share_image.jpg">
+    <meta property="og:image:secure_url" content="https://semiconductor.withgoogle.com/static/share_image.jpg">
+    <meta property="og:description" content="An AI experiment to conduct an orchestra inside your web browser.">
+    <link rel="icon" type="image/png" href="/static/favicon-32x32.3e89edb4.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/static/favicon-16x16.1eab2253.png" sizes="16x16">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400" rel="stylesheet">
+    <link rel="stylesheet" href="/static/main.9f53002f.css">
+    <script src="/static/main.f6b5259c.js" defer></script>
+</head>
+<body>
+<div class="page-error">
+    <div class="error-container"><img src="/static/error.b8a45222.svg" alt="A broken treble clef sign">
+        <h2 class="error-title">我们已经达到高音了.</h2>
+        <p class="error-text">出了点问题，我不知道是什么。也许你可以......唱?</p>
+    </div>
+</div>
+<div class="dot-bg">
+    <div class="start-bg-fade"></div>
+    <div class="start-bg"></div>
+</div>
+<section class="page-info">
+    <div class="info-content-outer">
+        <div class="info-content"><h1>工作原理</h1>
+            <p>Semi-Conductor 是一个实验，让你可以通过浏览器指挥自己的管弦乐团。您可以
+                移动你的手臂来改变一首曲子的速度、音量和编制.</p>
+            <p>它使用Tensorflow.js——一个在浏览器中运行的机器学习库——来绘制你的移动路线图
+                通过你的摄像头。算法会随着你指挥的同时播放乐谱，使用数百个微小音频
+                现场录音乐器的文件.</p>
+            <p>了解更多关于PoseNet的信息 <a
+                    href="https://medium.com/tensorflow/real-time-human-pose-estimation-in-the-browser-with-tensorflow-js-7dd0bc881cd5"
+                    target="_blank"> 在TensorFlow博客上</a>.</p>
+            <p></p>
+            <p>由 Rupert Parry、Melissa Lu、Haylie Craig 和 Samantha Cordingley 制作，来自 Google Creative Lab，
+                悉尼.</p>
+            <p>
+                <button class="button-info-close">返回</button>
+            </p>
+        </div>
+    </div>
+</section>
+<section class="page-finish">
+    <div class="roses-container"></div>
+    <div class="finish-content-outer">
+        <div class="finish-content"><p class="finish-text">Bravo!</p>
+            <button class="button-large button-restart"> 再来一次</button>
+        </div>
+    </div>
+</section>
+<section class="page-start">
+    <div class="start-content"><h1 class="start-logo"><img src="/static/logo.7bc55bd9.gif" alt="Semi-Conductor"
+                                                           class="start-logo-image"></h1>
+        <h2 class="start-subtitle">通过浏览器指挥AI管弦乐团</h2>
+        <div class="start-button-container">
+            <button class="button-large progress start-button" disabled> 加载中...</button>
+        </div>
+    </div>
+    <footer class="start-footer"><img src="/static/footer-intro.4dea6282.svg" class="start-footer-image"
+                                      alt="This is an A.I. Experiment. Made with some friends from Google."></footer>
+</section>
+<section class="page-tutorial">
+    <section class="tutorial-part tutorial-part-1">
+        <div class="card tutorial-part-content">
+            <div class="tutorial-text"> 通过动动手臂让乐团演奏. <br>你动得越快，演奏速度越快.
+            </div>
+            <div class="tutorial-image"><img src="/static/tutorial-conducting.a946c02e.gif"></div>
+            <div class="tutorial-controls">
+                <button class="button-large tutorial-next">下一个</button>
+            </div>
+        </div>
+    </section>
+    <section class="tutorial-part tutorial-part-2">
+        <div class="card tutorial-part-content">
+            <div class="tutorial-text"> 上下移动以让演奏更大更小</div>
+            <div class="tutorial-image"><img src="/static/tutorial-volume.c519bb6f.gif"></div>
+            <div class="tutorial-controls">
+                <button class="button-large tutorial-next">下一个</button>
+            </div>
+        </div>
+    </section>
+    <section class="tutorial-part tutorial-part-3">
+        <div class="card tutorial-part-content">
+            <div class="tutorial-text"> 左右移动以控制播放的部分</div>
+            <div class="tutorial-image"><img src="/static/tutorial-sections.76f06e44.gif"></div>
+            <div class="tutorial-controls">
+                <button class="button-large tutorial-end">我们开始吧</button>
+            </div>
+        </div>
+    </section>
+</section>
+<section class="page-main">
+    <nav class="main-topbar">
+        <div class="main-topbar-buttons">
+            <button class="button-restart"><img src="/static/icon-restart.a2be1aa6.svg" alt="Restart"></button>
+            <button class="button-info"><img src="/static/icon-info.5acf9b0f.svg" alt="Info"></button>
+        </div>
+        <div class="timebar">
+            <div class="progress song-progress song-title"></div>
+        </div>
+        <h1><img class="main-topbar-logo" src="/static/logo.7bc55bd9.gif"></h1></nav>
+    <div class="orchestra-container">
+        <div class="tempo-meter-container">
+            <div class="tempo-meter-container-inner">
+                <div class="tempo-icon-container">
+                    <div class="tempo-icon"><img src="/static/metronome.8f57dd04.svg">
+                        <div class="tempo-icon-label">速度</div>
+                    </div>
+                </div>
+                <div class="tempo-meter-clipping-box">
+                    <div class="tempo-meter"></div>
+                    <div class="tempo-meter-background"></div>
+                </div>
+            </div>
+        </div>
+        <div class="orchestra"></div>
+    </div>
+    <div class="video-outer">
+        <div class="video-container">
+            <div class="top video-label">大声</div>
+            <div class="left video-label">高弦</div>
+            <div class="bottom video-label">柔软</div>
+            <div class="right video-label">低弦</div>
+            <div class="video-border">
+                <div class="calibration-overlay"><img src="/static/calibration-overlay.1c71eb94.png"></div>
+                <div class="conducting-overlay"></div>
+                <div class="countdown-overlay"><p class="countdown-text"></p></div>
+            </div>
+        </div>
+        <div class="instructions"><p>把你的身体装进框架里，大师。这是一个个人实验.</p></div>
+    </div>
+</section>
+<script>!function (e, a, t, n, g, r, c) {
+    e.GoogleAnalyticsObject = g, e.ga = e.ga || function () {
+        (e.ga.q = e.ga.q || []).push(arguments)
+    }, e.ga.l = 1 * new Date, r = a.createElement(t), c = a.getElementsByTagName(t)[0], r.async = 1, r.src = "https://www.google-analytics.com/analytics.js", c.parentNode.insertBefore(r, c)
+}(window, document, "script", 0, "ga"), ga("create", "UA-129142084-1", "auto"), ga("set", "referrer", document.referrer.split("?")[0]), ga("send", "pageview");</script>
+</body>
+</html>
