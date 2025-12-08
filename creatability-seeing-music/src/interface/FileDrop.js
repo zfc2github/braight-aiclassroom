@@ -33,7 +33,7 @@ export class FileDrop extends EventEmitter {
 		dragDrop('body', (files) => {
 			const file = files[0]
 			this._getFile(file)
-			
+
 		})
 
 		/**
@@ -82,7 +82,7 @@ export class FileDrop extends EventEmitter {
 	set currentFile(f){
 		const uploadedFile = this.status
 		if (f === ''){
-			uploadedFile.textContent = 'no file chosen'
+			uploadedFile.textContent = '未选择文件'
 			uploadedFile.classList.add('nofile')
 			uploadedFile.setAttribute('aria-label', 'no chosen file')
 			uploadedFile.setAttribute('tabindex', '-1')
