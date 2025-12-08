@@ -81,7 +81,7 @@ export class Model extends EventEmitter {
 				return
 			}
 
-			this.loader.setAttribute('label', 'Initializing Transcription Model')
+			this.loader.setAttribute('label', '初始化转录模型')
 			this.loading = true
 			// dynamic imports
 			require.ensure(['@magenta/music'], async () => {
@@ -94,9 +94,9 @@ export class Model extends EventEmitter {
 					this._enabled = true
 					//add a notification
 					if (WebMidi.supported){
-						document.querySelector('acc-snackbar').setAttribute('message', 'Choose an audio file to transcribe, or play live with a MIDI keyboard.')
+						document.querySelector('acc-snackbar').setAttribute('message', '选择音频文件进行转录，或用MIDI键盘现场演奏。')
 					} else {
-						document.querySelector('acc-snackbar').setAttribute('message', 'Choose an audio file to transcribe.')
+						document.querySelector('acc-snackbar').setAttribute('message', '选择一个音频文件进行转录。')
 					}
 				} catch (e){
 					this.loading = false
