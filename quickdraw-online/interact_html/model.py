@@ -39,3 +39,17 @@ class Model:
         for rk, (label, pred) in enumerate(zip(top5_labels, pred[top5_idxs])):
             top5_table.append((rk+1, label+' '+eng_to_chn[label], str(np.round(pred*100,2))+"%"))
         return top5_table
+    def predict_table_v2(self, x):
+        x = np.expand_dims(x, axis=-1)
+        x = image_reshape_pyramid(x)
+        x = np.expand_dims(x, axis=0)
+        # plt.imshow(x[0])
+        # plt.savefig("fig.png")
+        # plt.close()
+        pred = self.model.predict(x, verbose=0)[0]
+        top5_idxs = np.argsort(pred)[::-1][:5]
+        top5_labels = target_labels[top5_idxs]
+        top5_table = []
+        for rk, (label, pred) in enumerate(zip(top5_labels, pred[top5_idxs])):
+            top5_table.append((rk+1, label, eng_to_chn[label], str(pred)))
+        return top5_table

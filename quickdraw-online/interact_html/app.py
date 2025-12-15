@@ -11,7 +11,9 @@ model = Model('deeper_cnn')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret_key'
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins=[
+    "https://education.braightidea.com"
+])
 
 @app.route('/', methods=["POST", "GET"])
 def index():
@@ -46,6 +48,16 @@ def handle_upload_image(data):
     # table_data = user.test_table()
     table_data = model.predict_table(user.img)
     # print(table_data)
+    emit('update_data',
+        # 'image_url' 已经不用了，原本测试是将画版而文件重新显示出来
+        {'image_url': url_for("static", filename=user.get_relative_path()),
+         'table_data': table_data})
+
+@socketio.on('upload_image_v2')
+def handle_upload_image_v2(data):
+    user = manager.add()
+    user.update_img(data['image_data'])
+    table_data = model.predict_table_v2(user.img)
     emit('update_data',
         # 'image_url' 已经不用了，原本测试是将画版而文件重新显示出来
         {'image_url': url_for("static", filename=user.get_relative_path()),
