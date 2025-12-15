@@ -45,7 +45,7 @@ app.post('/text-to-image', async (req, res) => {
             success: true,
             data: imageData
         });
-    } catch (error) {
+    } catch (e) {
         const status = e.response?.status || 500;
         res.status(status).json(e.response?.data || { error: e.message });
     }
