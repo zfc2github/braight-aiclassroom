@@ -1512,10 +1512,10 @@ class NetworkInfoPanel {
 
   describeLayerName(rawName, index) {
     if (typeof rawName === "string" && rawName.trim().length > 0) {
-      const normalized = rawName.replace(/[_-]+/g, " ").trim();
-      return normalized.length ? normalized : `Layer ${index + 1}`;
+      const normalized = rawName.replace(/[_-]+/g, " ").replace('dense', '全连接层').trim();
+      return normalized.length ? normalized : `卷积层 ${index + 1}`;
     }
-    return `Layer ${index + 1}`;
+    return `卷积层 ${index + 1}`;
   }
 
   update(model) {
