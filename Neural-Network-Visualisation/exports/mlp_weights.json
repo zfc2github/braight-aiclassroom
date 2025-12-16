@@ -71,7 +71,7 @@
       "images_seen": 0,
       "batches_seen": 0,
       "dataset_passes": 0.0,
-      "description": "0 images processed (random initialisation)",
+      "description": "0 图片处理 (随机初始化)",
       "metrics": {
         "test_accuracy": 0.1375
       },
@@ -84,13 +84,13 @@
     {
       "id": "approx_50",
       "order": 1,
-      "label": "\u224850 images",
+      "label": "\u224850 图片",
       "kind": "approx",
       "target_images": 50,
       "images_seen": 128,
       "batches_seen": 1,
       "dataset_passes": 0.0021333333333333334,
-      "description": "128 images processed \u2022 1 batches \u2022 0.00\u00d7 dataset",
+      "description": "128 图片处理 \u2022 1 批次 \u2022 0.00\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.252,
         "avg_training_loss": 2.318258285522461
@@ -104,13 +104,13 @@
     {
       "id": "approx_120",
       "order": 2,
-      "label": "\u2248120 images",
+      "label": "\u2248120 图片",
       "kind": "approx",
       "target_images": 120,
       "images_seen": 128,
       "batches_seen": 1,
       "dataset_passes": 0.0021333333333333334,
-      "description": "128 images processed \u2022 1 batches \u2022 0.00\u00d7 dataset",
+      "description": "128 图片处理 \u2022 1 批次 \u2022 0.00\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.252,
         "avg_training_loss": 2.318258285522461
@@ -124,13 +124,13 @@
     {
       "id": "approx_250",
       "order": 3,
-      "label": "\u2248250 images",
+      "label": "\u2248250 图片",
       "kind": "approx",
       "target_images": 250,
       "images_seen": 256,
       "batches_seen": 2,
       "dataset_passes": 0.004266666666666667,
-      "description": "256 images processed \u2022 2 batches \u2022 0.00\u00d7 dataset",
+      "description": "256 图片处理 \u2022 2 批次 \u2022 0.00\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.3617,
         "avg_training_loss": 2.273592472076416
@@ -144,13 +144,13 @@
     {
       "id": "approx_500",
       "order": 4,
-      "label": "\u2248500 images",
+      "label": "\u2248500 图片",
       "kind": "approx",
       "target_images": 500,
       "images_seen": 512,
       "batches_seen": 4,
       "dataset_passes": 0.008533333333333334,
-      "description": "512 images processed \u2022 4 batches \u2022 0.01\u00d7 dataset",
+      "description": "512 图片处理 \u2022 4 批次 \u2022 0.01\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.4532,
         "avg_training_loss": 2.2220916748046875
@@ -164,13 +164,13 @@
     {
       "id": "approx_1k",
       "order": 5,
-      "label": "\u22481k images",
+      "label": "\u22481k 图片",
       "kind": "approx",
       "target_images": 1000,
       "images_seen": 1024,
       "batches_seen": 8,
       "dataset_passes": 0.017066666666666667,
-      "description": "1,024 images processed \u2022 8 batches \u2022 0.02\u00d7 dataset",
+      "description": "1,024 图片处理 \u2022 8 批次 \u2022 0.02\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.5534,
         "avg_training_loss": 2.0986886620521545
@@ -184,13 +184,13 @@
     {
       "id": "approx_2k",
       "order": 6,
-      "label": "\u22482k images",
+      "label": "\u22482k 图片",
       "kind": "approx",
       "target_images": 2000,
       "images_seen": 2048,
       "batches_seen": 16,
       "dataset_passes": 0.034133333333333335,
-      "description": "2,048 images processed \u2022 16 batches \u2022 0.03\u00d7 dataset",
+      "description": "2,048 图片处理 \u2022 16 批次 \u2022 0.03\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.7241,
         "avg_training_loss": 1.7861761301755905
@@ -204,13 +204,13 @@
     {
       "id": "approx_3_5k",
       "order": 7,
-      "label": "\u22483.5k images",
+      "label": "\u22483.5k 图片",
       "kind": "approx",
       "target_images": 3500,
       "images_seen": 3584,
       "batches_seen": 28,
       "dataset_passes": 0.05973333333333333,
-      "description": "3,584 images processed \u2022 28 batches \u2022 0.06\u00d7 dataset",
+      "description": "3,584 图片处理 \u2022 28 批次 \u2022 0.06\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.8315,
         "avg_training_loss": 1.3815991559198924
@@ -224,13 +224,13 @@
     {
       "id": "approx_5_8k",
       "order": 8,
-      "label": "\u22485.8k images",
+      "label": "\u22485.8k 图片",
       "kind": "approx",
       "target_images": 5800,
       "images_seen": 5888,
       "batches_seen": 46,
       "dataset_passes": 0.09813333333333334,
-      "description": "5,888 images processed \u2022 46 batches \u2022 0.10\u00d7 dataset",
+      "description": "5,888 图片处理 \u2022 46 批次 \u2022 0.10\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.8793,
         "avg_training_loss": 1.042623273704363
@@ -244,13 +244,13 @@
     {
       "id": "approx_8_7k",
       "order": 9,
-      "label": "\u22488.7k images",
+      "label": "\u22488.7k 图片",
       "kind": "approx",
       "target_images": 8700,
       "images_seen": 8704,
       "batches_seen": 68,
       "dataset_passes": 0.14506666666666668,
-      "description": "8,704 images processed \u2022 68 batches \u2022 0.15\u00d7 dataset",
+      "description": "8,704 图片处理 \u2022 68 批次 \u2022 0.15\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.8797,
         "avg_training_loss": 0.8291185336077914
@@ -264,13 +264,13 @@
     {
       "id": "approx_13k",
       "order": 10,
-      "label": "\u224813k images",
+      "label": "\u224813k 图片",
       "kind": "approx",
       "target_images": 13000,
       "images_seen": 13056,
       "batches_seen": 102,
       "dataset_passes": 0.2176,
-      "description": "13,056 images processed \u2022 102 batches \u2022 0.22\u00d7 dataset",
+      "description": "13,056 图片处理 \u2022 102 批次 \u2022 0.22\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.9132,
         "avg_training_loss": 0.6702231720966452
@@ -284,13 +284,13 @@
     {
       "id": "approx_19_5k",
       "order": 11,
-      "label": "\u224819.5k images",
+      "label": "\u224819.5k 图片",
       "kind": "approx",
       "target_images": 19500,
       "images_seen": 19584,
       "batches_seen": 153,
       "dataset_passes": 0.3264,
-      "description": "19,584 images processed \u2022 153 batches \u2022 0.33\u00d7 dataset",
+      "description": "19,584 图片处理 \u2022 153 批次 \u2022 0.33\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.9165,
         "avg_training_loss": 0.5470870994274912
@@ -304,13 +304,13 @@
     {
       "id": "approx_28_5k",
       "order": 12,
-      "label": "\u224828.5k images",
+      "label": "\u224828.5k 图片",
       "kind": "approx",
       "target_images": 28500,
       "images_seen": 28544,
       "batches_seen": 223,
       "dataset_passes": 0.47573333333333334,
-      "description": "28,544 images processed \u2022 223 batches \u2022 0.48\u00d7 dataset",
+      "description": "28,544 图片处理 \u2022 223 批次 \u2022 0.48\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.9321,
         "avg_training_loss": 0.4570673514374703
@@ -324,13 +324,13 @@
     {
       "id": "approx_40k",
       "order": 13,
-      "label": "\u224840k images",
+      "label": "\u224840k 图片",
       "kind": "approx",
       "target_images": 40000,
       "images_seen": 40064,
       "batches_seen": 313,
       "dataset_passes": 0.6677333333333333,
-      "description": "40,064 images processed \u2022 313 batches \u2022 0.67\u00d7 dataset",
+      "description": "40,064 图片处理 \u2022 313 批次 \u2022 0.67\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.9432,
         "avg_training_loss": 0.3905749294323662
@@ -344,13 +344,13 @@
     {
       "id": "dataset_1x",
       "order": 14,
-      "label": "1\u00d7 dataset",
+      "label": "1\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 60000,
       "images_seen": 60000,
       "batches_seen": 469,
       "dataset_passes": 1.0,
-      "description": "60,000 images \u2022 1\u00d7 dataset \u2022 469 batches",
+      "description": "60,000 图片 \u2022 1\u00d7 数据集 \u2022 469 批次",
       "metrics": {
         "test_accuracy": 0.9539,
         "avg_training_loss": 0.3209175285657247
@@ -365,13 +365,13 @@
     {
       "id": "approx_80k",
       "order": 15,
-      "label": "\u224880k images",
+      "label": "\u224880k 图片",
       "kind": "approx",
       "target_images": 80000,
       "images_seen": 80096,
       "batches_seen": 626,
       "dataset_passes": 1.3349333333333333,
-      "description": "80,096 images processed \u2022 626 batches \u2022 1.33\u00d7 dataset",
+      "description": "80,096 图片处理 \u2022 626 批次 \u2022 1.33\u00d7 数据集",
       "metrics": {
         "test_accuracy": 0.9597,
         "avg_training_loss": 0.27560593552747537
@@ -385,13 +385,13 @@
     {
       "id": "dataset_1_5x",
       "order": 16,
-      "label": "1.5\u00d7 dataset",
+      "label": "1.5\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 90000,
       "images_seen": 90080,
       "batches_seen": 704,
       "dataset_passes": 1.5013333333333334,
-      "description": "90,080 images \u2022 1.5\u00d7 dataset \u2022 704 batches",
+      "description": "90,080 图片 \u2022 1.5\u00d7 数据集 \u2022 704 批次",
       "metrics": {
         "test_accuracy": 0.9631,
         "avg_training_loss": 0.25851080862285825
@@ -406,13 +406,13 @@
     {
       "id": "dataset_2x",
       "order": 17,
-      "label": "2\u00d7 dataset",
+      "label": "2\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 120000,
       "images_seen": 120000,
       "batches_seen": 938,
       "dataset_passes": 2.0,
-      "description": "120,000 images \u2022 2\u00d7 dataset \u2022 938 batches",
+      "description": "120,000 图片 \u2022 2\u00d7 数据集 \u2022 938 批次",
       "metrics": {
         "test_accuracy": 0.9646,
         "avg_training_loss": 0.22427394441167514
@@ -427,13 +427,13 @@
     {
       "id": "dataset_2_5x",
       "order": 18,
-      "label": "2.5\u00d7 dataset",
+      "label": "2.5\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 150000,
       "images_seen": 150080,
       "batches_seen": 1173,
       "dataset_passes": 2.501333333333333,
-      "description": "150,080 images \u2022 2.5\u00d7 dataset \u2022 1,173 batches",
+      "description": "150,080 图片 \u2022 2.5\u00d7 数据集 \u2022 1,173 批次",
       "metrics": {
         "test_accuracy": 0.9684,
         "avg_training_loss": 0.19729697190558732
@@ -448,13 +448,13 @@
     {
       "id": "dataset_3x",
       "order": 19,
-      "label": "3\u00d7 dataset",
+      "label": "3\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 180000,
       "images_seen": 180000,
       "batches_seen": 1407,
       "dataset_passes": 3.0,
-      "description": "180,000 images \u2022 3\u00d7 dataset \u2022 1,407 batches",
+      "description": "180,000 图片 \u2022 3\u00d7 数据集 \u2022 1,407 批次",
       "metrics": {
         "test_accuracy": 0.9716,
         "avg_training_loss": 0.17897553289665116
@@ -469,13 +469,13 @@
     {
       "id": "dataset_4x",
       "order": 20,
-      "label": "4\u00d7 dataset",
+      "label": "4\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 240000,
       "images_seen": 240000,
       "batches_seen": 1876,
       "dataset_passes": 4.0,
-      "description": "240,000 images \u2022 4\u00d7 dataset \u2022 1,876 batches",
+      "description": "240,000 图片 \u2022 4\u00d7 数据集 \u2022 1,876 批次",
       "metrics": {
         "test_accuracy": 0.9754,
         "avg_training_loss": 0.15087367727557818
@@ -490,13 +490,13 @@
     {
       "id": "dataset_5x",
       "order": 21,
-      "label": "5\u00d7 dataset",
+      "label": "5\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 300000,
       "images_seen": 300000,
       "batches_seen": 2345,
       "dataset_passes": 5.0,
-      "description": "300,000 images \u2022 5\u00d7 dataset \u2022 2,345 batches",
+      "description": "300,000 图片 \u2022 5\u00d7 数据集 \u2022 2,345 批次",
       "metrics": {
         "test_accuracy": 0.9717,
         "avg_training_loss": 0.13142688159386318
@@ -511,13 +511,13 @@
     {
       "id": "dataset_6_5x",
       "order": 22,
-      "label": "6.5\u00d7 dataset",
+      "label": "6.5\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 390000,
       "images_seen": 390080,
       "batches_seen": 3049,
       "dataset_passes": 6.501333333333333,
-      "description": "390,080 images \u2022 6.5\u00d7 dataset \u2022 3,049 batches",
+      "description": "390,080 图片 \u2022 6.5\u00d7 数据集 \u2022 3,049 批次",
       "metrics": {
         "test_accuracy": 0.979,
         "avg_training_loss": 0.11078209049764401
@@ -532,13 +532,13 @@
     {
       "id": "dataset_8_5x",
       "order": 23,
-      "label": "8.5\u00d7 dataset",
+      "label": "8.5\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 510000,
       "images_seen": 510080,
       "batches_seen": 3987,
       "dataset_passes": 8.501333333333333,
-      "description": "510,080 images \u2022 8.5\u00d7 dataset \u2022 3,987 batches",
+      "description": "510,080 图片 \u2022 8.5\u00d7 数据集 \u2022 3,987 批次",
       "metrics": {
         "test_accuracy": 0.9776,
         "avg_training_loss": 0.09172532411944823
@@ -553,13 +553,13 @@
     {
       "id": "dataset_10x",
       "order": 24,
-      "label": "10\u00d7 dataset",
+      "label": "10\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 600000,
       "images_seen": 600000,
       "batches_seen": 4690,
       "dataset_passes": 10.0,
-      "description": "600,000 images \u2022 10\u00d7 dataset \u2022 4,690 batches",
+      "description": "600,000 图片 \u2022 10\u00d7 数据集 \u2022 4,690 批次",
       "metrics": {
         "test_accuracy": 0.977,
         "avg_training_loss": 0.08172680414684116
@@ -574,13 +574,13 @@
     {
       "id": "dataset_12_5x",
       "order": 25,
-      "label": "12.5\u00d7 dataset",
+      "label": "12.5\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 750000,
       "images_seen": 750080,
       "batches_seen": 5863,
       "dataset_passes": 12.501333333333333,
-      "description": "750,080 images \u2022 12.5\u00d7 dataset \u2022 5,863 batches",
+      "description": "750,080 图片 \u2022 12.5\u00d7 数据集 \u2022 5,863 批次",
       "metrics": {
         "test_accuracy": 0.9747,
         "avg_training_loss": 0.06874381689089168
@@ -595,13 +595,13 @@
     {
       "id": "dataset_15x",
       "order": 26,
-      "label": "15\u00d7 dataset",
+      "label": "15\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 900000,
       "images_seen": 900000,
       "batches_seen": 7035,
       "dataset_passes": 15.0,
-      "description": "900,000 images \u2022 15\u00d7 dataset \u2022 7,035 batches",
+      "description": "900,000 图片 \u2022 15\u00d7 数据集 \u2022 7,035 批次",
       "metrics": {
         "test_accuracy": 0.9758,
         "avg_training_loss": 0.05990715338343133
@@ -616,13 +616,13 @@
     {
       "id": "dataset_17_5x",
       "order": 27,
-      "label": "17.5\u00d7 dataset",
+      "label": "17.5\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 1050000,
       "images_seen": 1050080,
       "batches_seen": 8208,
       "dataset_passes": 17.501333333333335,
-      "description": "1,050,080 images \u2022 17.5\u00d7 dataset \u2022 8,208 batches",
+      "description": "1,050,080 图片 \u2022 17.5\u00d7 数据集 \u2022 8,208 批次",
       "metrics": {
         "test_accuracy": 0.979,
         "avg_training_loss": 0.052932906627145095
@@ -637,13 +637,13 @@
     {
       "id": "dataset_20x",
       "order": 28,
-      "label": "20\u00d7 dataset",
+      "label": "20\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 1200000,
       "images_seen": 1200000,
       "batches_seen": 9380,
       "dataset_passes": 20.0,
-      "description": "1,200,000 images \u2022 20\u00d7 dataset \u2022 9,380 batches",
+      "description": "1,200,000 图片 \u2022 20\u00d7 数据集 \u2022 9,380 批次",
       "metrics": {
         "test_accuracy": 0.9788,
         "avg_training_loss": 0.04783339347316379
@@ -658,13 +658,13 @@
     {
       "id": "dataset_25x",
       "order": 29,
-      "label": "25\u00d7 dataset",
+      "label": "25\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 1500000,
       "images_seen": 1500000,
       "batches_seen": 11725,
       "dataset_passes": 25.0,
-      "description": "1,500,000 images \u2022 25\u00d7 dataset \u2022 11,725 batches",
+      "description": "1,500,000 图片 \u2022 25\u00d7 数据集 \u2022 11,725 批次",
       "metrics": {
         "test_accuracy": 0.9793,
         "avg_training_loss": 0.04011526816737574
@@ -679,13 +679,13 @@
     {
       "id": "dataset_30x",
       "order": 30,
-      "label": "30\u00d7 dataset",
+      "label": "30\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 1800000,
       "images_seen": 1800000,
       "batches_seen": 14070,
       "dataset_passes": 30.0,
-      "description": "1,800,000 images \u2022 30\u00d7 dataset \u2022 14,070 batches",
+      "description": "1,800,000 图片 \u2022 30\u00d7 数据集 \u2022 14,070 批次",
       "metrics": {
         "test_accuracy": 0.9802,
         "avg_training_loss": 0.03463914606095505
@@ -700,13 +700,13 @@
     {
       "id": "dataset_35x",
       "order": 31,
-      "label": "35\u00d7 dataset",
+      "label": "35\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 2100000,
       "images_seen": 2100000,
       "batches_seen": 16415,
       "dataset_passes": 35.0,
-      "description": "2,100,000 images \u2022 35\u00d7 dataset \u2022 16,415 batches",
+      "description": "2,100,000 图片 \u2022 35\u00d7 数据集 \u2022 16,415 批次",
       "metrics": {
         "test_accuracy": 0.9792,
         "avg_training_loss": 0.030765175048975562
@@ -721,13 +721,13 @@
     {
       "id": "dataset_40x",
       "order": 32,
-      "label": "40\u00d7 dataset",
+      "label": "40\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 2400000,
       "images_seen": 2400000,
       "batches_seen": 18760,
       "dataset_passes": 40.0,
-      "description": "2,400,000 images \u2022 40\u00d7 dataset \u2022 18,760 batches",
+      "description": "2,400,000 图片 \u2022 40\u00d7 数据集 \u2022 18,760 批次",
       "metrics": {
         "test_accuracy": 0.9803,
         "avg_training_loss": 0.027775665313667063
@@ -742,13 +742,13 @@
     {
       "id": "dataset_45x",
       "order": 33,
-      "label": "45\u00d7 dataset",
+      "label": "45\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 2700000,
       "images_seen": 2700000,
       "batches_seen": 21105,
       "dataset_passes": 45.0,
-      "description": "2,700,000 images \u2022 45\u00d7 dataset \u2022 21,105 batches",
+      "description": "2,700,000 图片 \u2022 45\u00d7 数据集 \u2022 21,105 批次",
       "metrics": {
         "test_accuracy": 0.9775,
         "avg_training_loss": 0.025380229007694655
@@ -763,13 +763,13 @@
     {
       "id": "dataset_50x",
       "order": 34,
-      "label": "50\u00d7 dataset",
+      "label": "50\u00d7 数据集",
       "kind": "dataset_multiple",
       "target_images": 3000000,
       "images_seen": 3000000,
       "batches_seen": 23450,
       "dataset_passes": 50.0,
-      "description": "3,000,000 images \u2022 50\u00d7 dataset \u2022 23,450 batches",
+      "description": "3,000,000 图片 \u2022 50\u00d7 数据集 \u2022 23,450 批次",
       "metrics": {
         "test_accuracy": 0.9816,
         "avg_training_loss": 0.023422177559777473

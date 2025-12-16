@@ -317,7 +317,7 @@ def format_snapshot_description(
     if milestone.kind == "dataset_multiple" and milestone.dataset_multiple is not None:
         multiplier = f"{milestone.dataset_multiple:g}× 数据集"
         return f"{human_images} 图片 • {multiplier} • {batches} 批次"
-    return f"{human_images} 图像处理 • {batches} 批次 • {dataset_passes:.2f}× 数据集"
+    return f"{human_images} 图片处理 • {batches} 批次 • {dataset_passes:.2f}× 数据集"
 
 
 def main() -> None:
@@ -465,8 +465,8 @@ def main() -> None:
             entry["metrics"]["avg_training_loss"] = cumulative_loss / images_seen
         timeline_entries.append(entry)
         print(
-            f"[Timeline] Captured '{milestone.label}' at {images_seen:,} images "
-            f"({global_step:,} batches) – accuracy: {accuracy * 100:.2f}%"
+            f"[时间线] 捕获 '{milestone.label}' at {images_seen:,} 图片 "
+            f"({global_step:,} 批次) – 准确率: {accuracy * 100:.2f}%"
         )
 
     def advance_milestones() -> None:
