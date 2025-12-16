@@ -77,8 +77,7 @@ app.post('/image-to-image', async (req, res) => {
 // 文生视频
 app.post('/video_generation', async (req, res) => {
     try {
-        const { prompt, duration } = req.body;
-        const responseData = await generateVideoFromText({ prompt, duration });
+        const responseData = await generateVideoFromText(req.body);
         res.json({
             success: true,
             data: responseData

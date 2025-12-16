@@ -6,13 +6,20 @@ const baseUrl = 'https://api.minimaxi.com/v1';
 /**
  * 调用海螺文生视频接口
  */
-async function generateVideoFromText({prompt, duration}) {
+async function generateVideoFromText({prompt, duration, first_frame_image, last_frame_image}) {
+    let body = {
+        model: 'MiniMax-Hailuo-02',
+        prompt,
+        duration
+    };
+    if (first_frame_image) {
+        body.first_frame_image = first_frame_image;
+    }
+    if (last_frame_image) {
+        body.last_frame_image = last_frame_image;
+    }
     const response = await axios.post(`${baseUrl}/video_generation`,
-        {
-            model: 'MiniMax-Hailuo-2.3',
-            prompt,
-            duration
-        }, {
+        body, {
             headers: {
                 'Authorization': `Bearer ${apiToken}`,
                 'Content-Type': 'application/json'
