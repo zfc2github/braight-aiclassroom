@@ -923,10 +923,10 @@ function formatTimelineMetrics(metrics) {
   if (!metrics) return "";
   const segments = [];
   if (Number.isFinite(metrics.testAccuracy)) {
-    segments.push(`Test acc: ${formatDecimal(metrics.testAccuracy * 100, 2)}%`);
+    segments.push(`测试准确率: ${formatDecimal(metrics.testAccuracy * 100, 2)}%`);
   }
   if (Number.isFinite(metrics.avgTrainingLoss)) {
-    segments.push(`Avg loss: ${formatDecimal(metrics.avgTrainingLoss, 4)}`);
+    segments.push(`平均损失: ${formatDecimal(metrics.avgTrainingLoss, 4)}`);
   }
   return segments.join(" • ");
 }
@@ -1746,7 +1746,7 @@ class NeuronDetailPanel {
 
     const summaryFormula =
       payload.preActivation !== null && payload.preActivation !== undefined
-        ? `Σ = Σ(input × gewicht)${payload.bias !== null && payload.bias !== undefined ? " + bias" : ""}`
+        ? `Σ = Σ(输入 × 重量)${payload.bias !== null && payload.bias !== undefined ? " + 偏差" : ""}`
         : "";
 
     this.root.innerHTML = `

@@ -310,14 +310,14 @@ def format_snapshot_description(
     dataset_size: int,
 ) -> str:
     if milestone.kind == "initial":
-        return "0 images processed (random initialisation)"
+        return "0 图像处理（随机初始化）"
     dataset_passes = images_seen / dataset_size if dataset_size else 0.0
     human_images = f"{images_seen:,}"
     batches = f"{batches_seen:,}"
     if milestone.kind == "dataset_multiple" and milestone.dataset_multiple is not None:
-        multiplier = f"{milestone.dataset_multiple:g}× dataset"
-        return f"{human_images} images • {multiplier} • {batches} batches"
-    return f"{human_images} images processed • {batches} batches • {dataset_passes:.2f}× dataset"
+        multiplier = f"{milestone.dataset_multiple:g}× 数据集"
+        return f"{human_images} 图片 • {multiplier} • {batches} 批次"
+    return f"{human_images} 图像处理 • {batches} 批次 • {dataset_passes:.2f}× 数据集"
 
 
 def main() -> None:
@@ -510,9 +510,9 @@ def main() -> None:
                 # Ensure we keep tabs on accuracy even if no milestone was reached in this epoch.
                 last_eval_accuracy = evaluate(model, test_loader, device)
             print(
-                f"Epoch {epoch:02d} - avg loss: {avg_epoch_loss:.4f} - "
-                f"test accuracy: {last_eval_accuracy * 100:.2f}% - "
-                f"images seen: {images_seen:,}"
+                f"周期 {epoch:02d} - 平均损失: {avg_epoch_loss:.4f} - "
+                f"测试准确率: {last_eval_accuracy * 100:.2f}% - "
+                f"已见图像: {images_seen:,}"
             )
 
     if not timeline_entries:
