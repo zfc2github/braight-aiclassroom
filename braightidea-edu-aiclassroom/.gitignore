@@ -1,0 +1,5 @@
+/.idea/
+/admin-ui/node_modules/
+*.iml
+/admin-ui/dist/
+/*/target/
