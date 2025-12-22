@@ -14,11 +14,11 @@ swagger:
 spring:
     datasource:
         dynamic:
-          primary: braightidea_edu_aiclassroom
+          primary: primary-db
           strict: false
           datasource:
             # 数据源-数智文遗（本项目）数据库
-            braight_idea:
+            primary-db:
               url: jdbc:mysql://8.133.19.252:3306/braightidea_edu_aiclassroom?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
               username: braightidea
               password: LuckyTable910!@#
