@@ -63,25 +63,16 @@ export const constantRoutes = [
   },
   {
     path: '',
-    alias: '/index',
-    // component: Layout,
-    component: () => import('@/views/home'),
-    hidden: true
-  },
-  {
-    path: '/search',
-    component: () => import('@/views/resourceSearch/resourceSearch'),
-    hidden: true
-  },
-  {
-    path: '/search/resourceDetail',
-    component: () => import('@/views/resourceSearch/resourceDetail'),
-    hidden: true
-  },
-  {
-    path: '/search/subjectDatabaseDetail',
-    component: () => import('@/views/resourceSearch/subjectDatabaseDetail'),
-    hidden: true
+    component: Layout,
+    redirect: 'index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/index'),
+        name: 'Index',
+        meta: { title: '首页', icon: 'dashboard', affix: true }
+      }
+    ]
   },
   {
     path: '/user',
