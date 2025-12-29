@@ -1,6 +1,7 @@
 package com.braight.dc.admin.web.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.Transient;
 
 import java.sql.Date;
 
@@ -122,6 +123,8 @@ public class AieduLiteracyClassPO {
      * @mbg.generated Thu Dec 25 10:12:25 GMT+08:00 2025
      */
     private String keyConcepts;
+    @Transient
+    private String[] keyConceptList;
 
     /**
      *
@@ -131,6 +134,8 @@ public class AieduLiteracyClassPO {
      * @mbg.generated Thu Dec 25 10:12:25 GMT+08:00 2025
      */
     private String keyConceptsEn;
+    @Transient
+    private String[] keyConceptEnList;
 
     /**
      *
