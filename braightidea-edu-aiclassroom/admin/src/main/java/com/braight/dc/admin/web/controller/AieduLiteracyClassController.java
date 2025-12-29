@@ -5,7 +5,6 @@ import com.braight.dc.admin.web.mapper.AieduLiteracyClassPOMapper;
 import com.braight.master.common.core.controller.BaseController;
 import com.braight.master.common.core.domain.AjaxResult;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +17,6 @@ import java.util.List;
  * @author Shine
  * @date 2025/12/24
  */
-@CrossOrigin(origins = "*") // todo Shine 测试用，待删除
 @RestController
 public class AieduLiteracyClassController extends BaseController {
     @Resource
