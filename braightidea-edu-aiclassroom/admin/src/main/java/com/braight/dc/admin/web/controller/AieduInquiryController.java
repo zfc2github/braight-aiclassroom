@@ -6,6 +6,7 @@ import com.braight.dc.admin.web.entity.AieduInquiryPO;
 import com.braight.dc.admin.web.mapper.AieduInquiryPOMapper;
 import com.braight.master.common.core.controller.BaseController;
 import com.braight.master.common.core.domain.AjaxResult;
+import com.braight.master.common.core.page.TableDataInfo;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,8 @@ public class AieduInquiryController extends BaseController {
 
 
     @GetMapping("/api/aieduInquiry/list")
-    public AjaxResult list() {
+    public TableDataInfo list() {
+        startPage();
         List<AieduInquiryPO> all = aieduInquiryPOMapper.selectAll();
         all.forEach(aieduInquiryPO -> {
             String interestsJson = aieduInquiryPO.getInterestsJson();
@@ -47,7 +49,7 @@ public class AieduInquiryController extends BaseController {
                 aieduInquiryPO.setParentInterests(new String[0]);
             }
         });
-        return success(all);
+        return getDataTable(all);
     }
 
     @GetMapping("/api/aieduInquiry/{id}")
