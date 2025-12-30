@@ -40,7 +40,9 @@
 
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="150px" style="height: 900px;overflow-y: scroll;padding-right: 20px;">
+      <el-form ref="form" :model="form" :rules="rules" label-width="150px"
+               class="cms-solution-form"
+               style="height: 900px;overflow-y: scroll;padding-right: 20px;">
         <el-form-item label="编码" prop="type">
           {{form.id}}
         </el-form-item>
@@ -102,7 +104,6 @@
 </template>
 
 <script>
-import { listContent, getContent, delContent, addContent, updateContent } from "@/api/system/content";
 import request from "@/utils/request";
 import VueJsonEditor from "vue-json-editor";
 
@@ -190,7 +191,6 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          console.log(this.form.solutionDetail);
           if (this.form.tid != null) {
             request({
               url: '/api/aieduSolution/edit',
@@ -208,7 +208,6 @@ export default {
     onJsonChange(value) {
     },
     onJsonSave(value) {
-      console.log(value);
       this.form.solutionDetail = value;
     },
   }
@@ -226,7 +225,7 @@ export default {
 }
 </style>
 <style type="text/css">
-.jsoneditor-outer {
-  height: 400px!important;
+.cms-solution-form .jsoneditor-outer {
+  height: 500px!important;
 }
 </style>
