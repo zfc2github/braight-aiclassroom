@@ -162,19 +162,8 @@ export default {
       }).then(response => {
         this.contentList = response.rows;
         this.total = response.total;
-        console.log(this.contentList);
         this.loading = false;
       });
-    },
-    // 取消按钮
-    cancel() {
-      this.open = false;
-      this.reset();
-    },
-    // 表单重置
-    reset() {
-      //this.form = {};
-      this.resetForm("form");
     },
     /** 搜索按钮操作 */
     handleQuery() {
