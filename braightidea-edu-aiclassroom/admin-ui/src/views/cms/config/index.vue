@@ -84,7 +84,7 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.tid != null) {
+          if (this.form.id != null) {
             request({
               url: '/api/aieduHomeConfig/edit',
               method: 'post',

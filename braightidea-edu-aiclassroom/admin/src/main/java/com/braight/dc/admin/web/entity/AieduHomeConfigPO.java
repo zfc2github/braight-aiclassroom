@@ -75,10 +75,7 @@ public class AieduHomeConfigPO {
     }
 
     public JSONObject getHomeConfig() {
-        if (contentJson != null && contentJson.length() > 0) {
-            return JSONObject.parseObject(contentJson);
-        }
-        return new JSONObject();
+        return this.homeConfig;
     }
 
     public void setHomeConfig(JSONObject homeConfig) {

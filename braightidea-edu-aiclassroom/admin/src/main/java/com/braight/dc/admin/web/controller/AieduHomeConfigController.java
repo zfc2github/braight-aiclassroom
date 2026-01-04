@@ -25,6 +25,10 @@ public class AieduHomeConfigController extends BaseController {
     @GetMapping("/api/aieduHomeConfig/{id}")
     public AjaxResult getById(@PathVariable Integer id) {
         AieduHomeConfigPO aieduHomeConfigPO = aieduHomeConfigPOMapper.selectByPrimaryKey(id);
+        String contentJson = aieduHomeConfigPO.getContentJson();
+        if (contentJson != null && contentJson.length() > 0) {
+            aieduHomeConfigPO.setHomeConfig(JSONObject.parseObject(contentJson));
+        }
         return success(aieduHomeConfigPO);
     }
 
