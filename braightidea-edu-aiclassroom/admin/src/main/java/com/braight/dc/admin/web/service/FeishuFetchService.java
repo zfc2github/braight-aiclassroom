@@ -51,7 +51,7 @@ public class FeishuFetchService {
                 throw new RuntimeException("飞书接口错误：" + resp.getMsg());
             }
             SearchAppTableRecordRespBody data = resp.getData();
-            log.info("拉取飞书数据成功：{}", JSON.toJSONString(data));
+//            log.info("拉取飞书数据成功：{}", JSON.toJSONString(data));
             pageToken = data.getPageToken();
             AppTableRecord[] items = data.getItems();
             for (AppTableRecord item : items) {
@@ -89,7 +89,7 @@ public class FeishuFetchService {
                         po.setLiteracy(getMultiTextJoinDot(v));
                     } else if ("相关素养维度-en".equals(k)) {
                         po.setLiteracyEn(getMultiTextJoinDot(v));
-                    } else if ("封面图".equals(k)) {
+                    } else if ("封面图URL".equals(k)) {
                         po.setCoverImage(getText(v));
                     } else if ("PPT嵌入代码".equals(k)) {
                         po.setPptCanvaCode(getText(v));

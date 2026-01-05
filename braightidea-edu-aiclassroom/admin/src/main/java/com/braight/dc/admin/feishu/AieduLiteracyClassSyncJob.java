@@ -1,4 +1,4 @@
-package com.braight.dc.admin.feishuo;
+package com.braight.dc.admin.feishu;
 
 import com.braight.dc.admin.web.entity.AieduLiteracyClassPO;
 import com.braight.dc.admin.web.mapper.AieduLiteracyClassMapper;

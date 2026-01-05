@@ -1,4 +1,4 @@
-package com.braight.dc.admin.feishuo;
+package com.braight.dc.admin.feishu;
 
 import com.lark.oapi.Client;
 import org.springframework.beans.factory.annotation.Value;
