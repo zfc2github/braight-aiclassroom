@@ -240,7 +240,7 @@ export default class Renderer {
   }
 
   /* === VIDEO SETUP FUNCTIONS === */
-  
+
   async loadVideo() {
     const elem = this.elems.videoContainer;
 
@@ -260,10 +260,10 @@ export default class Renderer {
     }
 
     video.srcObject = stream;
-    
+
     // Add new video object to the DOM
     elem.appendChild(video);
-    
+
     // Send promise to return video object once stream is loaded
     return new Promise((resolve) => {
       video.onloadedmetadata = () => { resolve (video) };
@@ -291,7 +291,7 @@ export default class Renderer {
 
   /* What's the point of being a conductor if no-one throws roses at you?
      TODO: Replace with rotten tomatoes for your enemies.
-  */ 
+  */
   renderFallingRoses() {
     const interval = setInterval(() => {
       if (!this.isFinishPage) clearInterval(interval);
@@ -335,7 +335,7 @@ export default class Renderer {
   /* Called if webcam error */
   renderVideoError() {
     show(this.pages.error, 'flex');
-    this.elems.errorText.innerHTML = "The orchestra needs to see its conductor! Please connect your webcam or allow us to access it, and refresh the page.";
+    this.elems.errorText.innerHTML = "乐团需要见指挥！请连接您的摄像头或允许我们访问，并刷新页面。";
   }
 
   /* Called when the experience restarts */
