@@ -116,4 +116,13 @@
       </if>
     </where>
   </select>
+  <select id="selectLatest" resultMap="BaseResultMap">
+    select id, type, title, title_en, cover_image, tag, tag_en, featured, created_at,
+           updated_at, link_type, link_url, author, duration, grade, summary, summary_en,
+           content
+    from aiedu_resource
+    where featured = 1
+    order by updated_at desc
+    limit 0, 10
+  </select>
 </mapper>

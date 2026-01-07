@@ -37,24 +37,39 @@ public class AieduResourceController extends BaseController {
     {
         startPage();
         List<AieduResourcePO> list = aieduResourcePOMapper.selectAll(po);
-        list.forEach(res -> {
-            String tag = res.getTag();
-            res.setTags(!StringUtils.hasLength(tag) ? new String[0] : JSON.parseArray(tag, String.class).toArray(new String[0]));
-            String tagEn = res.getTagEn();
-            res.setTagEns(!StringUtils.hasLength(tagEn) ? new String[0] : JSON.parseArray(tagEn, String.class).toArray(new String[0]));
-        });
+        transferFieldTag2Object(list);
         return getDataTable(list);
     }
 
-//    @PreAuthorize("@ss.hasPermi('cms:aieduResource:query')")
+    /**
+     * 最新动态
+     * @return
+     */
+    @GetMapping("/latest")
+    public AjaxResult getLatest()
+    {
+        List<AieduResourcePO> list = aieduResourcePOMapper.selectLatest();
+        transferFieldTag2Object(list);
+        return success(list);
+    }
+
+    private void transferFieldTag2Object(List<AieduResourcePO> list) {
+        list.forEach(this::transferFieldTag2Object);
+    }
+
+    private void transferFieldTag2Object(AieduResourcePO res) {
+        String tag = res.getTag();
+        res.setTags(!StringUtils.hasLength(tag) ? new String[0] : JSON.parseArray(tag, String.class).toArray(new String[0]));
+        String tagEn = res.getTagEn();
+        res.setTagEns(!StringUtils.hasLength(tagEn) ? new String[0] : JSON.parseArray(tagEn, String.class).toArray(new String[0]));
+    }
+
+    //    @PreAuthorize("@ss.hasPermi('cms:aieduResource:query')")
     @GetMapping("/{id}" )
     public AjaxResult getInfo(@PathVariable("id") Integer id)
     {
         AieduResourcePO po = aieduResourcePOMapper.selectByPrimaryKey(id);
-        String tag = po.getTag();
-        po.setTags(!StringUtils.hasLength(tag) ? new String[0] : JSON.parseArray(tag, String.class).toArray(new String[0]));
-        String tagEn = po.getTagEn();
-        po.setTagEns(!StringUtils.hasLength(tagEn) ? new String[0] : JSON.parseArray(tagEn, String.class).toArray(new String[0]));
+        transferFieldTag2Object(po);
         return AjaxResult.success(po);
     }
 
@@ -63,29 +78,14 @@ public class AieduResourceController extends BaseController {
     @PostMapping("/add")
     public AjaxResult add(@Validated @RequestBody AieduResourcePO po)
     {
-        String[] tags = po.getTags();
-        if (ArrayUtil.isEmpty(tags)) {
-            po.setTag("[]");
-        } else {
-            po.setTag(JSON.toJSONString(tags));
-        }
-        String[] tagEns = po.getTagEns();
-        if (ArrayUtil.isEmpty(tagEns)) {
-            po.setTagEn("[]");
-        } else {
-            po.setTagEn(JSON.toJSONString(tagEns));
-        }
+        transferFieldTag2String(po);
         Date now = new Date();
         po.setCreatedAt(now);
         po.setUpdatedAt(now);
         return toAjax(aieduResourcePOMapper.insert(po));
     }
 
-//    @PreAuthorize("@ss.hasPermi('cms:aieduResource:edit')")
-    @Log(title = "资源中心", businessType = BusinessType.UPDATE)
-    @PostMapping("/edit")
-    public AjaxResult edit(@Validated @RequestBody AieduResourcePO po)
-    {
+    private void transferFieldTag2String(AieduResourcePO po) {
         String[] tags = po.getTags();
         if (ArrayUtil.isEmpty(tags)) {
             po.setTag("[]");
@@ -98,6 +98,14 @@ public class AieduResourceController extends BaseController {
         } else {
             po.setTagEn(JSON.toJSONString(tagEns));
         }
+    }
+
+    //    @PreAuthorize("@ss.hasPermi('cms:aieduResource:edit')")
+    @Log(title = "资源中心", businessType = BusinessType.UPDATE)
+    @PostMapping("/edit")
+    public AjaxResult edit(@Validated @RequestBody AieduResourcePO po)
+    {
+        transferFieldTag2String(po);
         po.setUpdatedAt(new Date());
         return toAjax(aieduResourcePOMapper.updateByPrimaryKey(po));
     }
