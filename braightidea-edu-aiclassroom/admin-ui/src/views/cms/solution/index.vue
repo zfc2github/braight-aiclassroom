@@ -77,10 +77,15 @@
           <el-input type="textarea" v-model="form.featuresEn" :rows="2" />
         </el-form-item>
         <el-form-item label="背景图片" prop="image">
-          <el-input type="textarea" v-model="form.image" :rows="2" />
+          <image-upload v-model="form.image" :limit="1"></image-upload>
         </el-form-item>
         <el-form-item label="图标" prop="icon">
-          <el-input type="textarea" v-model="form.icon" :rows="2" />
+          <image-upload v-model="form.icon" :limit="1"></image-upload>
+        </el-form-item>
+        <el-form-item label="解决方案-Hero图片"
+                      prop="solutionDetail.sectionHero.imageUrl"
+                      class="section-hero-imageUrl">
+          <image-upload v-model="form.solutionDetail.sectionHero.imageUrl" :limit="1"></image-upload>
         </el-form-item>
         <el-form-item label="解决方案-Hero信息"
                       prop="solutionDetail.sectionHero"
@@ -107,6 +112,24 @@
             @json-save="onJsonSavesectionSupport"
           >
           </vue-json-editor>
+        </el-form-item>
+        <el-form-item label="解决方案-应用场景1-图片"
+                      prop="solutionDetail.sectionScene.scenes"
+                      class="section-scene">
+          <image-upload v-model="form.solutionDetail.sectionScene.scenes[0].imageUrl" :limit="1" :is-show-tip="false"></image-upload>
+          <el-alert type="info" :closable="false">{{form.solutionDetail.sectionScene.scenes[0].title}}</el-alert>
+        </el-form-item>
+        <el-form-item label="解决方案-应用场景2-图片"
+                      prop="solutionDetail.sectionScene.scenes"
+                      class="section-scene">
+          <image-upload v-model="form.solutionDetail.sectionScene.scenes[1].imageUrl" :limit="1" :is-show-tip="false"></image-upload>
+          <el-alert type="info" :closable="false">{{form.solutionDetail.sectionScene.scenes[1].title}}</el-alert>
+        </el-form-item>
+        <el-form-item label="解决方案-应用场景2-图片"
+                      prop="solutionDetail.sectionScene.scenes"
+                      class="section-scene">
+          <image-upload v-model="form.solutionDetail.sectionScene.scenes[2].imageUrl" :limit="1" :is-show-tip="false"></image-upload>
+          <el-alert type="info" :closable="false">{{form.solutionDetail.sectionScene.scenes[2].title}}</el-alert>
         </el-form-item>
         <el-form-item label="解决方案-应用场景"
                       prop="solutionDetail.sectionScene"
@@ -169,7 +192,11 @@ export default {
             supports: []
           },
           sectionScene: {
-            scenes: []
+            scenes: [
+              {title: '', imageUrl: ''},
+              {title: '', imageUrl: ''},
+              {title: '', imageUrl: ''},
+            ]
           },
         }
       },
