@@ -279,25 +279,25 @@ export default {
   height: 65vh!important;
 }
 .home-config .section-hero .jsoneditor-outer {
-  height: 25vh!important;
+  height: 20vh!important;
 }
 .home-config .section-course .jsoneditor-outer {
   height: 65vh!important;
 }
 .home-config .section-LearningSpaceHeader .jsoneditor-outer {
-  height: 16vh!important;
+  height: 14vh!important;
 }
 .home-config .section-LearningSpace-modules .jsoneditor-outer {
   height: 65vh!important;
 }
 .home-config .section-sectionSolutionPreview .jsoneditor-outer {
-  height: 16vh!important;
+  height: 14vh!important;
 }
 .home-config .section-sectionFeatureCarousel .jsoneditor-outer {
-  height: 16vh!important;
+  height: 14vh!important;
 }
 .home-config .section-sectionFooter .jsoneditor-outer {
-  height: 40vh!important;
+  height: 32vh!important;
 }
 .home-config .el-collapse-item__header {
   background-color: transparent;
