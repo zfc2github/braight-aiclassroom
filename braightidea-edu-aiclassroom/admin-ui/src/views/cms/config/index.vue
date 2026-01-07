@@ -276,19 +276,19 @@ export default {
 </style>
 <style type="text/css">
 .home-config .nav-items .jsoneditor-outer {
-  height: 65vh!important;
+  height: 50vh!important;
 }
 .home-config .section-hero .jsoneditor-outer {
   height: 20vh!important;
 }
 .home-config .section-course .jsoneditor-outer {
-  height: 65vh!important;
+  height: 50vh!important;
 }
 .home-config .section-LearningSpaceHeader .jsoneditor-outer {
   height: 14vh!important;
 }
 .home-config .section-LearningSpace-modules .jsoneditor-outer {
-  height: 65vh!important;
+  height: 50vh!important;
 }
 .home-config .section-sectionSolutionPreview .jsoneditor-outer {
   height: 14vh!important;
