@@ -1,24 +1,43 @@
 <template>
-  <div class="component-upload-image">
+  <div class="component-upload-video">
+    <!-- 视频播放区域，添加悬停容器 -->
+    <div class="video-container" @mouseenter="showDeleteBtn = true" @mouseleave="showDeleteBtn = false" style="position: relative;width: 400px;">
+      <video
+        :src="dialogVideoUrl"
+        controls
+        v-show="dialogVideoUrl"        style="width: 400px; height: auto;"
+      >
+        您的浏览器不支持视频播放
+      </video>
+      <!-- 删除按钮 -->
+      <el-button
+        v-show="showDeleteBtn && dialogVideoUrl"
+        class="delete-btn"
+        type="danger"
+        icon="el-icon-delete"
+        size="mini"
+        circle
+        @click="handleRemoveVideo"
+        style="position: absolute;left: 48%;top: 48%;"
+      ></el-button>
+    </div>
     <el-upload
       multiple
-      :action="uploadImgUrl"
+      :action="uploadVideoUrl"
       :accept="acceptFileType"
-      list-type="picture-card"
       :on-success="handleUploadSuccess"
       :before-upload="handleBeforeUpload"
       :limit="limit"
       :on-error="handleUploadError"
       :on-exceed="handleExceed"
-      ref="imageUpload"
+      ref="videoUpload"
       :on-remove="handleDelete"
-      :show-file-list="true"
+      :show-file-list="false"
       :headers="headers"
       :file-list="fileList"
-      :on-preview="handlePictureCardPreview"
       :class="{hide: this.fileList.length >= this.limit}"
     >
-      <i class="el-icon-plus"></i>
+      <el-button size="small" type="primary">点击上传</el-button>
     </el-upload>
 
     <!-- 上传提示 -->
@@ -28,18 +47,6 @@
       <template v-if="fileType"> 格式为 <b style="color: #f56c6c">{{ fileType.join("/") }}</b> </template>
       的文件
     </div>
-
-    <el-dialog
-      :visible.sync="dialogVisible"
-      title="预览"
-      width="800"
-      append-to-body
-    >
-      <img
-        :src="dialogImageUrl"
-        style="display: block; max-width: 100%; margin: 0 auto"
-      />
-    </el-dialog>
   </div>
 </template>
 
@@ -47,23 +54,23 @@
 import { getToken } from "@/utils/auth";
 
 export default {
-  name: "ImageUpload",
+  name: "VideoUpload",
   props: {
     value: [String, Object, Array],
     // 数量限制
     limit: {
       type: Number,
-      default: 5,
+      default: 1,
     },
     // 大小限制(MB)
     fileSize: {
-       type: Number,
-      default: 5,
+      type: Number,
+      default: 50,
     },
-    // 文件类型, 例如['png', 'jpg', 'jpeg']
+    // 文件类型, 例如['mp4', 'avi', 'mov']
     fileType: {
       type: Array,
-      default: () => ["png", "jpg", "jpeg"],
+      default: () => ["mp4", "avi", "mov", "wmv", "flv", "webm"],
     },
     // 是否显示提示
     isShowTip: {
@@ -75,15 +82,16 @@ export default {
     return {
       number: 0,
       uploadList: [],
-      dialogImageUrl: "",
+      dialogVideoUrl: "",
       dialogVisible: false,
       hideUpload: false,
       baseUrl: process.env.VUE_APP_BASE_API,
-      uploadImgUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
+      uploadVideoUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的视频服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
       },
-      fileList: []
+      fileList: [],
+      showDeleteBtn: false // 控制删除按钮显示
     };
   },
   watch: {
@@ -97,16 +105,18 @@ export default {
             if (typeof item === "string") {
               if (item.indexOf(this.baseUrl) === -1
                 && !item.startsWith("http") && !item.startsWith("https")) {
-                  item = { name: this.baseUrl + item, url: this.baseUrl + item };
+                item = { name: this.baseUrl + item, url: this.baseUrl + item };
               } else {
-                  item = { name: item, url: item };
+                item = { name: item, url: item };
               }
             }
             return item;
           });
         } else {
           this.fileList = [];
-          return [];
+        }
+        if (this.fileList.length === 1) {
+          this.dialogVideoUrl = this.fileList[0].url;
         }
       },
       deep: true,
@@ -126,40 +136,53 @@ export default {
           } else {
             return `.${item}`;
           }
-          }).join(",")
-        : "image/*";
+        }).join(",")
+        : "video/*";
     },
   },
   methods: {
+    // 处理删除视频
+    handleRemoveVideo() {
+      // 重置视频URL和文件列表
+      this.dialogVideoUrl = "";
+      this.fileList = [];
+      this.$emit("input", "");
+
+      // 如果有对应的上传文件，也从上传列表中移除
+      if(this.$refs.videoUpload && this.$refs.videoUpload.fileList) {
+        this.$refs.videoUpload.fileList = [];
+      }
+    },
     // 上传前loading加载
     handleBeforeUpload(file) {
-      let isImg = false;
+      let isVideo = false;
+
       if (this.fileType.length) {
         let fileExtension = "";
         if (file.name.lastIndexOf(".") > -1) {
-          fileExtension = file.name.slice(file.name.lastIndexOf(".") + 1);
+          fileExtension = file.name.slice(file.name.lastIndexOf(".") + 1).toLowerCase();
         }
-        isImg = this.fileType.some(type => {
+        isVideo = this.fileType.some(type => {
           if (file.type.indexOf(type) > -1) return true;
           if (fileExtension && fileExtension.indexOf(type) > -1) return true;
           return false;
         });
       } else {
-        isImg = file.type.indexOf("image") > -1;
+        isVideo = file.type.indexOf("video") > -1;
       }
 
-      if (!isImg) {
-        this.$modal.msgError(`文件格式不正确, 请上传${this.fileType.join("/")}图片格式文件!`);
+      if (!isVideo) {
+        this.$modal.msgError(`文件格式不正确, 请上传${this.fileType.join("/")}视频格式文件!`);
         return false;
       }
       if (this.fileSize) {
         const isLt = file.size / 1024 / 1024 < this.fileSize;
         if (!isLt) {
-          this.$modal.msgError(`上传头像图片大小不能超过 ${this.fileSize} MB!`);
+          this.$modal.msgError(`上传视频大小不能超过 ${this.fileSize} MB!`);
           return false;
         }
       }
-      this.$modal.loading("正在上传图片，请稍候...");
+      this.$modal.loading("正在上传视频，请稍候...");
       this.number++;
     },
     // 文件个数超出
@@ -175,11 +198,11 @@ export default {
         this.number--;
         this.$modal.closeLoading();
         this.$modal.msgError(res.msg);
-        this.$refs.imageUpload.handleRemove(file);
+        this.$refs.videoUpload.handleRemove(file);
         this.uploadedSuccessfully();
       }
     },
-    // 删除图片
+    // 删除视频
     handleDelete(file) {
       const findex = this.fileList.map(f => f.name).indexOf(file.name);
       if(findex > -1) {
@@ -189,7 +212,7 @@ export default {
     },
     // 上传失败
     handleUploadError() {
-      this.$modal.msgError("上传图片失败，请重试");
+      this.$modal.msgError("上传视频失败，请重试");
       this.$modal.closeLoading();
     },
     // 上传结束处理
@@ -201,11 +224,6 @@ export default {
         this.$emit("input", this.listToString(this.fileList));
         this.$modal.closeLoading();
       }
-    },
-    // 预览
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
     },
     // 对象转成指定字符串分隔
     listToString(list, separator) {
@@ -222,7 +240,7 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-// .el-upload--picture-card 控制加号部分
+// 隐藏超出限制的上传按钮
 ::v-deep.hide .el-upload--picture-card {
     display: none;
 }
@@ -239,11 +257,11 @@ export default {
 }
 </style>
 <style>
-.component-upload-image .el-upload-list__item-thumbnail {
-  height: auto !important;
-  max-height: 100% !important;
-}
-.component-upload-image .el-upload-list__item {
+ .component-upload-video .el-upload-list__item-thumbnail {
+   height: auto !important;
+   max-height: 100% !important;
+ }
+.component-upload-video .el-upload-list__item {
   display: flex;
   align-items: center;
 }
