@@ -12,7 +12,7 @@
             <vue-json-editor
               v-model="form.homeConfig.sectionNav.navItems"
               :show-btns="false"
-              :mode="'code'"
+              :mode="'tree'"
               lang="zh"
               :expanded-on-start="true"
               @json-save="onJsonSaveNavItems"
@@ -33,7 +33,7 @@
             <vue-json-editor
               v-model="form.homeConfig.sectionHero"
               :show-btns="false"
-              :mode="'code'"
+              :mode="'tree'"
               lang="zh"
               :expanded-on-start="true"
               @json-save="onJsonSaveSectionHero"
@@ -48,7 +48,7 @@
             <vue-json-editor
               v-model="form.homeConfig.sectionCourse"
               :show-btns="false"
-              :mode="'code'"
+              :mode="'tree'"
               lang="zh"
               :expanded-on-start="true"
               @json-save="onJsonSaveSectionCourse"
@@ -63,7 +63,7 @@
             <vue-json-editor
               v-model="form.homeConfig.sectionLearningSpaceHeader"
               :show-btns="false"
-              :mode="'code'"
+              :mode="'tree'"
               lang="zh"
               :expanded-on-start="true"
               @json-save="onJsonSaveSectionLearningSpaceHeader"
@@ -76,7 +76,7 @@
             <vue-json-editor
               v-model="form.homeConfig.sectionLearningSpace.modules"
               :show-btns="false"
-              :mode="'code'"
+              :mode="'tree'"
               lang="zh"
               :expanded-on-start="true"
               @json-save="onJsonSaveSectionLearningSpaceModules"
@@ -91,7 +91,7 @@
             <vue-json-editor
               v-model="form.homeConfig.sectionSolutionPreview"
               :show-btns="false"
-              :mode="'code'"
+              :mode="'tree'"
               lang="zh"
               :expanded-on-start="true"
               @json-save="onJsonSaveSectionSolutionPreview"
@@ -106,7 +106,7 @@
             <vue-json-editor
               v-model="form.homeConfig.sectionFeatureCarousel"
               :show-btns="false"
-              :mode="'code'"
+              :mode="'tree'"
               lang="zh"
               :expanded-on-start="true"
               @json-save="onJsonSaveSectionFeatureCarousel"
@@ -121,7 +121,7 @@
             <vue-json-editor
               v-model="form.homeConfig.sectionFooter"
               :show-btns="false"
-              :mode="'code'"
+              :mode="'tree'"
               lang="zh"
               :expanded-on-start="true"
               @json-save="onJsonSaveSectionFooter"

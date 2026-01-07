@@ -82,15 +82,42 @@
         <el-form-item label="图标" prop="icon">
           <el-input type="textarea" v-model="form.icon" :rows="2" />
         </el-form-item>
-        <el-form-item label="解决方案内容明细" prop="solutionDetail">
+        <el-form-item label="解决方案-Hero信息"
+                      prop="solutionDetail.sectionHero"
+                      class="section-hero">
           <vue-json-editor
-            v-model="form.solutionDetail"
+            v-model="form.solutionDetail.sectionHero"
             :show-btns="false"
             :mode="'tree'"
             lang="zh"
             :expanded-on-start="true"
-            @json-change="onJsonChange"
-            @json-save="onJsonSave"
+            @json-save="onJsonSavesectionHero"
+          >
+          </vue-json-editor>
+        </el-form-item>
+        <el-form-item label="解决方案-学校支持"
+                      prop="solutionDetail.sectionSupport"
+                      class="section-support">
+          <vue-json-editor
+            v-model="form.solutionDetail.sectionSupport"
+            :show-btns="false"
+            :mode="'tree'"
+            lang="zh"
+            :expanded-on-start="true"
+            @json-save="onJsonSavesectionSupport"
+          >
+          </vue-json-editor>
+        </el-form-item>
+        <el-form-item label="解决方案-应用场景"
+                      prop="solutionDetail.sectionScene"
+                      class="section-scene">
+          <vue-json-editor
+            v-model="form.solutionDetail.sectionScene"
+            :show-btns="false"
+            :mode="'tree'"
+            lang="zh"
+            :expanded-on-start="true"
+            @json-save="onJsonSavesectionScene"
           >
           </vue-json-editor>
         </el-form-item>
@@ -134,7 +161,17 @@ export default {
       queryParams: {},
       // 表单参数
       form: {
-        solutionDetail: {}
+        solutionDetail: {
+          sectionHero: {
+            imageUrl: ''
+          },
+          sectionSupport: {
+            supports: []
+          },
+          sectionScene: {
+            scenes: []
+          },
+        }
       },
       // 表单校验
       rules: {
@@ -205,10 +242,14 @@ export default {
         }
       });
     },
-    onJsonChange(value) {
+    onJsonSavesectionHero(value) {
+      this.form.solutionDetail.sectionHero = value;
     },
-    onJsonSave(value) {
-      this.form.solutionDetail = value;
+    onJsonSavesectionSupport(value) {
+      this.form.solutionDetail.sectionSupport = value;
+    },
+    onJsonSavesectionScene(value) {
+      this.form.solutionDetail.sectionScene = value;
     },
   }
 };
@@ -225,7 +266,13 @@ export default {
 }
 </style>
 <style type="text/css">
-.cms-solution-form .jsoneditor-outer {
+.cms-solution-form .section-hero .jsoneditor-outer {
+  height: 320px!important;
+}
+.cms-solution-form .section-support .jsoneditor-outer {
+  height: 500px!important;
+}
+.cms-solution-form .section-scene .jsoneditor-outer {
   height: 500px!important;
 }
 </style>

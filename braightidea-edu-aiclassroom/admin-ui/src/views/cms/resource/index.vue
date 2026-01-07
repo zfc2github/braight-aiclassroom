@@ -194,7 +194,7 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="封面图" prop="coverImage">
-              <el-input v-model="form.coverImage" maxlength="1000" />
+              <image-upload v-model="form.coverImage" :limit="1"></image-upload>
             </el-form-item>
           </el-col>
           <el-col :span="12">
