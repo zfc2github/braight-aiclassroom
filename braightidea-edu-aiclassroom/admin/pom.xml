@@ -91,6 +91,12 @@
             <version>2.5.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+
         <!-- SpringBoot 项目监控 -->
         <!--<dependency>
             <groupId>org.springframework.boot</groupId>

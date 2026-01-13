@@ -1,6 +1,8 @@
 package com.braight.dc.admin.web.service;
 
 import com.braight.dc.admin.web.controller.RegisterBodyVO;
+import com.braight.dc.admin.web.entity.AieduTeachersPO;
+import com.braight.dc.admin.web.mapper.AieduTeachersPOMapper;
 import com.braight.master.common.constant.CacheConstants;
 import com.braight.master.common.constant.Constants;
 import com.braight.master.common.constant.UserConstants;
@@ -18,6 +20,9 @@ import com.braight.master.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+import java.util.Date;
+
 /**
  * @author Shine
  * @date 2025/12/24
@@ -25,6 +30,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class RegisterService {
 
+    private static final Long TEACHER_ROLE_ID = 4L;
+    private static final Long STUDENT_ROLE_ID = 5L;
+    private static final Long PARENT_ROLE_ID = 6L;
     @Autowired
     private ISysUserService userService;
 
@@ -33,6 +41,8 @@ public class RegisterService {
 
     @Autowired
     private RedisCache redisCache;
+    @Resource
+    private AieduTeachersPOMapper aieduTeachersPOMapper;
 
     /**
      * 注册
@@ -44,6 +54,7 @@ public class RegisterService {
         SysUser sysUser = new SysUser();
         sysUser.setUserName(username);
         sysUser.setEmail(email);
+        sysUser.setPhonenumber(registerBody.getPhone());
 
         // 验证码开关
         boolean captchaEnabled = configService.selectCaptchaEnabled();
@@ -85,6 +96,30 @@ public class RegisterService {
             }
             else
             {
+                Long[] roleIds = null;
+                if ("teacher".equals(registerBody.getUserType())) {
+                    roleIds = new Long[]{TEACHER_ROLE_ID};
+                } else if ("student".equals(registerBody.getUserType())) {
+                    roleIds = new Long[]{STUDENT_ROLE_ID};
+                } else if ("parent".equals(registerBody.getUserType())) {
+                    roleIds = new Long[]{PARENT_ROLE_ID};
+                } else {
+                    roleIds = new Long[]{};
+                }
+                userService.insertUserAuth(sysUser.getUserId(), roleIds);
+                // 同步创建 aiedu_teachers 表记录
+                AieduTeachersPO po = new AieduTeachersPO();
+                po.setName(registerBody.getUsername());
+                po.setSchool(registerBody.getSchool());
+                po.setEmail(registerBody.getEmail());
+                po.setPhone(registerBody.getPhone());
+                po.setAvatar(registerBody.getAvatar());
+                po.setDepartment(registerBody.getDepartment());
+                po.setUserId(sysUser.getUserId());
+                Date now = new Date();
+                po.setCreatedAt(now);
+                po.setUpdatedAt(now);
+                aieduTeachersPOMapper.insert(po);
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success")));
             }
         }
