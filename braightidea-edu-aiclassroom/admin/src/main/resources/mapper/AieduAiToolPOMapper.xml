@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.braight.dc.admin.web.mapper.AieduAiToolPOMapper">
+  <resultMap id="BaseResultMap" type="com.braight.dc.admin.web.entity.AieduAiToolPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="tool_id" jdbcType="VARCHAR" property="toolId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="name_en" jdbcType="VARCHAR" property="nameEn" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="category" jdbcType="VARCHAR" property="category" />
+    <result column="recommended" jdbcType="BIT" property="recommended" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+    <result column="description_en" jdbcType="LONGVARCHAR" property="descriptionEn" />
+    <result column="teaching_goal" jdbcType="LONGVARCHAR" property="teachingGoal" />
+    <result column="teaching_goal_en" jdbcType="LONGVARCHAR" property="teachingGoalEn" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from aiedu_aitool
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.braight.dc.admin.web.entity.AieduAiToolPO" useGeneratedKeys="true" keyProperty="id">
+    insert into aiedu_aitool (id, tool_id, name, name_en,
+      icon, category, recommended,
+      created_at, updated_at, description,
+      description_en, teaching_goal, teaching_goal_en
+      )
+    values (#{id,jdbcType=INTEGER}, #{toolId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameEn,jdbcType=VARCHAR},
+      #{icon,jdbcType=VARCHAR}, #{category,jdbcType=VARCHAR}, #{recommended,jdbcType=BIT},
+      #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR},
+      #{descriptionEn,jdbcType=LONGVARCHAR}, #{teachingGoal,jdbcType=LONGVARCHAR}, #{teachingGoalEn,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduAiToolPO">
+    update aiedu_aitool
+    set tool_id = #{toolId,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      name_en = #{nameEn,jdbcType=VARCHAR},
+      icon = #{icon,jdbcType=VARCHAR},
+      category = #{category,jdbcType=VARCHAR},
+      recommended = #{recommended,jdbcType=BIT},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=LONGVARCHAR},
+      description_en = #{descriptionEn,jdbcType=LONGVARCHAR},
+      teaching_goal = #{teachingGoal,jdbcType=LONGVARCHAR},
+      teaching_goal_en = #{teachingGoalEn,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, tool_id, name, name_en, icon, category, recommended, created_at, updated_at, description,
+    description_en, teaching_goal, teaching_goal_en
+    from aiedu_aitool
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, tool_id, name, name_en, icon, category, recommended, created_at, updated_at, description,
+    description_en, teaching_goal, teaching_goal_en
+    from aiedu_aitool
+  </select>
+  <select id="selectListByCategory" resultMap="BaseResultMap">
+    select id, tool_id, name, name_en, icon, category, recommended, created_at, updated_at, description,
+           description_en, teaching_goal, teaching_goal_en
+    from aiedu_aitool
+    <where>
+      <if test="category != null and category != ''">
+        category = #{category}
+      </if>
+    </where>
+    order by category asc
+  </select>
+</mapper>

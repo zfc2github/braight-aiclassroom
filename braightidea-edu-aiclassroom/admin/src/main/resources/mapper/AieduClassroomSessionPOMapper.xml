@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.braight.dc.admin.web.mapper.AieduClassroomSessionPOMapper">
+  <resultMap id="BaseResultMap" type="com.braight.dc.admin.web.entity.AieduClassroomSessionPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="class_id" jdbcType="INTEGER" property="classId" />
+    <result column="classroom_id" jdbcType="INTEGER" property="classroomId" />
+    <result column="classroom_name" jdbcType="VARCHAR" property="classroomName" />
+    <result column="teacher_id" jdbcType="INTEGER" property="teacherId" />
+    <result column="teacher_name" jdbcType="VARCHAR" property="teacherName" />
+    <result column="class_code" jdbcType="VARCHAR" property="classCode" />
+    <result column="current_stage" jdbcType="VARCHAR" property="currentStage" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from aiedu_classroom_session
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionPO" keyProperty="id" useGeneratedKeys="true">
+    insert into aiedu_classroom_session (id, class_id, classroom_id, classroom_name,
+      teacher_id, teacher_name, class_code,
+      current_stage, status, created_at,
+      updated_at)
+    values (#{id,jdbcType=INTEGER}, #{classId,jdbcType=INTEGER}, #{classroomId,jdbcType=INTEGER}, #{classroomName,jdbcType=VARCHAR},
+      #{teacherId,jdbcType=INTEGER}, #{teacherName,jdbcType=VARCHAR}, #{classCode,jdbcType=VARCHAR},
+      #{currentStage,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
+      #{updatedAt,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionPO">
+    update aiedu_classroom_session
+    set class_id = #{classId,jdbcType=INTEGER},
+      classroom_id = #{classroomId,jdbcType=INTEGER},
+      classroom_name = #{classroomName,jdbcType=VARCHAR},
+      teacher_id = #{teacherId,jdbcType=INTEGER},
+      teacher_name = #{teacherName,jdbcType=VARCHAR},
+      class_code = #{classCode,jdbcType=VARCHAR},
+      current_stage = #{currentStage,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateStageStatus" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionPO">
+    update aiedu_classroom_session
+    <set>
+      <if test="currentStage != null and currentStage != ''">
+        current_stage = #{currentStage,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null and status != ''">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, class_id, classroom_id, classroom_name, teacher_id, teacher_name, class_code, current_stage,
+    status, created_at, updated_at
+    from aiedu_classroom_session
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, class_id, classroom_id, classroom_name, teacher_id, teacher_name, class_code, current_stage,
+    status, created_at, updated_at
+    from aiedu_classroom_session
+  </select>
+  <select id="selectActiveSession" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionPO" resultMap="BaseResultMap">
+    select id, class_id, classroom_id, classroom_name, teacher_id, teacher_name, class_code, current_stage,
+           status, created_at, updated_at
+    from aiedu_classroom_session
+    where status = 'active'
+    and classroom_id = #{classroomId}
+    and teacher_id = #{teacherId}
+    and class_id = #{classId}
+  </select>
+</mapper>

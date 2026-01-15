@@ -1,7 +1,9 @@
 package com.braight.dc.admin.web.mapper;
 
 import com.braight.dc.admin.web.entity.AieduClassroomsPO;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface AieduClassroomsPOMapper {
@@ -44,4 +46,9 @@ public interface AieduClassroomsPOMapper {
      * @mbg.generated Tue Jan 13 17:29:07 GMT+08:00 2026
      */
     int updateByPrimaryKey(AieduClassroomsPO row);
+
+    List<AieduClassroomsPO> selectListFeatured();
+
+    int updateLastUsedAt(@Param("classroomId") Integer classroomId,
+                         @Param("lastUsedAt") Date lastUsedAt);
 }
