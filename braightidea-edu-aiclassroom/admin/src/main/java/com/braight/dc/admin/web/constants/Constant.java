@@ -5,6 +5,15 @@ package com.braight.dc.admin.web.constants;
  * @date 2026/1/15
  */
 public class Constant {
+    public static class ClassroomStatus {
+        public static final String WAITING = "waiting";
+        public static final String IN_PROGRESS = "in-progress";
+        public static final String COMPLETED = "completed";
+
+        private ClassroomStatus() {
+        }
+
+    }
     public static class ClassroomSessionCurrentStage {
         public static final String WAITING = "waiting";
         public static final String TOOL_EXPERIENCE = "tool-experience";

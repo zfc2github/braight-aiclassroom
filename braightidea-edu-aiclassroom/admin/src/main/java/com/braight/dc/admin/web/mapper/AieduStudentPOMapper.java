@@ -53,4 +53,8 @@ public interface AieduStudentPOMapper {
                                     @Param("search") String search);
 
     int deleteByClassId(Integer classId);
+
+    AieduStudentPO selectByStudentId(String studentId);
+
+    List<AieduStudentPO> selectBySessionId(Integer classId);
 }

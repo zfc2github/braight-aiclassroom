@@ -98,4 +98,15 @@
       </if>
     </where>
   </select>
+  <select id="selectByStudentId" parameterType="String" resultMap="BaseResultMap">
+    select id, class_id, student_id, name, gender, created_at, updated_at, remark
+    from aiedu_student
+    where student_id = #{studentId,jdbcType=VARCHAR}
+    limit 1
+  </select>
+  <select id="selectBySessionId" parameterType="Integer" resultMap="BaseResultMap">
+    select id, class_id, student_id, name, gender, created_at, updated_at, remark
+    from aiedu_student
+    where class_id = #{classId,jdbcType=INTEGER}
+  </select>
 </mapper>

@@ -3,6 +3,7 @@ package com.braight.dc.admin.web.entity;
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -68,6 +69,7 @@ public class AieduStudentPO {
      * @mbg.generated Tue Jan 13 10:38:59 GMT+08:00 2026
      */
     @ExcelIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createdAt;
 
     /**
@@ -78,6 +80,7 @@ public class AieduStudentPO {
      * @mbg.generated Tue Jan 13 10:38:59 GMT+08:00 2026
      */
     @ExcelIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updatedAt;
 
     /**

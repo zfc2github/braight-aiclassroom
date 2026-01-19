@@ -34,8 +34,12 @@ public class AieduClassroomSessionPO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updatedAt;
 
+    private String grade;
+    private String aiToolJson;
     private JSONObject aiTool;
+    private String coursewareJson;
     private JSONObject courseware;
+    private String quizConfigJson;
     private JSONObject quizConfig;
 
     public Integer getId() {

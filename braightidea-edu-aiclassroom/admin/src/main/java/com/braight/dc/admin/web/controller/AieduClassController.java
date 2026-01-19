@@ -225,5 +225,17 @@ public class AieduClassController extends BaseController {
         }
     }
 
+
+    /**
+     * 根据学号获取学生信息
+     *
+     * @param studentId
+     * @return
+     */
+    @GetMapping("/students/{studentId}")
+    public AjaxResult getStudentInfo(@PathVariable String studentId) {
+        AieduStudentPO po = aieduStudentPOMapper.selectByStudentId(studentId);
+        return AjaxResult.success(po);
+    }
 }
 

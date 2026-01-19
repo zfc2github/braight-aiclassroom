@@ -19,4 +19,6 @@ public interface AieduClassroomSessionPOMapper {
     List<AieduClassroomSessionPO> selectActiveSession(AieduClassroomSessionPO po);
 
     int updateStageStatus(AieduClassroomSessionPO po);
+
+    AieduClassroomSessionPO selectActiveByClassCode(String classCode);
 }

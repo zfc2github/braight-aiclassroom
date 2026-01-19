@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.braight.dc.admin.web.mapper.AieduClassroomSessionStudentPOMapper">
+  <resultMap id="BaseResultMap" type="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="classroom_session_id" jdbcType="INTEGER" property="classroomSessionId" />
+    <result column="student_id" jdbcType="VARCHAR" property="studentId" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="joined_at" jdbcType="TIMESTAMP" property="joinedAt" />
+    <result column="current_stage" jdbcType="VARCHAR" property="currentStage" />
+    <result column="work_status" jdbcType="VARCHAR" property="workStatus" />
+    <result column="api_count" jdbcType="INTEGER" property="apiCount" />
+    <result column="quiz_status" jdbcType="VARCHAR" property="quizStatus" />
+    <result column="quiz_score" jdbcType="INTEGER" property="quizScore" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from aiedu_classroom_session_student
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentPO">
+    insert into aiedu_classroom_session_student (id, classroom_session_id, student_id,
+                                                 student_name, joined_at, current_stage,
+                                                 work_status, api_count, quiz_status,
+                                                 quiz_score)
+    values (#{id,jdbcType=INTEGER}, #{classroomSessionId,jdbcType=INTEGER}, #{studentId,jdbcType=VARCHAR},
+            #{studentName,jdbcType=VARCHAR}, #{joinedAt,jdbcType=TIMESTAMP}, #{currentStage,jdbcType=VARCHAR},
+            #{workStatus,jdbcType=VARCHAR}, #{apiCount,jdbcType=INTEGER}, #{quizStatus,jdbcType=VARCHAR},
+            #{quizScore,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentPO">
+    update aiedu_classroom_session_student
+    set classroom_session_id = #{classroomSessionId,jdbcType=INTEGER},
+        student_id = #{studentId,jdbcType=VARCHAR},
+        student_name = #{studentName,jdbcType=VARCHAR},
+        joined_at = #{joinedAt,jdbcType=TIMESTAMP},
+        current_stage = #{currentStage,jdbcType=VARCHAR},
+        work_status = #{workStatus,jdbcType=VARCHAR},
+        api_count = #{apiCount,jdbcType=INTEGER},
+        quiz_status = #{quizStatus,jdbcType=VARCHAR},
+        quiz_score = #{quizScore,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateSelective" parameterType="aieduClassroomSessionStudentPO">
+      update aiedu_classroom_session_student
+      <set>
+        <if test="classroomSessionId != null">
+          classroom_session_id = #{classroomSessionId,jdbcType=INTEGER},
+        </if>
+        <if test="studentId != null">
+          student_id = #{studentId,jdbcType=VARCHAR},
+        </if>
+        <if test="studentName != null">
+          student_name = #{studentName,jdbcType=VARCHAR},
+        </if>
+        <if test="joinedAt != null">
+          joined_at = #{joinedAt,jdbcType=TIMESTAMP},
+        </if>
+        <if test="currentStage != null">
+              current_stage = #{currentStage,jdbcType=VARCHAR},
+        </if>
+        <if test="workStatus != null">
+            work_status = #{workStatus,jdbcType=VARCHAR},
+        </if>
+        <if test="apiCount != null">
+            api_count = #{apiCount,jdbcType=INTEGER},
+        </if>
+        <if test="quizStatus != null">
+            quiz_status = #{quizStatus,jdbcType=VARCHAR},
+        </if>
+        <if test="quizScore != null">
+            quiz_score = #{quizScore,jdbcType=INTEGER},
+        </if>
+      </set>
+      where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, classroom_session_id, student_id, student_name, joined_at, current_stage,
+           work_status, api_count, quiz_status, quiz_score
+    from aiedu_classroom_session_student
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, classroom_session_id, student_id, student_name, joined_at, current_stage,
+           work_status, api_count, quiz_status, quiz_score
+    from aiedu_classroom_session_student
+  </select>
+  <select id="selectJoinedByEntity" resultType="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentPO" resultMap="BaseResultMap">
+    select id, classroom_session_id, student_id, student_name, joined_at, current_stage,
+    work_status, api_count, quiz_status, quiz_score
+    from aiedu_classroom_session_student
+    <where>
+      <if test="classroomSessionId != null">
+        and classroom_session_id = #{classroomSessionId}
+      </if>
+      <if test="studentId != null and studentId != ''">
+          and student_id = #{studentId}
+      </if>
+      <if test="studentName != null and studentName != ''">
+          and student_name = #{studentName}
+      </if>
+      <if test="currentStage != null and currentStage != ''">
+          and current_stage = #{currentStage}
+      </if>
+      and joined_at is not null
+    </where>
+  </select>
+  <select id="selectJoined" resultMap="BaseResultMap">
+      select id, classroom_session_id, student_id, student_name, joined_at, current_stage,
+             work_status, api_count, quiz_status, quiz_score
+      from aiedu_classroom_session_student
+      where joined_at is not null
+      and classroom_session_id = #{classroomSessionId}
+      and student_id = #{studentId}
+  </select>
+  <select id="selectStudent" resultMap="BaseResultMap">
+      select id, classroom_session_id, student_id, student_name, joined_at, current_stage,
+             work_status, api_count, quiz_status, quiz_score
+      from aiedu_classroom_session_student
+      where classroom_session_id = #{classroomSessionId}
+      and student_id = #{studentId}
+  </select>
+</mapper>

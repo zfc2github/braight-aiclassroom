@@ -11,6 +11,10 @@
     <result column="class_code" jdbcType="VARCHAR" property="classCode" />
     <result column="current_stage" jdbcType="VARCHAR" property="currentStage" />
     <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="grade" jdbcType="VARCHAR" property="grade" />
+    <result column="ai_tool_json" jdbcType="LONGVARCHAR" property="aiToolJson" />
+    <result column="courseware_json" jdbcType="LONGVARCHAR" property="coursewareJson" />
+    <result column="quiz_config_json" jdbcType="LONGVARCHAR" property="quizConfigJson" />
     <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
     <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
   </resultMap>
@@ -21,11 +25,11 @@
   <insert id="insert" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionPO" keyProperty="id" useGeneratedKeys="true">
     insert into aiedu_classroom_session (id, class_id, classroom_id, classroom_name,
       teacher_id, teacher_name, class_code,
-      current_stage, status, created_at,
+      current_stage, status, grade, ai_tool_json, courseware_json, quiz_config_json, created_at,
       updated_at)
     values (#{id,jdbcType=INTEGER}, #{classId,jdbcType=INTEGER}, #{classroomId,jdbcType=INTEGER}, #{classroomName,jdbcType=VARCHAR},
       #{teacherId,jdbcType=INTEGER}, #{teacherName,jdbcType=VARCHAR}, #{classCode,jdbcType=VARCHAR},
-      #{currentStage,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
+      #{currentStage,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{grade,jdbcType=VARCHAR}, #{aiToolJson,jdbcType=VARCHAR}, #{coursewareJson,jdbcType=VARCHAR}, #{quizConfigJson,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
       #{updatedAt,jdbcType=TIMESTAMP})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionPO">
@@ -38,6 +42,10 @@
       class_code = #{classCode,jdbcType=VARCHAR},
       current_stage = #{currentStage,jdbcType=VARCHAR},
       status = #{status,jdbcType=VARCHAR},
+      grade = #{grade,jdbcType=VARCHAR},
+      ai_tool_json = #{aiToolJson,jdbcType=VARCHAR},
+      courseware_json = #{coursewareJson,jdbcType=VARCHAR},
+      quiz_config_json = #{quizConfigJson,jdbcType=VARCHAR},
       created_at = #{createdAt,jdbcType=TIMESTAMP},
       updated_at = #{updatedAt,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
@@ -56,22 +64,30 @@
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select id, class_id, classroom_id, classroom_name, teacher_id, teacher_name, class_code, current_stage,
-    status, created_at, updated_at
+    status, grade, ai_tool_json, courseware_json, quiz_config_json, created_at, updated_at
     from aiedu_classroom_session
     where id = #{id,jdbcType=INTEGER}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select id, class_id, classroom_id, classroom_name, teacher_id, teacher_name, class_code, current_stage,
-    status, created_at, updated_at
+    status, grade, ai_tool_json, courseware_json, quiz_config_json, created_at, updated_at
     from aiedu_classroom_session
   </select>
   <select id="selectActiveSession" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionPO" resultMap="BaseResultMap">
     select id, class_id, classroom_id, classroom_name, teacher_id, teacher_name, class_code, current_stage,
-           status, created_at, updated_at
+           status, grade, ai_tool_json, courseware_json, quiz_config_json, created_at, updated_at
     from aiedu_classroom_session
     where status = 'active'
     and classroom_id = #{classroomId}
     and teacher_id = #{teacherId}
     and class_id = #{classId}
+  </select>
+  <select id="selectActiveByClassCode" resultType="String" resultMap="BaseResultMap">
+    select id, class_id, classroom_id, classroom_name, teacher_id, teacher_name, class_code, current_stage,
+           status, grade, ai_tool_json, courseware_json, quiz_config_json, created_at, updated_at
+    from aiedu_classroom_session
+    where status = 'active'
+    and class_code = #{classCode}
+    limit 1
   </select>
 </mapper>
