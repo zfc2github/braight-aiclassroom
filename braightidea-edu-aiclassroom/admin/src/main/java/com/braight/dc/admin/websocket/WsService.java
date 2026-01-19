@@ -21,6 +21,18 @@ public class WsService {
     private final Map<Integer, Set<String>> classroomSessionStudents = new ConcurrentHashMap<>();
 
     /**
+     * 广播：开始实验通知
+     *
+     * @param classroomSessionId
+     */
+    public void startToolExperience(Integer classroomSessionId) {
+        WsEvent evt = new WsEvent(WsEvent.START_TOOL_EXPERIENCE,
+                null,
+                System.currentTimeMillis());
+        template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+    }
+
+    /**
      * 广播：开始测验通知
      *
      * @param classroomSessionId

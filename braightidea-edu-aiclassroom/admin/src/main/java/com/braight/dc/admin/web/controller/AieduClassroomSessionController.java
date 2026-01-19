@@ -7,6 +7,7 @@ import com.braight.dc.admin.web.dto.ClassroomSessionJoinQuery;
 import com.braight.dc.admin.web.dto.ClassroomSessionJoinVO;
 import com.braight.dc.admin.web.entity.*;
 import com.braight.dc.admin.web.mapper.*;
+import com.braight.dc.admin.websocket.WsService;
 import com.braight.master.common.annotation.Log;
 import com.braight.master.common.annotation.Login;
 import com.braight.master.common.core.controller.BaseController;
@@ -43,6 +44,8 @@ public class AieduClassroomSessionController extends BaseController {
     private AieduClassroomSessionStudentPOMapper aieduClassroomSessionStudentPOMapper;
     @Resource
     private AieduStudentPOMapper aieduStudentPOMapper;
+    @Resource
+    private WsService wsService;
 
 
     @Login
@@ -184,16 +187,13 @@ public class AieduClassroomSessionController extends BaseController {
 
         AieduClassroomSessionStudentPO entity = aieduClassroomSessionStudentPOMapper.selectStudent(classroomSessionId, studentId);
         entity.setJoinedAt(new Date());
-        String studentName = query.getStudentName();
-        entity.setCurrentStage(Constant.ClassroomSessionCurrentStage.TOOL_EXPERIENCE);
-        entity.setWorkStatus(Constant.ClassroomStatus.IN_PROGRESS);
         aieduClassroomSessionStudentPOMapper.updateSelective(entity);
 
         // 返回课堂信息、学生信息、在线学生数量等
         ClassroomSessionJoinVO vo = new ClassroomSessionJoinVO();
         vo.setSessionId(classroomSessionId);
         vo.setStudentId(studentId);
-        vo.setStudentName(studentName);
+        vo.setStudentName(query.getStudentName());
         vo.setClassCode(classCode);
         vo.setClassroomName(activePo.getClassroomName());
         vo.setCurrentStage(activePo.getCurrentStage());
@@ -206,6 +206,32 @@ public class AieduClassroomSessionController extends BaseController {
         vo.setOnlineStudentCount(list.size());
 
         return AjaxResult.success(vo);
+    }
+
+    /**
+     * 开始学生实验
+     *
+     * @param sessionId
+     * @return
+     */
+    @Login
+    @GetMapping("/{sessionId}/startToolExperience")
+    public AjaxResult startToolExperience(@PathVariable Integer sessionId) {
+        wsService.startToolExperience(sessionId);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 开始测验
+     *
+     * @param sessionId
+     * @return
+     */
+    @Login
+    @GetMapping("/{sessionId}/startQuiz")
+    public AjaxResult startQuiz(@PathVariable Integer sessionId) {
+        wsService.publishQuiz(sessionId);
+        return AjaxResult.success();
     }
 }
 
