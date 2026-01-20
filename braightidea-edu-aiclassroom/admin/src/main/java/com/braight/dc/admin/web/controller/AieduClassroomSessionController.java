@@ -3,6 +3,7 @@ package com.braight.dc.admin.web.controller;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.braight.dc.admin.web.constants.Constant;
+import com.braight.dc.admin.web.dto.AieduClassroomSessionStudentWork;
 import com.braight.dc.admin.web.dto.ClassroomSessionJoinQuery;
 import com.braight.dc.admin.web.dto.ClassroomSessionJoinVO;
 import com.braight.dc.admin.web.entity.*;
@@ -12,15 +13,18 @@ import com.braight.master.common.annotation.Log;
 import com.braight.master.common.annotation.Login;
 import com.braight.master.common.core.controller.BaseController;
 import com.braight.master.common.core.domain.AjaxResult;
+import com.braight.master.common.core.page.PageDomain;
+import com.braight.master.common.core.page.TableSupport;
 import com.braight.master.common.enums.BusinessType;
+import com.braight.master.common.utils.sql.SqlUtil;
+import com.github.pagehelper.PageHelper;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 课堂会话表
@@ -46,6 +50,8 @@ public class AieduClassroomSessionController extends BaseController {
     private AieduStudentPOMapper aieduStudentPOMapper;
     @Resource
     private WsService wsService;
+    @Resource
+    private AieduClassroomSessionStudentWorkPOMapper aieduClassroomSessionStudentWorkPOMapper;
 
 
     @Login
@@ -91,7 +97,6 @@ public class AieduClassroomSessionController extends BaseController {
             row.setStudentId(student.getStudentId());
             row.setStudentName(student.getName());
             row.setJoinedAt(null);
-            row.setCurrentStage(Constant.ClassroomSessionCurrentStage.WAITING);
             row.setWorkStatus(Constant.ClassroomStatus.WAITING);
             row.setApiCount(0);
             row.setQuizStatus(Constant.ClassroomStatus.WAITING);
@@ -137,6 +142,8 @@ public class AieduClassroomSessionController extends BaseController {
         po.setCurrentStage(Constant.ClassroomSessionCurrentStage.COMPLETED);
         po.setStatus(Constant.ClassroomSessionStatus.ENDED);
         aieduClassroomSessionPOMapper.updateStageStatus(po);
+        // 推送websocket消息
+        wsService.endClassroomSession(sessionId);
         return AjaxResult.success();
     }
 
@@ -168,7 +175,12 @@ public class AieduClassroomSessionController extends BaseController {
         return new JSONObject();
     }
 
-    @Log(title = "加入课堂", businessType = BusinessType.OTHER)
+    /**
+     * 加入课堂
+     *
+     * @param query
+     * @return
+     */
     @PostMapping("/join")
     public AjaxResult joinSession(@Validated @RequestBody ClassroomSessionJoinQuery query) {
         // 校验课堂码是否处于激活状态
@@ -208,6 +220,20 @@ public class AieduClassroomSessionController extends BaseController {
         return AjaxResult.success(vo);
     }
 
+
+    /**
+     * 获取加入课堂的学生列表
+     *
+     * @param sessionId
+     * @return
+     */
+    @Login
+    @GetMapping("/{sessionId}/students")
+    public AjaxResult getStudents(@PathVariable String sessionId) {
+        List<AieduClassroomSessionStudentPO> students = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
+        return AjaxResult.success(students);
+    }
+
     /**
      * 开始学生实验
      *
@@ -217,6 +243,12 @@ public class AieduClassroomSessionController extends BaseController {
     @Login
     @GetMapping("/{sessionId}/startToolExperience")
     public AjaxResult startToolExperience(@PathVariable Integer sessionId) {
+        // 更新当前阶段
+        AieduClassroomSessionPO session = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
+        aieduClassroomSessionPOMapper.updateCurrentStage(session.getClassroomId(), Constant.ClassroomSessionCurrentStage.TOOL_EXPERIENCE);
+        // 更新作业状态
+        aieduClassroomSessionStudentPOMapper.updateWorkStatusByClassroomSessionId(sessionId, Constant.ClassroomStatus.IN_PROGRESS);
+        // 发送websocket消息
         wsService.startToolExperience(sessionId);
         return AjaxResult.success();
     }
@@ -230,8 +262,73 @@ public class AieduClassroomSessionController extends BaseController {
     @Login
     @GetMapping("/{sessionId}/startQuiz")
     public AjaxResult startQuiz(@PathVariable Integer sessionId) {
+        // 更新当前阶段
+        AieduClassroomSessionPO session = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
+        aieduClassroomSessionPOMapper.updateCurrentStage(session.getClassroomId(), Constant.ClassroomSessionCurrentStage.QUIZ);
+        // 更新测验状态
+        aieduClassroomSessionStudentPOMapper.updateQuizStatusByClassroomSessionId(sessionId, Constant.ClassroomStatus.IN_PROGRESS);
+        // 发送websocket消息
         wsService.publishQuiz(sessionId);
         return AjaxResult.success();
+    }
+
+    /**
+     * 学生提交作品
+     *
+     * @param po
+     * @return
+     */
+    @PostMapping("/submitWork")
+    public AjaxResult submitWork(@Validated @RequestBody AieduClassroomSessionStudentWorkPO po) {
+        // todo Shine 是否限制提交次数
+        po.setContentJson(getJsonString(po.getContent()));
+        po.setSubmittedAt(new Date());
+        aieduClassroomSessionStudentWorkPOMapper.insert(po);
+        return AjaxResult.success();
+    }
+
+    private String getJsonString(JSONObject content) {
+        return Objects.isNull(content)
+                ? new JSONObject().toJSONString()
+                : content.toJSONString();
+    }
+
+    /**
+     * 获取学生作品列表
+     *
+     * @param sessionId
+     * @return
+     */
+    @Login
+    @GetMapping("/{sessionId}/submissions")
+    public AjaxResult list(@PathVariable String sessionId) {
+        List<AieduClassroomSessionStudentWorkPO> list;
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
+        if (StringUtils.hasLength(orderBy)) {
+            PageHelper.orderBy(orderBy);
+        }
+        list = aieduClassroomSessionStudentWorkPOMapper.selectByClassroomSessionId(sessionId);
+
+        // 按学生studentId分组合并
+        Map<String, List<AieduClassroomSessionStudentWorkPO>> collect = list.stream()
+                .collect(Collectors.groupingBy(AieduClassroomSessionStudentWorkPO::getStudentId));
+
+        List<AieduClassroomSessionStudentWorkPO> result = new ArrayList<>();
+        collect.forEach((studentId, workList) -> {
+            AieduClassroomSessionStudentWorkPO po = workList.get(0);
+            List<AieduClassroomSessionStudentWork> works = workList.stream()
+                    .map(p-> {
+                        AieduClassroomSessionStudentWork jsonObject = new AieduClassroomSessionStudentWork();
+                        jsonObject.setContent(getJsonObject(p.getContentJson()));
+                        jsonObject.setSubmittedAt(p.getSubmittedAt());
+                        return jsonObject;
+                    })
+                    .collect(Collectors.toList());
+            po.setSubmissions(works);
+            result.add(po);
+        });
+        return AjaxResult.success(result);
     }
 }
 

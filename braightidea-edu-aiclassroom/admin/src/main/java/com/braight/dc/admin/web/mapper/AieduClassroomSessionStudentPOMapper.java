@@ -25,4 +25,12 @@ public interface AieduClassroomSessionStudentPOMapper {
 
     AieduClassroomSessionStudentPO selectStudent(@Param("classroomSessionId") Integer classroomSessionId,
                                                 @Param("studentId") String studentId);
+
+    int updateWorkStatusByClassroomSessionId(@Param("classroomSessionId") Integer classroomSessionId,
+                                             @Param("workStatus") String workStatus);
+
+    int updateQuizStatusByClassroomSessionId(@Param("classroomSessionId") Integer classroomSessionId,
+                                             @Param("quizStatus") String quizStatus);
+
+    List<AieduClassroomSessionStudentPO> selectStudentsByClassroomSessionId(@Param("classroomSessionId") String classroomSessionId);
 }

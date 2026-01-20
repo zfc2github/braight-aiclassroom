@@ -62,6 +62,11 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <update id="updateCurrentStage">
+    update aiedu_classroom_session
+    set current_stage = #{currentStage,jdbcType=VARCHAR}
+    where classroom_id = #{classroomId,jdbcType=INTEGER}
+  </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select id, class_id, classroom_id, classroom_name, teacher_id, teacher_name, class_code, current_stage,
     status, grade, ai_tool_json, courseware_json, quiz_config_json, created_at, updated_at

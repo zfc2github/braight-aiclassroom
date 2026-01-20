@@ -1,5 +1,6 @@
 package com.braight.dc.admin.web.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -14,9 +15,8 @@ public class AieduClassroomSessionStudentPO {
 
     private String studentName;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date joinedAt;
-
-    private String currentStage;
 
     private String workStatus;
 
@@ -64,14 +64,6 @@ public class AieduClassroomSessionStudentPO {
 
     public void setJoinedAt(Date joinedAt) {
         this.joinedAt = joinedAt;
-    }
-
-    public String getCurrentStage() {
-        return currentStage;
-    }
-
-    public void setCurrentStage(String currentStage) {
-        this.currentStage = currentStage;
     }
 
     public String getWorkStatus() {

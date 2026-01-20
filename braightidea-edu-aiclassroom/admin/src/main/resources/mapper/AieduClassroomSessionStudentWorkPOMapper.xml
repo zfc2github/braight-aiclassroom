@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.braight.dc.admin.web.mapper.AieduClassroomSessionStudentWorkPOMapper">
+  <resultMap id="BaseResultMap" type="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentWorkPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="classroom_session_id" jdbcType="INTEGER" property="classroomSessionId" />
+    <result column="student_id" jdbcType="VARCHAR" property="studentId" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="ai_tool_type" jdbcType="VARCHAR" property="aiToolType" />
+    <result column="submission_type" jdbcType="VARCHAR" property="submissionType" />
+    <result column="submitted_at" jdbcType="TIMESTAMP" property="submittedAt" />
+    <result column="content_json" jdbcType="LONGVARCHAR" property="contentJson" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from aiedu_classroom_session_student_work
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentWorkPO">
+    insert into aiedu_classroom_session_student_work (id, classroom_session_id, student_id,
+      student_name, ai_tool_type, submission_type,
+      submitted_at, content_json)
+    values (#{id,jdbcType=INTEGER}, #{classroomSessionId,jdbcType=INTEGER}, #{studentId,jdbcType=VARCHAR},
+      #{studentName,jdbcType=VARCHAR}, #{aiToolType,jdbcType=VARCHAR}, #{submissionType,jdbcType=VARCHAR},
+      #{submittedAt,jdbcType=TIMESTAMP}, #{contentJson,jdbcType=LONGVARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentWorkPO">
+    update aiedu_classroom_session_student_work
+    set classroom_session_id = #{classroomSessionId,jdbcType=INTEGER},
+      student_id = #{studentId,jdbcType=VARCHAR},
+      student_name = #{studentName,jdbcType=VARCHAR},
+      ai_tool_type = #{aiToolType,jdbcType=VARCHAR},
+      submission_type = #{submissionType,jdbcType=VARCHAR},
+      submitted_at = #{submittedAt,jdbcType=TIMESTAMP},
+      content_json = #{contentJson,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, classroom_session_id, student_id, student_name, ai_tool_type, submission_type,
+    submitted_at, content_json
+    from aiedu_classroom_session_student_work
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, classroom_session_id, student_id, student_name, ai_tool_type, submission_type,
+    submitted_at, content_json
+    from aiedu_classroom_session_student_work
+  </select>
+  <select id="selectByClassroomSessionId" resultMap="BaseResultMap">
+    select id, classroom_session_id, student_id, student_name, ai_tool_type, submission_type,
+    submitted_at, content_json
+    from aiedu_classroom_session_student_work
+    where classroom_session_id = #{classroomSessionId,jdbcType=INTEGER}
+  </select>
+</mapper>

@@ -1,8 +1,8 @@
 package com.braight.dc.admin.web.mapper;
 
 import com.braight.dc.admin.web.entity.AieduClassroomSessionPO;
+import org.apache.ibatis.annotations.Param;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface AieduClassroomSessionPOMapper {
@@ -21,4 +21,7 @@ public interface AieduClassroomSessionPOMapper {
     int updateStageStatus(AieduClassroomSessionPO po);
 
     AieduClassroomSessionPO selectActiveByClassCode(String classCode);
+
+    int updateCurrentStage(@Param("classroomId") Integer classroomId,
+                           @Param("currentStage") String currentStage);
 }

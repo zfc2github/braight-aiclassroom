@@ -54,6 +54,18 @@ public class WsService {
                 null,
                 System.currentTimeMillis());
         template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+    }
+
+    /**
+     * 广播：结束课堂
+     *
+     * @param classroomSessionId
+     */
+    public void endClassroomSession(Integer classroomSessionId) {
+        WsEvent evt = new WsEvent(WsEvent.TYPE_END_CLASSROOM_SESSION,
+                null,
+                System.currentTimeMillis());
+        template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
         // 删除所有学生连接信息
         removeStudentFromClassroomSession(classroomSessionId);
     }
