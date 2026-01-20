@@ -2,7 +2,9 @@ package com.braight.dc.admin.web.entity;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.braight.dc.admin.web.dto.AieduClassroomSessionStudentWork;
+import com.braight.dc.admin.web.dto.Views;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -34,6 +36,9 @@ public class AieduClassroomSessionStudentWorkPO {
     @NotNull
     private JSONObject content;
     private List<AieduClassroomSessionStudentWork> submissions;
+
+    @JsonView(Views.Backend.class)
+    private Boolean finalSubmit = false;
 
     public Integer getId() {
         return id;

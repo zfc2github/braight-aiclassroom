@@ -15,4 +15,5 @@ public class AieduClassroomSessionStudentWork {
     private JSONObject content;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date submittedAt;
+    private Boolean finalSubmit;
 }

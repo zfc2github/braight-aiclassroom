@@ -76,6 +76,9 @@ spring:
           socketFactory:
             class:
             port:
+  jackson:
+    mapper:
+      default-view-inclusion: true
 
 # token配置
 token:

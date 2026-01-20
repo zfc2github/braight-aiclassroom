@@ -3,9 +3,7 @@ package com.braight.dc.admin.web.controller;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.braight.dc.admin.web.constants.Constant;
-import com.braight.dc.admin.web.dto.AieduClassroomSessionStudentWork;
-import com.braight.dc.admin.web.dto.ClassroomSessionJoinQuery;
-import com.braight.dc.admin.web.dto.ClassroomSessionJoinVO;
+import com.braight.dc.admin.web.dto.*;
 import com.braight.dc.admin.web.entity.*;
 import com.braight.dc.admin.web.mapper.*;
 import com.braight.dc.admin.websocket.WsService;
@@ -17,7 +15,9 @@ import com.braight.master.common.core.page.PageDomain;
 import com.braight.master.common.core.page.TableSupport;
 import com.braight.master.common.enums.BusinessType;
 import com.braight.master.common.utils.sql.SqlUtil;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.github.pagehelper.PageHelper;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -301,6 +301,7 @@ public class AieduClassroomSessionController extends BaseController {
      */
     @Login
     @GetMapping("/{sessionId}/submissions")
+    @JsonView(Views.Frontend.class)
     public AjaxResult list(@PathVariable String sessionId) {
         List<AieduClassroomSessionStudentWorkPO> list;
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -322,6 +323,7 @@ public class AieduClassroomSessionController extends BaseController {
                         AieduClassroomSessionStudentWork jsonObject = new AieduClassroomSessionStudentWork();
                         jsonObject.setContent(getJsonObject(p.getContentJson()));
                         jsonObject.setSubmittedAt(p.getSubmittedAt());
+                        jsonObject.setFinalSubmit(p.getFinalSubmit());
                         return jsonObject;
                     })
                     .collect(Collectors.toList());
@@ -329,6 +331,24 @@ public class AieduClassroomSessionController extends BaseController {
             result.add(po);
         });
         return AjaxResult.success(result);
+    }
+
+    /**
+     * todo Shine 批量下载学生作品
+     *
+     * @param sessionId
+     * @return
+     */
+    @Login
+    @PostMapping("/{sessionId}/submissions/download")
+    public void downloadSubmissions(@PathVariable String sessionId,
+                                    @RequestBody ClassroomSessionWorkDownloadQuery query) {
+        List<Integer> ids = query.getIds();
+        if (CollectionUtils.isEmpty(ids)) {
+            // 下载全部作品
+        } else {
+            // 下载指定作品
+        }
     }
 }
 

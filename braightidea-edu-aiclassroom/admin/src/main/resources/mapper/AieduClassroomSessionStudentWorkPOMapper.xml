@@ -10,6 +10,7 @@
     <result column="submission_type" jdbcType="VARCHAR" property="submissionType" />
     <result column="submitted_at" jdbcType="TIMESTAMP" property="submittedAt" />
     <result column="content_json" jdbcType="LONGVARCHAR" property="contentJson" />
+    <result column="final_submit" jdbcType="BOOLEAN" property="finalSubmit" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from aiedu_classroom_session_student_work
@@ -18,10 +19,10 @@
   <insert id="insert" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentWorkPO">
     insert into aiedu_classroom_session_student_work (id, classroom_session_id, student_id,
       student_name, ai_tool_type, submission_type,
-      submitted_at, content_json)
+      submitted_at, content_json, final_submit)
     values (#{id,jdbcType=INTEGER}, #{classroomSessionId,jdbcType=INTEGER}, #{studentId,jdbcType=VARCHAR},
       #{studentName,jdbcType=VARCHAR}, #{aiToolType,jdbcType=VARCHAR}, #{submissionType,jdbcType=VARCHAR},
-      #{submittedAt,jdbcType=TIMESTAMP}, #{contentJson,jdbcType=LONGVARCHAR})
+      #{submittedAt,jdbcType=TIMESTAMP}, #{contentJson,jdbcType=LONGVARCHAR}, #{finalSubmit,jdbcType=BOOLEAN})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentWorkPO">
     update aiedu_classroom_session_student_work
@@ -31,23 +32,24 @@
       ai_tool_type = #{aiToolType,jdbcType=VARCHAR},
       submission_type = #{submissionType,jdbcType=VARCHAR},
       submitted_at = #{submittedAt,jdbcType=TIMESTAMP},
-      content_json = #{contentJson,jdbcType=LONGVARCHAR}
+      content_json = #{contentJson,jdbcType=LONGVARCHAR},
+      final_submit = #{finalSubmit,jdbcType=BOOLEAN}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select id, classroom_session_id, student_id, student_name, ai_tool_type, submission_type,
-    submitted_at, content_json
+    submitted_at, content_json, final_submit
     from aiedu_classroom_session_student_work
     where id = #{id,jdbcType=INTEGER}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select id, classroom_session_id, student_id, student_name, ai_tool_type, submission_type,
-    submitted_at, content_json
+    submitted_at, content_json, final_submit
     from aiedu_classroom_session_student_work
   </select>
   <select id="selectByClassroomSessionId" resultMap="BaseResultMap">
     select id, classroom_session_id, student_id, student_name, ai_tool_type, submission_type,
-    submitted_at, content_json
+    submitted_at, content_json, final_submit
     from aiedu_classroom_session_student_work
     where classroom_session_id = #{classroomSessionId,jdbcType=INTEGER}
   </select>
