@@ -289,6 +289,23 @@ public class AieduClassroomSessionController extends BaseController {
         return AjaxResult.success();
     }
 
+    /**
+     * API调用记数（调用一次+1）
+     * @param sessionId
+     * @param studentId
+     * @return
+     */
+    @GetMapping("/{sessionId}/apiInvokeCounter")
+    public AjaxResult apiInvokeCounter(@PathVariable Integer sessionId,
+                                     @RequestParam String studentId) {
+        AieduClassroomSessionStudentPO sessionStudentPO = aieduClassroomSessionStudentPOMapper.selectStudent(sessionId, studentId);
+        int apiCount = sessionStudentPO.getApiCount() == null
+                ? 1
+                : sessionStudentPO.getApiCount() + 1;
+        aieduClassroomSessionStudentPOMapper.updateApiCount(sessionStudentPO.getId(), apiCount);
+        return AjaxResult.success();
+    }
+
     private String getJsonString(JSONObject content) {
         return Objects.isNull(content)
                 ? new JSONObject().toJSONString()

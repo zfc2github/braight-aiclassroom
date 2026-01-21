@@ -100,6 +100,11 @@
         where classroom_session_id = #{classroomSessionId,jdbcType=INTEGER}
           and student_id = #{studentId,jdbcType=VARCHAR}
     </update>
+    <update id="updateApiCount">
+        update aiedu_classroom_session_student
+        set api_count = #{apiCount,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select id, classroom_session_id, student_id, student_name, joined_at,
            work_status, api_count, quiz_status, quiz_score, quiz_answers_jsonarray, quiz_result_jsonobject
