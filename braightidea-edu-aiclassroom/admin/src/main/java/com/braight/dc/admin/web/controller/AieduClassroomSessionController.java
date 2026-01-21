@@ -231,7 +231,7 @@ public class AieduClassroomSessionController extends BaseController {
      */
     @Login
     @GetMapping("/{sessionId}/students")
-    public AjaxResult getStudents(@PathVariable String sessionId) {
+    public AjaxResult getStudents(@PathVariable Integer sessionId) {
         List<AieduClassroomSessionStudentPO> students = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
         return AjaxResult.success(students);
     }
@@ -504,6 +504,67 @@ public class AieduClassroomSessionController extends BaseController {
         return correctList.size() == studentList.size() &&
                 correctList.containsAll(studentList) &&
                 studentList.containsAll(correctList);
+    }
+
+    /**
+     * 获取学生参与情况
+     *
+     * @param sessionId
+     * @return
+     */
+    @GetMapping("/{sessionId}/student/participationStats")
+    public AjaxResult studentParticipationStats(@PathVariable Integer sessionId) {
+        List<AieduClassroomSessionStudentPO> sessionStudents = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
+        ParticipationStats stats = new ParticipationStats();
+        stats.setClassroomSessionId(sessionId);
+        stats.setTotal(sessionStudents.size());
+
+        List<AieduClassroomSessionStudentPO> notJoined = sessionStudents.stream()
+                .filter(s -> Objects.isNull(s.getJoinedAt()))
+                .collect(Collectors.toList());
+        stats.setNotJoinedStudents(notJoined);
+        stats.setJoined(sessionStudents.size() - notJoined.size());
+
+        List<AieduClassroomSessionStudentPO> waitingStudents = sessionStudents.stream()
+                .filter(s -> Constant.ClassroomStatus.WAITING.equals(s.getWorkStatus()))
+                .collect(Collectors.toList());
+        stats.setWaitingStudents(waitingStudents);
+        stats.setInProgress(sessionStudents.size() - waitingStudents.size());
+
+        List<AieduClassroomSessionStudentPO> completedStudents = sessionStudents.stream()
+                .filter(s -> Constant.ClassroomStatus.COMPLETED.equals(s.getWorkStatus()))
+                .collect(Collectors.toList());
+        stats.setCompleted(completedStudents.size());
+
+        stats.setAllStudents(sessionStudents);
+        return AjaxResult.success(stats);
+    }
+
+    /**
+     * 获取学生API调用情况
+     *
+     * @param sessionId
+     * @return
+     */
+    @GetMapping("/{sessionId}/student/apiInvokeStats")
+    public AjaxResult studentApiInvokeStats(@PathVariable Integer sessionId) {
+        List<AieduClassroomSessionStudentPO> sessionStudents = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
+        ApiInvokeStats stats = new ApiInvokeStats();
+        stats.setClassroomSessionId(sessionId);
+        List<String> xAxis = new ArrayList<>();
+        List<Integer> seriesData = new ArrayList<>();
+        sessionStudents.forEach(s -> {
+            xAxis.add(s.getStudentName());
+            seriesData.add(s.getApiCount()==null?0:s.getApiCount());
+        });
+        stats.setXAxis(xAxis);
+        stats.setSeriesData(seriesData);
+        double avg = seriesData.stream()
+                .mapToDouble(Integer::doubleValue)
+                .average()
+                .orElse(0.0);
+        stats.setAvgCalls((int) avg);
+        return AjaxResult.success(stats);
     }
 }
 

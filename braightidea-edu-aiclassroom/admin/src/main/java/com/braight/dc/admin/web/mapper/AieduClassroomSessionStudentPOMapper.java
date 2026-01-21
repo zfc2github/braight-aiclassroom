@@ -32,7 +32,7 @@ public interface AieduClassroomSessionStudentPOMapper {
     int updateQuizStatusByClassroomSessionId(@Param("classroomSessionId") Integer classroomSessionId,
                                              @Param("quizStatus") String quizStatus);
 
-    List<AieduClassroomSessionStudentPO> selectStudentsByClassroomSessionId(@Param("classroomSessionId") String classroomSessionId);
+    List<AieduClassroomSessionStudentPO> selectStudentsByClassroomSessionId(@Param("classroomSessionId") Integer classroomSessionId);
 
     int updateQuizAnswers(@Param("classroomSessionId") Integer classroomSessionId,
                           @Param("quizAnswersJsonarray") String quizAnswersJsonarray,
