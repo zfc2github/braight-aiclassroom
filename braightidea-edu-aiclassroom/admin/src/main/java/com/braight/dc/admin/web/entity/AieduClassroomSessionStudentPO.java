@@ -1,8 +1,11 @@
 package com.braight.dc.admin.web.entity;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 @Data
@@ -11,6 +14,7 @@ public class AieduClassroomSessionStudentPO {
 
     private Integer classroomSessionId;
 
+    @NotBlank
     private String studentId;
 
     private String studentName;
@@ -25,6 +29,10 @@ public class AieduClassroomSessionStudentPO {
     private String quizStatus;
 
     private Integer quizScore;
+    private String quizAnswersJsonarray;
+    private JSONArray quizAnswers;
+    private JSONObject quizResult;
+    private String quizResultJsonobject;
 
     public Integer getId() {
         return id;

@@ -1,6 +1,8 @@
 package com.braight.dc.admin.web.controller;
 
 import cn.hutool.core.util.RandomUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.braight.dc.admin.web.constants.Constant;
 import com.braight.dc.admin.web.dto.*;
@@ -349,6 +351,142 @@ public class AieduClassroomSessionController extends BaseController {
         } else {
             // 下载指定作品
         }
+    }
+
+    /**
+     * 获取测验题目
+     *
+     * @param sessionId
+     * @return
+     */
+    @GetMapping("/{sessionId}/quiz/questions")
+    public AjaxResult quizQuestions(@PathVariable Integer sessionId) {
+        AieduClassroomSessionPO sessionPO = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
+        JSONObject quizConfig = getJsonObject(sessionPO.getQuizConfigJson());
+        Boolean enabled = quizConfig.getBoolean("enabled");
+        if (!enabled) {
+            return AjaxResult.success(new ArrayList<>());
+        }
+        JSONArray questions = quizConfig.getJSONArray("questions");
+        return AjaxResult.success(questions);
+    }
+
+    /**
+     * 学生提交测验答题
+     *
+     * @param sessionId
+     * @param query
+     * @return
+     */
+    @PostMapping("/{sessionId}/quiz/submit")
+    public AjaxResult submitQuiz(@PathVariable Integer sessionId,
+                                 @Validated @RequestBody AieduClassroomSessionStudentPO query) {
+        JSONArray quizAnswers = query.getQuizAnswers();
+        if (quizAnswers == null) {
+            quizAnswers = new JSONArray();
+        }
+        aieduClassroomSessionStudentPOMapper.updateQuizAnswers(sessionId, quizAnswers.toJSONString(), query.getStudentId());
+        // 生成测验结果
+        QuizResult quizResult = new QuizResult();
+        int score = 0;
+        int totalQuestions = 0;
+        int correctCount = 0;
+        List<QuestionResult> results = new ArrayList<>();
+        try {
+            AieduClassroomSessionPO sessionPO = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
+            JSONObject quizConfig = getJsonObject(sessionPO.getQuizConfigJson());
+            JSONArray questions = quizConfig.getJSONArray("questions");
+            totalQuestions = questions.size();
+            for (int i = 0; i < questions.size(); i++) {
+                AieduQuizQuestionPO questionPO = questions.getObject(i, AieduQuizQuestionPO.class);
+                String type = questionPO.getType();
+                Integer points = questionPO.getPoints();
+                String answerJson = questionPO.getAnswerJson();
+                QuestionResult questionResult = new QuestionResult();
+                questionResult.setType(type);
+                questionResult.setQuestionId(questionPO.getId());
+                if (i < quizAnswers.size()) {
+                    JSONObject quizAnswer = quizAnswers.getJSONObject(i);
+                    if ("single".equals(type)
+                            || "multiple".equals(type)) {
+                        JSONArray correctAnswer = JSON.parseArray(answerJson);
+                        JSONArray studentAnswer = quizAnswer.getJSONArray("answer");
+                        if (isEqualJsonArray(correctAnswer, studentAnswer)) {
+                            score += points;
+                            correctCount++;
+                            questionResult.setIsCorrect(true);
+                        } else {
+                            questionResult.setIsCorrect(false);
+                        }
+                        questionResult.setCorrectAnswer(correctAnswer);
+                        questionResult.setStudentAnswer(studentAnswer);
+                    } else if ("boolean".equals(type)) {
+                        Integer correctAnswer = JSON.parseObject(answerJson, Integer.class);
+                        Integer studentAnswer = quizAnswer.getInteger("answer");
+                        if (correctAnswer.equals(studentAnswer)) {
+                            score += points;
+                            correctCount++;
+                            questionResult.setIsCorrect(true);
+                        } else {
+                            questionResult.setIsCorrect(false);
+                        }
+                        questionResult.setCorrectAnswer(correctAnswer);
+                        questionResult.setStudentAnswer(studentAnswer);
+                    } else {
+                        System.err.println("未知的题型:" + type);
+                        questionResult.setIsCorrect(false);
+                        questionResult.setCorrectAnswer(answerJson);
+                        questionResult.setStudentAnswer(quizAnswer.get("answer"));
+                    }
+                } else {
+                    // 未完成
+                    if ("single".equals(type)
+                            || "multiple".equals(type)) {
+                        JSONArray correctAnswer = JSON.parseArray(answerJson);
+                        questionResult.setIsCorrect(false);
+                        questionResult.setCorrectAnswer(correctAnswer);
+                        questionResult.setStudentAnswer("");
+                    } else if ("boolean".equals(type)) {
+                        Integer correctAnswer = JSON.parseObject(answerJson, Integer.class);
+                        questionResult.setIsCorrect(false);
+                        questionResult.setCorrectAnswer(correctAnswer);
+                        questionResult.setStudentAnswer("");
+                    } else {
+                        System.err.println("未知的题型:" + type);
+                        questionResult.setIsCorrect(false);
+                        questionResult.setCorrectAnswer(answerJson);
+                        questionResult.setStudentAnswer("");
+                    }
+                }
+                results.add(questionResult);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        quizResult.setScore(score);
+        quizResult.setTotalQuestions(totalQuestions);
+        quizResult.setCorrectCount(correctCount);
+        quizResult.setResults(results);
+        aieduClassroomSessionStudentPOMapper.updateQuizResult(sessionId, query.getStudentId(), JSON.toJSONString(quizResult));
+        // 返回测验结果
+        return AjaxResult.success(quizResult);
+    }
+
+    /**
+     * 判断两个JSONArray是否相等
+     *
+     * @param correctAnswer
+     * @param studentAnswer
+     * @return
+     */
+    private boolean isEqualJsonArray(JSONArray correctAnswer, JSONArray studentAnswer) {
+        List<Object> correctList = correctAnswer.toJavaList(Object.class);
+        List<Object> studentList = studentAnswer.toJavaList(Object.class);
+
+        // 检查两个列表长度是否相同，且相互包含所有元素
+        return correctList.size() == studentList.size() &&
+                correctList.containsAll(studentList) &&
+                studentList.containsAll(correctList);
     }
 }
 

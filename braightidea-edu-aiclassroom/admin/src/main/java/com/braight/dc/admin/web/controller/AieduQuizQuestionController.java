@@ -49,6 +49,10 @@ public class AieduQuizQuestionController extends BaseController {
         if (po.getCustomized() == null) {
             po.setCustomized(false);
         }
+        Object answer = po.getAnswer();
+        if (!Objects.isNull(answer)) {
+            po.setAnswerJson(JSON.toJSONString(answer));
+        }
         aieduQuizQuestionPOMapper.insert(po);
         return AjaxResult.success(po);
     }
@@ -76,6 +80,9 @@ public class AieduQuizQuestionController extends BaseController {
     }
 
 
+    /**
+     * 获取推荐题目
+     */
     //    @PreAuthorize("@ss.hasPermi('cms:aiTools:list')")
     @Login
     @GetMapping("/recommended")
@@ -98,6 +105,17 @@ public class AieduQuizQuestionController extends BaseController {
             po.setOptions(JSON.parseArray(optionsJsonarray));
         } else {
             po.setOptions(new JSONArray());
+        }
+        String answerJson = po.getAnswerJson();
+        if (StringUtils.hasLength(answerJson)) {
+            if ("single".equals(po.getType())
+                    ||"multiple".equals(po.getType())) {
+                po.setAnswer(JSON.parseArray(answerJson));
+            } else if ("boolean".equals(po.getType())) {
+                po.setAnswer(JSON.parseObject(answerJson, Integer.class));
+            } else {
+                po.setAnswer(JSON.parseObject(answerJson));
+            }
         }
     }
 

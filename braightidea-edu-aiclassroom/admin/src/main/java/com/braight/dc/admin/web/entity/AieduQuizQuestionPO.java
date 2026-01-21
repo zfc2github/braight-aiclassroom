@@ -29,6 +29,8 @@ public class AieduQuizQuestionPO {
 
     private String explanation;
     private Boolean customized;
+    private String answerJson;
+    private Object answer;
 
     public Boolean getCustomized() {
         return customized;

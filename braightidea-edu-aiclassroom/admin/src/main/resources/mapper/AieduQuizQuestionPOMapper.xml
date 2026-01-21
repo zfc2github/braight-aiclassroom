@@ -12,6 +12,7 @@
     <result column="options_jsonarray" jdbcType="LONGVARCHAR" property="optionsJsonarray" />
     <result column="explanation" jdbcType="LONGVARCHAR" property="explanation" />
     <result column="customized" jdbcType="BOOLEAN" property="customized" />
+    <result column="answer_json" jdbcType="LONGVARCHAR" property="answerJson" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from aiedu_quiz_question
@@ -21,12 +22,12 @@
           useGeneratedKeys="true" keyProperty="id">
     insert into aiedu_quiz_question (id, type, points,
       created_at, updated_at, question,
-      question_en, options_jsonarray, explanation, customized
+      question_en, options_jsonarray, explanation, customized, answer_json
       )
     values (#{id,jdbcType=INTEGER}, #{type,jdbcType=VARCHAR}, #{points,jdbcType=INTEGER},
       #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{question,jdbcType=LONGVARCHAR},
       #{questionEn,jdbcType=LONGVARCHAR}, #{optionsJsonarray,jdbcType=LONGVARCHAR}, #{explanation,jdbcType=LONGVARCHAR},
-      #{customized,jdbcType=BOOLEAN}
+      #{customized,jdbcType=BOOLEAN}, #{answerJson,jdbcType=LONGVARCHAR}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduQuizQuestionPO">
@@ -39,23 +40,24 @@
       question_en = #{questionEn,jdbcType=LONGVARCHAR},
       options_jsonarray = #{optionsJsonarray,jdbcType=LONGVARCHAR},
       explanation = #{explanation,jdbcType=LONGVARCHAR},
-      customized = #{customized,jdbcType=BOOLEAN}
+      customized = #{customized,jdbcType=BOOLEAN},
+      answer = #{answerJson,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select id, type, points, created_at, updated_at, question, question_en, options_jsonarray,
-    explanation, customized
+    explanation, customized, answer_json
     from aiedu_quiz_question
     where id = #{id,jdbcType=INTEGER}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select id, type, points, created_at, updated_at, question, question_en, options_jsonarray,
-    explanation, customized
+    explanation, customized, answer_json
     from aiedu_quiz_question
   </select>
   <select id="selectListByIds" resultMap="BaseResultMap">
     select id, type, points, created_at, updated_at, question, question_en, options_jsonarray,
-           explanation, customized
+           explanation, customized, answer_json
     from aiedu_quiz_question
     where id in
     <foreach item="item" collection="ids" separator="," open="(" close=")" index="index">

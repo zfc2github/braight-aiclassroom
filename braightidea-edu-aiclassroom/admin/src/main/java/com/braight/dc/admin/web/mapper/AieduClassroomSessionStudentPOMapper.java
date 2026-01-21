@@ -33,4 +33,12 @@ public interface AieduClassroomSessionStudentPOMapper {
                                              @Param("quizStatus") String quizStatus);
 
     List<AieduClassroomSessionStudentPO> selectStudentsByClassroomSessionId(@Param("classroomSessionId") String classroomSessionId);
+
+    int updateQuizAnswers(@Param("classroomSessionId") Integer classroomSessionId,
+                          @Param("quizAnswersJsonarray") String quizAnswersJsonarray,
+                          @Param("studentId") String studentId);
+
+    int updateQuizResult(@Param("classroomSessionId") Integer classroomSessionId,
+                         @Param("studentId") String studentId,
+                         @Param("quizResultJsonobject") String quizResultJsonobject);
 }
