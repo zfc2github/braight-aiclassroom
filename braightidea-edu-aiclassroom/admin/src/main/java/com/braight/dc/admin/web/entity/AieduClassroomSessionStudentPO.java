@@ -32,6 +32,8 @@ public class AieduClassroomSessionStudentPO {
     private JSONArray quizAnswers;
     private JSONObject quizResult;
     private String quizResultJsonobject;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date submittedAt;
 
     public Integer getId() {
         return id;

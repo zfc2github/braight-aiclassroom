@@ -321,7 +321,7 @@ public class AieduClassroomSessionController extends BaseController {
     @Login
     @GetMapping("/{sessionId}/submissions")
     @JsonView(Views.Frontend.class)
-    public AjaxResult list(@PathVariable String sessionId) {
+    public AjaxResult list(@PathVariable Integer sessionId) {
         List<AieduClassroomSessionStudentWorkPO> list;
         PageDomain pageDomain = TableSupport.buildPageRequest();
         String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
@@ -404,8 +404,13 @@ public class AieduClassroomSessionController extends BaseController {
         }
         // 生成测验结果
         QuizResult quizResult = new QuizResult();
+        quizResult.setStudentId(query.getStudentId());
+        AieduClassroomSessionStudentPO selectStudent = aieduClassroomSessionStudentPOMapper.selectStudent(sessionId, query.getStudentId());
+        quizResult.setStudentName(selectStudent.getStudentName());
+
         int score = 0;
         int totalQuestions = 0;
+        int unansweredCount = 0;
         int correctCount = 0;
         List<QuestionResult> results = new ArrayList<>();
         try {
@@ -427,6 +432,10 @@ public class AieduClassroomSessionController extends BaseController {
                             || "multiple".equals(type)) {
                         JSONArray correctAnswer = JSON.parseArray(answerJson);
                         JSONArray studentAnswer = quizAnswer.getJSONArray("answer");
+                        if (studentAnswer == null || studentAnswer.isEmpty()) {
+                            studentAnswer = new JSONArray();
+                            unansweredCount++;
+                        }
                         if (isEqualJsonArray(correctAnswer, studentAnswer)) {
                             score += points;
                             correctCount++;
@@ -439,6 +448,9 @@ public class AieduClassroomSessionController extends BaseController {
                     } else if ("boolean".equals(type)) {
                         Integer correctAnswer = JSON.parseObject(answerJson, Integer.class);
                         Integer studentAnswer = quizAnswer.getInteger("answer");
+                        if (studentAnswer == null) {
+                            unansweredCount++;
+                        }
                         if (correctAnswer.equals(studentAnswer)) {
                             score += points;
                             correctCount++;
@@ -456,6 +468,7 @@ public class AieduClassroomSessionController extends BaseController {
                     }
                 } else {
                     // 未完成
+                    unansweredCount++;
                     if ("single".equals(type)
                             || "multiple".equals(type)) {
                         JSONArray correctAnswer = JSON.parseArray(answerJson);
@@ -481,8 +494,10 @@ public class AieduClassroomSessionController extends BaseController {
         }
         quizResult.setScore(score);
         quizResult.setTotalQuestions(totalQuestions);
+        quizResult.setAnsweredCount(totalQuestions - unansweredCount);
         quizResult.setCorrectCount(correctCount);
         quizResult.setResults(results);
+        quizResult.setSubmittedAt(new Date());
 //        aieduClassroomSessionStudentPOMapper.updateQuizAnswers(sessionId, quizAnswers.toJSONString(), query.getStudentId());
 //        aieduClassroomSessionStudentPOMapper.updateQuizResult(sessionId, query.getStudentId(), JSON.toJSONString(quizResult));
 //        aieduClassroomSessionStudentPOMapper.updateQuizStatusByClassroomSessionIdStudentId(sessionId, query.getStudentId(), Constant.ClassroomStatus.COMPLETED);
@@ -492,6 +507,7 @@ public class AieduClassroomSessionController extends BaseController {
         param.setQuizAnswersJsonarray(quizAnswers.toJSONString());
         param.setQuizResultJsonobject(JSON.toJSONString(quizResult));
         param.setQuizStatus(Constant.ClassroomStatus.COMPLETED);
+        param.setSubmittedAt(new Date());
         aieduClassroomSessionStudentPOMapper.updateSelectiveByClassroomSessionIdStudentId(param);
         // 返回测验结果
         return AjaxResult.success(quizResult);
@@ -664,6 +680,29 @@ public class AieduClassroomSessionController extends BaseController {
             }
         }
         return distribution;
+    }
+
+    /**
+     * 获取测验答案列表
+     *
+     * @param sessionId
+     * @return
+     */
+    @GetMapping("/{sessionId}/quiz/submissions")
+    public AjaxResult quizSubmissions(@PathVariable Integer sessionId) {
+        List<AieduClassroomSessionStudentPO> list;
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
+        if (StringUtils.hasLength(orderBy)) {
+            PageHelper.orderBy(orderBy);
+        }
+        list = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
+
+        List<QuizResult> result = list.stream()
+                .filter(s -> !Objects.isNull(s.getQuizResultJsonobject()))
+                .map(s -> JSON.parseObject(s.getQuizResultJsonobject(), QuizResult.class))
+                .collect(Collectors.toList());
+        return AjaxResult.success(result);
     }
 
 }

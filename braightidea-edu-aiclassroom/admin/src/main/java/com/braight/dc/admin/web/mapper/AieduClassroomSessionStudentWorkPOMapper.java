@@ -14,5 +14,5 @@ public interface AieduClassroomSessionStudentWorkPOMapper {
 
     int updateByPrimaryKey(AieduClassroomSessionStudentWorkPO row);
 
-    List<AieduClassroomSessionStudentWorkPO> selectByClassroomSessionId(String classroomSessionId);
+    List<AieduClassroomSessionStudentWorkPO> selectByClassroomSessionId(Integer classroomSessionId);
 }
