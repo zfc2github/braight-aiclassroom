@@ -25,9 +25,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * 课堂会话表
@@ -360,14 +366,118 @@ public class AieduClassroomSessionController extends BaseController {
      */
     @Login
     @PostMapping("/{sessionId}/submissions/download")
-    public void downloadSubmissions(@PathVariable String sessionId,
-                                    @RequestBody ClassroomSessionWorkDownloadQuery query) {
+    public void downloadSubmissions(@PathVariable Integer sessionId,
+                                    @RequestBody ClassroomSessionWorkDownloadQuery query,
+                                    HttpServletResponse response) {
         List<Integer> ids = query.getIds();
-        if (CollectionUtils.isEmpty(ids)) {
-            // 下载全部作品
-        } else {
+        List<AieduClassroomSessionStudentWorkPO> all = aieduClassroomSessionStudentWorkPOMapper.selectByClassroomSessionId(sessionId);
+        List<AieduClassroomSessionStudentWorkPO> finalSubmitWork = all.stream()
+                .filter(AieduClassroomSessionStudentWorkPO::getFinalSubmit)
+                .collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(ids)) {
             // 下载指定作品
+            finalSubmitWork = finalSubmitWork.stream()
+                    .filter(p -> ids.contains(p.getId()))
+                    .collect(Collectors.toList());
         }
+        List<StudentWork> works = finalSubmitWork.stream()
+                .map(p -> {
+                    JSONObject content = getJsonObject(p.getContentJson());
+                    String url = content.getString("url");
+                    if (StringUtils.hasLength(url)) {
+                        StudentWork work = new StudentWork();
+                        work.setStudentId(p.getStudentId());
+                        work.setStudentName(p.getStudentName());
+                        work.setUrl(url);
+                        return work;
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        // 将所有url下载下来并添加到zip中并返回到前端供直接下载
+        try {
+            // 设置响应头
+            // 设置响应头 - 使用UTF-8编码处理中文文件名
+            String encodedFileName = URLEncoder.encode("学生作品_" + sessionId + "_" + System.currentTimeMillis() + ".zip", "UTF-8");
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
+            // 同时设置RFC 6266标准的国际化文件名
+            response.setHeader("Content-Disposition", response.getHeader("Content-Disposition") + "; filename*=UTF-8''" + encodedFileName);
+
+
+            // 创建ZIP输出流
+            try (ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream())) {
+
+                for (int i = 0; i < works.size(); i++) {
+                    StudentWork work = works.get(i);
+                    try {
+                        // 使用HttpClient或OkHttp等库进行更可靠的下载
+                        URL url = new URL(work.getUrl());
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("GET");
+                        connection.setConnectTimeout(10000); // 10秒连接超时
+                        connection.setReadTimeout(30000);   // 30秒读取超时
+
+                        try (InputStream inputStream = connection.getInputStream()) {
+
+                            // 确保文件名唯一，避免冲突
+                            String uniqueFileName = work.getStudentId() + "_" + work.getStudentName() + "_" + extractFileNameUsingUri(work.getUrl());
+
+                            ZipEntry zipEntry = new ZipEntry(uniqueFileName);
+                            zipOut.putNextEntry(zipEntry);
+
+                            // 将文件内容复制到ZIP输出流
+                            byte[] buffer = new byte[8192]; // 增大缓冲区提高性能
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                zipOut.write(buffer, 0, bytesRead);
+                            }
+
+                            zipOut.closeEntry();
+                        }
+
+                    } catch (IOException e) {
+                        // 记录错误但继续处理其他文件
+                        System.err.println("无法下载文件: " + work.getUrl() + ", 错误: " + e.getMessage());
+
+                        // 可以创建一个错误说明文件放入ZIP中
+                        String errorFileName = work.getStudentId() + "_error.txt";
+                        ZipEntry errorEntry = new ZipEntry(errorFileName);
+                        zipOut.putNextEntry(errorEntry);
+                        String errorMessage = "Error downloading file from: " + work.getUrl() + "\nError: " + e.getMessage();
+                        zipOut.write(errorMessage.getBytes());
+                        zipOut.closeEntry();
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * 使用URI类从URL中提取文件名
+     * @param urlString URL字符串
+     * @return 文件名（包含扩展名）
+     */
+    private String extractFileNameUsingUri(String urlString) {
+        try {
+            URI uri = new URI(urlString);
+            String path = uri.getPath();
+            if (path != null) {
+                int lastSlashIndex = path.lastIndexOf('/');
+                if (lastSlashIndex != -1) {
+                    return path.substring(lastSlashIndex + 1);
+                }
+                return path;
+            }
+        } catch (URISyntaxException e) {
+            // 处理异常
+            System.err.println("Invalid URL: " + e.getMessage());
+        }
+        return "";
     }
 
     /**
