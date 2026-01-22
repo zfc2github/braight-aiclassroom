@@ -10,7 +10,6 @@
     <result column="work_status" jdbcType="VARCHAR" property="workStatus" />
     <result column="api_count" jdbcType="INTEGER" property="apiCount" />
     <result column="quiz_status" jdbcType="VARCHAR" property="quizStatus" />
-    <result column="quiz_score" jdbcType="INTEGER" property="quizScore" />
     <result column="quiz_answers_jsonarray" jdbcType="LONGNVARCHAR" property="quizAnswersJsonarray" />
     <result column="quiz_result_jsonobject" jdbcType="LONGNVARCHAR" property="quizResultJsonobject" />
   </resultMap>
@@ -22,11 +21,11 @@
     insert into aiedu_classroom_session_student (id, classroom_session_id, student_id,
                                                  student_name, joined_at,
                                                  work_status, api_count, quiz_status,
-                                                 quiz_score, quiz_answers_jsonarray, quiz_result_jsonobject)
+                                                 quiz_answers_jsonarray, quiz_result_jsonobject)
     values (#{id,jdbcType=INTEGER}, #{classroomSessionId,jdbcType=INTEGER}, #{studentId,jdbcType=VARCHAR},
             #{studentName,jdbcType=VARCHAR}, #{joinedAt,jdbcType=TIMESTAMP},
             #{workStatus,jdbcType=VARCHAR}, #{apiCount,jdbcType=INTEGER}, #{quizStatus,jdbcType=VARCHAR},
-            #{quizScore,jdbcType=INTEGER}, #{quizAnswersJsonarray,jdbcType=LONGNVARCHAR}, #{quizResultJsonobject,jdbcType=LONGNVARCHAR})
+            #{quizAnswersJsonarray,jdbcType=LONGNVARCHAR}, #{quizResultJsonobject,jdbcType=LONGNVARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentPO">
     update aiedu_classroom_session_student
@@ -37,7 +36,6 @@
         work_status = #{workStatus,jdbcType=VARCHAR},
         api_count = #{apiCount,jdbcType=INTEGER},
         quiz_status = #{quizStatus,jdbcType=VARCHAR},
-        quiz_score = #{quizScore,jdbcType=INTEGER},
         quiz_answers_jsonarray = #{quizAnswersJsonarray,jdbcType=LONGNVARCHAR},
         quiz_result_jsonobject = #{quizResultJsonobject,jdbcType=LONGNVARCHAR}
     where id = #{id,jdbcType=INTEGER}
@@ -65,9 +63,6 @@
         </if>
         <if test="quizStatus != null">
             quiz_status = #{quizStatus,jdbcType=VARCHAR},
-        </if>
-        <if test="quizScore != null">
-            quiz_score = #{quizScore,jdbcType=INTEGER},
         </if>
         <if test="quizAnswersJsonarray != null">
             quiz_answers_jsonarray = #{quizAnswersJsonarray,jdbcType=LONGNVARCHAR},
@@ -105,20 +100,54 @@
         set api_count = #{apiCount,jdbcType=INTEGER}
         where id = #{id,jdbcType=INTEGER}
     </update>
+    <update id="updateQuizStatusByClassroomSessionIdStudentId">
+        update aiedu_classroom_session_student
+        set quiz_status = #{quizStatus,jdbcType=VARCHAR}
+        where classroom_session_id = #{classroomSessionId,jdbcType=INTEGER}
+          and student_id = #{studentId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateSelectiveByClassroomSessionIdStudentId" parameterType="aieduClassroomSessionStudentPO">
+        update aiedu_classroom_session_student
+        <set>
+            <if test="studentName != null">
+                student_name = #{studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="joinedAt != null">
+                joined_at = #{joinedAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="workStatus != null">
+                work_status = #{workStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="apiCount != null">
+                api_count = #{apiCount,jdbcType=INTEGER},
+            </if>
+            <if test="quizStatus != null">
+                quiz_status = #{quizStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="quizAnswersJsonarray != null">
+                quiz_answers_jsonarray = #{quizAnswersJsonarray,jdbcType=LONGNVARCHAR},
+            </if>
+            <if test="quizResultJsonobject != null">
+                quiz_result_jsonobject = #{quizResultJsonobject,jdbcType=LONGNVARCHAR},
+            </if>
+        </set>
+        where classroom_session_id = #{classroomSessionId,jdbcType=INTEGER}
+        and student_id = #{studentId,jdbcType=VARCHAR}
+    </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select id, classroom_session_id, student_id, student_name, joined_at,
-           work_status, api_count, quiz_status, quiz_score, quiz_answers_jsonarray, quiz_result_jsonobject
+           work_status, api_count, quiz_status, quiz_answers_jsonarray, quiz_result_jsonobject
     from aiedu_classroom_session_student
     where id = #{id,jdbcType=INTEGER}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select id, classroom_session_id, student_id, student_name, joined_at,
-           work_status, api_count, quiz_status, quiz_score, quiz_answers_jsonarray, quiz_result_jsonobject
+           work_status, api_count, quiz_status, quiz_answers_jsonarray, quiz_result_jsonobject
     from aiedu_classroom_session_student
   </select>
   <select id="selectJoinedByEntity" resultType="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentPO" resultMap="BaseResultMap">
     select id, classroom_session_id, student_id, student_name, joined_at,
-    work_status, api_count, quiz_status, quiz_score, quiz_answers_jsonarray, quiz_result_jsonobject
+    work_status, api_count, quiz_status, quiz_answers_jsonarray, quiz_result_jsonobject
     from aiedu_classroom_session_student
     <where>
       <if test="classroomSessionId != null">
@@ -135,7 +164,7 @@
   </select>
   <select id="selectJoined" resultMap="BaseResultMap">
       select id, classroom_session_id, student_id, student_name, joined_at,
-             work_status, api_count, quiz_status, quiz_score, quiz_answers_jsonarray, quiz_result_jsonobject
+             work_status, api_count, quiz_status, quiz_answers_jsonarray, quiz_result_jsonobject
       from aiedu_classroom_session_student
       where joined_at is not null
       and classroom_session_id = #{classroomSessionId}
@@ -143,7 +172,7 @@
   </select>
   <select id="selectStudent" resultMap="BaseResultMap">
       select id, classroom_session_id, student_id, student_name, joined_at,
-             work_status, api_count, quiz_status, quiz_score, quiz_answers_jsonarray, quiz_result_jsonobject
+             work_status, api_count, quiz_status, quiz_answers_jsonarray, quiz_result_jsonobject
       from aiedu_classroom_session_student
       where classroom_session_id = #{classroomSessionId}
       and student_id = #{studentId}
@@ -151,7 +180,7 @@
   <select id="selectStudentsByClassroomSessionId"
           resultMap="BaseResultMap">
       select id, classroom_session_id, student_id, student_name, joined_at,
-             work_status, api_count, quiz_status, quiz_score, quiz_answers_jsonarray, quiz_result_jsonobject
+             work_status, api_count, quiz_status, quiz_answers_jsonarray, quiz_result_jsonobject
       from aiedu_classroom_session_student
       where classroom_session_id = #{classroomSessionId}
   </select>

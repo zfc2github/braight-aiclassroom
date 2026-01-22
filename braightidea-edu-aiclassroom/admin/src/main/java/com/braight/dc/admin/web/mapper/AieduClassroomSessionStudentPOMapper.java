@@ -43,4 +43,10 @@ public interface AieduClassroomSessionStudentPOMapper {
                          @Param("quizResultJsonobject") String quizResultJsonobject);
 
     int updateApiCount(@Param("id") Integer id, @Param("apiCount") int apiCount);
+
+    int updateQuizStatusByClassroomSessionIdStudentId(@Param("classroomSessionId") Integer classroomSessionId,
+                                                      @Param("studentId") String studentId,
+                                                      @Param("quizStatus") String quizStatus);
+
+    int updateSelectiveByClassroomSessionIdStudentId(AieduClassroomSessionStudentPO param);
 }

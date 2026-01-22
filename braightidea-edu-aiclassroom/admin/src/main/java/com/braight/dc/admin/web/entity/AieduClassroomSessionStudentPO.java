@@ -28,7 +28,6 @@ public class AieduClassroomSessionStudentPO {
 
     private String quizStatus;
 
-    private Integer quizScore;
     private String quizAnswersJsonarray;
     private JSONArray quizAnswers;
     private JSONObject quizResult;
@@ -98,11 +97,4 @@ public class AieduClassroomSessionStudentPO {
         this.quizStatus = quizStatus;
     }
 
-    public Integer getQuizScore() {
-        return quizScore;
-    }
-
-    public void setQuizScore(Integer quizScore) {
-        this.quizScore = quizScore;
-    }
 }

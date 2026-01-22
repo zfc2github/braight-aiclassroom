@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -102,7 +103,6 @@ public class AieduClassroomSessionController extends BaseController {
             row.setWorkStatus(Constant.ClassroomStatus.WAITING);
             row.setApiCount(0);
             row.setQuizStatus(Constant.ClassroomStatus.WAITING);
-            row.setQuizScore(0);
             aieduClassroomSessionStudentPOMapper.insert(row);
         });
         return AjaxResult.success(po);
@@ -402,7 +402,6 @@ public class AieduClassroomSessionController extends BaseController {
         if (quizAnswers == null) {
             quizAnswers = new JSONArray();
         }
-        aieduClassroomSessionStudentPOMapper.updateQuizAnswers(sessionId, quizAnswers.toJSONString(), query.getStudentId());
         // 生成测验结果
         QuizResult quizResult = new QuizResult();
         int score = 0;
@@ -484,7 +483,16 @@ public class AieduClassroomSessionController extends BaseController {
         quizResult.setTotalQuestions(totalQuestions);
         quizResult.setCorrectCount(correctCount);
         quizResult.setResults(results);
-        aieduClassroomSessionStudentPOMapper.updateQuizResult(sessionId, query.getStudentId(), JSON.toJSONString(quizResult));
+//        aieduClassroomSessionStudentPOMapper.updateQuizAnswers(sessionId, quizAnswers.toJSONString(), query.getStudentId());
+//        aieduClassroomSessionStudentPOMapper.updateQuizResult(sessionId, query.getStudentId(), JSON.toJSONString(quizResult));
+//        aieduClassroomSessionStudentPOMapper.updateQuizStatusByClassroomSessionIdStudentId(sessionId, query.getStudentId(), Constant.ClassroomStatus.COMPLETED);
+        AieduClassroomSessionStudentPO param = new AieduClassroomSessionStudentPO();
+        param.setClassroomSessionId(sessionId);
+        param.setStudentId(query.getStudentId());
+        param.setQuizAnswersJsonarray(quizAnswers.toJSONString());
+        param.setQuizResultJsonobject(JSON.toJSONString(quizResult));
+        param.setQuizStatus(Constant.ClassroomStatus.COMPLETED);
+        aieduClassroomSessionStudentPOMapper.updateSelectiveByClassroomSessionIdStudentId(param);
         // 返回测验结果
         return AjaxResult.success(quizResult);
     }
@@ -566,5 +574,97 @@ public class AieduClassroomSessionController extends BaseController {
         stats.setAvgCalls((int) avg);
         return AjaxResult.success(stats);
     }
+
+    /**
+     * 获取学生测验情况
+     *
+     * @param sessionId
+     * @return
+     */
+    @GetMapping("/{sessionId}/student/quizStats")
+    public AjaxResult studentQuizStats(@PathVariable Integer sessionId) {
+        QuizStats stats = new QuizStats();
+        List<AieduClassroomSessionStudentPO> sessionStudents = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
+        stats.setClassroomSessionId(sessionId);
+        stats.setTotalStudents(sessionStudents.size());
+        Map<String, List<AieduClassroomSessionStudentPO>> quizStatusMap = sessionStudents.stream()
+                .collect(Collectors.groupingBy(AieduClassroomSessionStudentPO::getQuizStatus));
+        List<AieduClassroomSessionStudentPO> submittedStudents = quizStatusMap.get(Constant.ClassroomStatus.COMPLETED);
+        if (CollectionUtils.isEmpty(submittedStudents)) {
+            stats.setSubmitted(0);
+            stats.setNotSubmitted(sessionStudents.size());
+            stats.setAverageScore(0.0);
+            stats.setScoreDistribution(calculateScoreDistribution(new ArrayList<>()));
+            stats.setQuestionStats(new ArrayList<>());
+            return AjaxResult.success(stats);
+        }
+        stats.setSubmitted(submittedStudents.size());
+        stats.setNotSubmitted(sessionStudents.size() - submittedStudents.size());
+        AtomicInteger totalScore = new AtomicInteger();
+        List<QuestionResult> allQuizResults = new ArrayList<>();
+        List<Integer> allScores = new ArrayList<>();
+        submittedStudents.forEach(s -> {
+            QuizResult quizResult = JSON.parseObject(s.getQuizResultJsonobject(), QuizResult.class);
+            Integer score = quizResult.getScore();
+            allScores.add(score);
+            totalScore.addAndGet(score);
+            allQuizResults.addAll(quizResult.getResults());
+        });
+        stats.setAverageScore((double) totalScore.get()/submittedStudents.size());
+        // 分数分布统计 scoreDistribution
+        Map<String, Integer> scoreDistribution = calculateScoreDistribution(allScores);
+        stats.setScoreDistribution(scoreDistribution);
+
+        // questionStats
+        Map<Integer, List<QuestionResult>> questionIdMap = allQuizResults.stream()
+                .collect(Collectors.groupingBy(QuestionResult::getQuestionId));
+        List<QuestionStats> questionStats = new ArrayList<>();
+        questionIdMap.forEach((questionId, questionResults) -> {
+            QuestionStats questionStat = new QuestionStats();
+            questionStat.setQuestionId(questionId);
+            int correctCount = (int) questionResults.stream().filter(QuestionResult::getIsCorrect).count();
+            questionStat.setCorrectCount(correctCount);
+            int wrongCount = questionResults.size() - correctCount;
+            questionStat.setWrongCount(wrongCount);
+            double accuracy = (double) correctCount / questionResults.size();
+            questionStat.setAccuracy(accuracy);
+            questionStats.add(questionStat);
+        });
+        stats.setQuestionStats(questionStats);
+        return AjaxResult.success(stats);
+    }
+
+    private Map<String, Integer> calculateScoreDistribution(List<Integer> allScores) {
+        // 初始化各分数段计数器
+        Map<String, Integer> distribution = new HashMap<>();
+        distribution.put("90-100", 0);
+        distribution.put("80-89", 0);
+        distribution.put("70-79", 0);
+        distribution.put("60-69", 0);
+        distribution.put("0-59", 0);
+
+        // 遍历所有学生，统计分数分布
+        for (Integer score : allScores) {
+            // 如果没有分数则跳过
+            if (score == null) {
+                continue;
+            }
+
+            // 根据分数范围增加对应计数
+            if (score >= 90 && score <= 100) {
+                distribution.put("90-100", distribution.get("90-100") + 1);
+            } else if (score >= 80 && score < 90) {
+                distribution.put("80-89", distribution.get("80-89") + 1);
+            } else if (score >= 70 && score < 80) {
+                distribution.put("70-79", distribution.get("70-79") + 1);
+            } else if (score >= 60 && score < 70) {
+                distribution.put("60-69", distribution.get("60-69") + 1);
+            } else if (score >= 0 && score < 60) {
+                distribution.put("0-59", distribution.get("0-59") + 1);
+            }
+        }
+        return distribution;
+    }
+
 }
 
