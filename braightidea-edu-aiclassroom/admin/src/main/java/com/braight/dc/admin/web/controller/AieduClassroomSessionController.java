@@ -141,6 +141,12 @@ public class AieduClassroomSessionController extends BaseController {
         return AjaxResult.success();
     }
 
+    /**
+     * 结束课堂会话
+     *
+     * @param sessionId
+     * @return
+     */
     @Login
     @Log(title = "课堂会话信息", businessType = BusinessType.UPDATE)
     @PostMapping("/{sessionId}/end")
@@ -359,7 +365,7 @@ public class AieduClassroomSessionController extends BaseController {
     }
 
     /**
-     * todo Shine 批量下载学生作品
+     * 批量下载学生作品
      *
      * @param sessionId
      * @return

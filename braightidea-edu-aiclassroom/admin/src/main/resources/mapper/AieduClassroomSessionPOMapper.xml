@@ -95,4 +95,11 @@
     and class_code = #{classCode}
     limit 1
   </select>
+  <select id="selectActiveByClassId" resultMap="BaseResultMap">
+    select *
+    from aiedu_classroom_session
+    where status = 'active'
+    and class_id = #{classId}
+    limit 1
+  </select>
 </mapper>

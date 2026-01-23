@@ -3,10 +3,12 @@ package com.braight.dc.admin.web.controller;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSONObject;
 import com.braight.dc.admin.web.entity.AieduClassPO;
+import com.braight.dc.admin.web.entity.AieduClassroomSessionPO;
 import com.braight.dc.admin.web.entity.AieduStudentPO;
 import com.braight.dc.admin.web.entity.AieduTeachersPO;
 import com.braight.dc.admin.web.excel.StudentDataListener;
 import com.braight.dc.admin.web.mapper.AieduClassPOMapper;
+import com.braight.dc.admin.web.mapper.AieduClassroomSessionPOMapper;
 import com.braight.dc.admin.web.mapper.AieduStudentPOMapper;
 import com.braight.dc.admin.web.mapper.AieduTeachersPOMapper;
 import com.braight.master.common.annotation.Log;
@@ -46,6 +48,8 @@ public class AieduClassController extends BaseController {
     private AieduStudentPOMapper aieduStudentPOMapper;
     @Resource
     private AieduTeachersPOMapper aieduTeachersPOMapper;
+    @Resource
+    private AieduClassroomSessionPOMapper aieduClassroomSessionPOMapper;
 
 
     //    @PreAuthorize("@ss.hasPermi('cms:aieduClass:add')")
@@ -169,8 +173,9 @@ public class AieduClassController extends BaseController {
     }
 
     private boolean hasActiveClassroom(Integer classId) {
-        // todo Shine 校验逻辑：班级内有活跃课堂，无法删除
-        return false;
+        // 校验逻辑：班级内有活跃课堂，无法删除
+        AieduClassroomSessionPO active = aieduClassroomSessionPOMapper.selectActiveByClassId(classId);
+        return active != null;
     }
 
     //    @PreAuthorize("@ss.hasPermi('cms:aieduClass:upload')")

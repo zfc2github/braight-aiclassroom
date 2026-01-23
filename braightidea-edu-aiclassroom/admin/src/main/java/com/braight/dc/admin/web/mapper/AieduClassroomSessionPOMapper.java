@@ -24,4 +24,6 @@ public interface AieduClassroomSessionPOMapper {
 
     int updateCurrentStage(@Param("classroomId") Integer classroomId,
                            @Param("currentStage") String currentStage);
+
+    AieduClassroomSessionPO selectActiveByClassId(@Param("classId") Integer classId);
 }
