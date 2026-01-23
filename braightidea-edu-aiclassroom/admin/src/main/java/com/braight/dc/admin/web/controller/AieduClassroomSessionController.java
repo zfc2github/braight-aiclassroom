@@ -156,7 +156,7 @@ public class AieduClassroomSessionController extends BaseController {
         po.setCurrentStage(Constant.ClassroomSessionCurrentStage.COMPLETED);
         po.setStatus(Constant.ClassroomSessionStatus.ENDED);
         aieduClassroomSessionPOMapper.updateStageStatus(po);
-        // 推送websocket消息
+        // 推送websocket消息：结束课堂会话
         wsService.endClassroomSession(sessionId);
         return AjaxResult.success();
     }
@@ -262,7 +262,7 @@ public class AieduClassroomSessionController extends BaseController {
         aieduClassroomSessionPOMapper.updateCurrentStage(session.getClassroomId(), Constant.ClassroomSessionCurrentStage.TOOL_EXPERIENCE);
         // 更新作业状态
         aieduClassroomSessionStudentPOMapper.updateWorkStatusByClassroomSessionId(sessionId, Constant.ClassroomStatus.IN_PROGRESS);
-        // 发送websocket消息
+        // 发送websocket消息：开始学生实验
         wsService.startToolExperience(sessionId);
         return AjaxResult.success();
     }
@@ -281,7 +281,7 @@ public class AieduClassroomSessionController extends BaseController {
         aieduClassroomSessionPOMapper.updateCurrentStage(session.getClassroomId(), Constant.ClassroomSessionCurrentStage.QUIZ);
         // 更新测验状态
         aieduClassroomSessionStudentPOMapper.updateQuizStatusByClassroomSessionId(sessionId, Constant.ClassroomStatus.IN_PROGRESS);
-        // 发送websocket消息
+        // 发送websocket消息：开始测验
         wsService.publishQuiz(sessionId);
         return AjaxResult.success();
     }
