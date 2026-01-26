@@ -219,7 +219,7 @@ public class AieduClassroomSessionController extends BaseController {
         ClassroomSessionJoinVO vo = new ClassroomSessionJoinVO();
         vo.setSessionId(classroomSessionId);
         vo.setStudentId(studentId);
-        vo.setStudentName(query.getStudentName());
+        vo.setStudentName(entity.getStudentName());
         vo.setClassCode(classCode);
         vo.setClassroomName(activePo.getClassroomName());
         vo.setCurrentStage(activePo.getCurrentStage());

@@ -1,4 +1,4 @@
-Application Version: ${braight.version}
+Application Version: ${braight-master.version}
 Spring Boot Version: ${spring-boot.version}
 ////////////////////////////////////////////////////////////////////
 //                          _ooOoo_                               //

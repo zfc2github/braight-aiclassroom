@@ -14,6 +14,4 @@ public class ClassroomSessionJoinQuery {
     private String classCode; // 课堂码
     @NotBlank
     private String studentId; // 学号
-    @NotBlank
-    private String studentName; // 姓名
 }
