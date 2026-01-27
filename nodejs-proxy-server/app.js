@@ -17,6 +17,7 @@ const {generateVideoFromText, queryVideoGeneration, queryFilesRetrieve} = requir
 const {generateMusicFromText} = require("./minimax-text2music");
 const {speechSynthesis, speechGeneration, listVoice} = require('./aliyun-cosyvoice');
 const {ocrImage} = require("./baidu-textRecog");
+const {generateCreativeIdeas} = require("./aliyun-creativeAssistant");
 
 
 /* ========== 中间件 ========== */
@@ -291,6 +292,21 @@ app.post('/ocr', async (req, res) => {
     }
 })
 
+// 创意助手-创意方案生成（阿里云百炼-文本生成）
+app.post('/creativeAssistant', async (req, res) => {
+    try {
+        const { prompt } = req.body;
+        const data = await generateCreativeIdeas({ prompt });
+        res.json({
+            success: true,
+            data: data
+        });
+    } catch (e) {
+        console.log(e);
+        const status = e?.status || 500;
+        res.status(status).json(e?.data || { error: e.message });
+    }
+})
 
 // 3. 启动
 app.listen(PORT, () => {
