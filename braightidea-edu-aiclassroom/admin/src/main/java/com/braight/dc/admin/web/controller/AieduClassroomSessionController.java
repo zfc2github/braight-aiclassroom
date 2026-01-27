@@ -207,23 +207,22 @@ public class AieduClassroomSessionController extends BaseController {
         String studentId = query.getStudentId();
         // 校验学号是否已加入
         AieduClassroomSessionStudentPO joinedStudent = aieduClassroomSessionStudentPOMapper.selectJoined(classroomSessionId, studentId);
-        if (!Objects.isNull(joinedStudent)) {
-            return AjaxResult.error("该学号已加入课堂");
+        if (Objects.isNull(joinedStudent)) {
+            joinedStudent = aieduClassroomSessionStudentPOMapper.selectStudent(classroomSessionId, studentId);
+            joinedStudent.setJoinedAt(new Date());
+            aieduClassroomSessionStudentPOMapper.updateSelective(joinedStudent);
         }
 
-        AieduClassroomSessionStudentPO entity = aieduClassroomSessionStudentPOMapper.selectStudent(classroomSessionId, studentId);
-        entity.setJoinedAt(new Date());
-        aieduClassroomSessionStudentPOMapper.updateSelective(entity);
 
         // 返回课堂信息、学生信息、在线学生数量等
         ClassroomSessionJoinVO vo = new ClassroomSessionJoinVO();
         vo.setSessionId(classroomSessionId);
         vo.setStudentId(studentId);
-        vo.setStudentName(entity.getStudentName());
+        vo.setStudentName(joinedStudent.getStudentName());
         vo.setClassCode(classCode);
         vo.setClassroomName(activePo.getClassroomName());
         vo.setCurrentStage(activePo.getCurrentStage());
-        vo.setJoinedAt(entity.getJoinedAt());
+        vo.setJoinedAt(joinedStudent.getJoinedAt());
         vo.setAiTool(getJsonObject(activePo.getAiToolJson()));
 
         AieduClassroomSessionStudentPO param = new AieduClassroomSessionStudentPO();
