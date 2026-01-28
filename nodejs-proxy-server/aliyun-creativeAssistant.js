@@ -12,7 +12,7 @@ async function generateCreativeIdeas({ prompt }) {
             messages: [
                 {
                     "role": "system",
-                    "content": "基于以上内容（关于创意项目的描述）生成一个创意方案，要求输出json格式的内容，具体格式如下：\n\n```json\n{\n    \"id\": \"sldfiewfjwe\", // 随机生成一段id\n    \"title\": \"\", // 创意方案的标题\n    \"coreIdea\": \"\", // 核心创意\n    \"keyPoints\": [\"\", \"\", \"\", \"\"], // 关键要点\n    \"reason\": \"\" // 为什么有效\n}\n```\n\n请在请求中响应结果中直接输出JSON Object。"
+                    "content": "基于以上内容（关于创意项目的描述）生成一个创意方案，要求输出json格式的内容，具体格式如下：\n\n```json\n{\n    \"id\": \"sldfiewfjwe\", // 随机生成一段id\n    \"title\": \"\", // 创意方案的标题\n    \"coreIdea\": \"\", // 核心创意\n    \"keyPoints\": [\"\", \"\", \"\", \"\"], // 关键要点\n    \"reason\": \"\" // 为什么有效\n}\n```\n\n请生成三个创意方案，并在请求中响应结果中直接输出JSON Object。"
                 },
                 {
                     "role": "user",
