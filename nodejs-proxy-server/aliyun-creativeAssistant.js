@@ -37,7 +37,40 @@ async function generateCreativeIdeas({ prompt }) {
     }
 }
 
+// 学习助手（阿里云百炼-文本生成）
+async function generateText({ systemPrompt, userPrompt }) {
+    const response = await axios.post(API_URL,
+        {
+            model: 'qwen-plus',
+            messages: [
+                {
+                    "role": "system",
+                    "content": systemPrompt
+                },
+                {
+                    "role": "user",
+                    "content": userPrompt
+                }
+            ],
+            "response_format": {
+                "type": "text"
+            }
+        }, {
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+    console.log(response?.data);
+    if (response?.data?.choices?.[0]?.message?.content) {
+        return response?.data.choices[0].message.content;
+    } else {
+        return "";
+    }
+}
+
 
 module.exports = {
-    generateCreativeIdeas
+    generateCreativeIdeas, generateText
 };

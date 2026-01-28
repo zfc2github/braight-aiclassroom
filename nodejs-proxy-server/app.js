@@ -17,7 +17,7 @@ const {generateVideoFromText, queryVideoGeneration, queryFilesRetrieve} = requir
 const {generateMusicFromText} = require("./minimax-text2music");
 const {speechSynthesis, speechGeneration, listVoice} = require('./aliyun-cosyvoice');
 const {ocrImage} = require("./baidu-textRecog");
-const {generateCreativeIdeas} = require("./aliyun-creativeAssistant");
+const {generateCreativeIdeas, generateText} = require("./aliyun-creativeAssistant");
 
 
 /* ========== 中间件 ========== */
@@ -297,6 +297,22 @@ app.post('/creativeAssistant', async (req, res) => {
     try {
         const { prompt } = req.body;
         const data = await generateCreativeIdeas({ prompt });
+        res.json({
+            success: true,
+            data: data
+        });
+    } catch (e) {
+        console.log(e);
+        const status = e?.status || 500;
+        res.status(status).json(e?.data || { error: e.message });
+    }
+})
+
+// 学习助手（阿里云百炼-文本生成）
+app.post('/learningAssistant', async (req, res) => {
+    try {
+        const { systemPrompt, userPrompt } = req.body;
+        const data = await generateText({ systemPrompt, userPrompt });
         res.json({
             success: true,
             data: data
