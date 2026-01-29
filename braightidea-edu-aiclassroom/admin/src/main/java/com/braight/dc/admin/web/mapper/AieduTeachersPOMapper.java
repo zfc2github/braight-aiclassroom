@@ -47,4 +47,6 @@ public interface AieduTeachersPOMapper {
     AieduTeachersPO selectByUserId(Long userId);
 
     int updateByUserId(AieduTeachersPO po);
+
+  int deleteByEmail(String email);
 }
