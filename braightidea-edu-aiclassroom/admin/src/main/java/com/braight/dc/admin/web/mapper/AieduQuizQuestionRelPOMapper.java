@@ -15,4 +15,6 @@ public interface AieduQuizQuestionRelPOMapper {
     int updateByPrimaryKey(AieduQuizQuestionRelPO row);
 
     List<AieduQuizQuestionRelPO> selectList(AieduQuizQuestionRelPO po);
+
+    List<AieduQuizQuestionRelPO> selectRecommendedList(AieduQuizQuestionRelPO po);
 }

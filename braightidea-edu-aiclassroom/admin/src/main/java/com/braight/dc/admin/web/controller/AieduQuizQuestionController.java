@@ -17,10 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,10 +46,6 @@ public class AieduQuizQuestionController extends BaseController {
         if (po.getCustomized() == null) {
             po.setCustomized(false);
         }
-        Object answer = po.getAnswer();
-        if (!Objects.isNull(answer)) {
-            po.setAnswerJson(JSON.toJSONString(answer));
-        }
         aieduQuizQuestionPOMapper.insert(po);
         return AjaxResult.success(po);
     }
@@ -77,6 +70,20 @@ public class AieduQuizQuestionController extends BaseController {
         } else {
             po.setOptionsJsonarray(new JSONArray().toJSONString());
         }
+        JSONArray optionsEn = po.getOptionsEn();
+        if (!Objects.isNull(optionsEn)) {
+            po.setOptionsJsonarray(optionsEn.toJSONString());
+        } else {
+            po.setOptionsJsonarray(new JSONArray().toJSONString());
+        }
+        Object answer = po.getAnswer();
+        if (!Objects.isNull(answer)) {
+            if ("boolean".equals(po.getType())) {
+                po.setAnswerJson(String.valueOf(answer));
+            } else {
+                po.setAnswerJson(JSON.toJSONString(answer));
+            }
+        }
     }
 
 
@@ -87,15 +94,27 @@ public class AieduQuizQuestionController extends BaseController {
     @Login
     @GetMapping("/recommended")
     public AjaxResult recommended(AieduQuizQuestionRelPO po) {
-        List<AieduQuizQuestionRelPO> rels = aieduQuizQuestionRelPOMapper.selectList(po);
+        List<AieduQuizQuestionRelPO> rels = aieduQuizQuestionRelPOMapper.selectRecommendedList(po);
         List<Integer> ids = rels.stream()
                 .map(AieduQuizQuestionRelPO::getQuizQuestionId)
                 .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(ids)) {
             return AjaxResult.success(Collections.emptyList());
         }
+        Map<Integer, List<AieduQuizQuestionRelPO>> quizQuestionIdMap = rels.stream()
+                .collect(Collectors.groupingBy(AieduQuizQuestionRelPO::getQuizQuestionId));
         List<AieduQuizQuestionPO> list = aieduQuizQuestionPOMapper.selectListByIds(ids);
-        list.forEach(this::transferFieldJsonString2Object);
+        list.forEach(p -> {
+            transferFieldJsonString2Object(p);
+            p.setIsSelected(true);
+            List<AieduQuizQuestionRelPO> rel = quizQuestionIdMap.get(p.getId());
+            if (!CollectionUtils.isEmpty(rel)) {
+                AieduQuizQuestionRelPO relPO = rel.get(0);
+                p.setCoursewareId(relPO.getCoursewareId());
+                p.setToolId(relPO.getToolId());
+                p.setSource(relPO.getSource());
+            }
+        });
         return AjaxResult.success(list);
     }
 
@@ -105,6 +124,12 @@ public class AieduQuizQuestionController extends BaseController {
             po.setOptions(JSON.parseArray(optionsJsonarray));
         } else {
             po.setOptions(new JSONArray());
+        }
+        String optionsEnJsonarray = po.getOptionsEnJsonarray();
+        if (StringUtils.hasLength(optionsEnJsonarray)) {
+            po.setOptionsEn(JSON.parseArray(optionsEnJsonarray));
+        } else {
+            po.setOptionsEn(new JSONArray());
         }
         String answerJson = po.getAnswerJson();
         if (StringUtils.hasLength(answerJson)) {

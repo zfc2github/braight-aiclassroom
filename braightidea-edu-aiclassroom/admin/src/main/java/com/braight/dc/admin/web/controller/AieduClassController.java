@@ -91,6 +91,10 @@ public class AieduClassController extends BaseController {
             pagination.put("total", pageInfo.getTotal());
             pagination.put("totalPages", pageInfo.getPages());
         }
+        list.forEach(aieduClassPO -> {
+            List<AieduStudentPO> students = aieduStudentPOMapper.selectByClassId(aieduClassPO.getClassId());
+            aieduClassPO.setStudents(students);
+        });
         Map<String, Object> map = new HashMap<>();
         map.put("items", list);
         map.put("pagination", pagination);
@@ -206,6 +210,29 @@ public class AieduClassController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
             return AjaxResult.error("班级学生信息导入失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 删除班级下的学生
+     *
+     * @param classId
+     * @param id
+     * @return
+     */
+    @Login
+    @Log(title = "班级学生信息-删除学生", businessType = BusinessType.DELETE)
+    @PostMapping("/{classId}/students/delete/{id}")
+    public AjaxResult studentsImport(@PathVariable Integer classId,
+                                     @PathVariable Integer id) {
+        try {
+            aieduStudentPOMapper.deleteByPrimaryKey(id);
+            // 更新班级学生数量
+            aieduClassPOMapper.updateStudentCount(classId);
+            return AjaxResult.success();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return AjaxResult.error("班级学生信息-删除学生失败：" + e.getMessage());
         }
     }
 

@@ -57,4 +57,6 @@ public interface AieduStudentPOMapper {
     AieduStudentPO selectByStudentId(String studentId);
 
     List<AieduStudentPO> selectBySessionId(Integer classId);
+
+    List<AieduStudentPO> selectByClassId(Integer classId);
 }

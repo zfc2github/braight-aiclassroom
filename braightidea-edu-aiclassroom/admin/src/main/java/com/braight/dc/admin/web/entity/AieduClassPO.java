@@ -1,10 +1,14 @@
 package com.braight.dc.admin.web.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+@Data
 public class AieduClassPO {
     /**
      *
@@ -63,6 +67,8 @@ public class AieduClassPO {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updatedAt;
+
+    private List<AieduStudentPO> students = new ArrayList<>();
 
     public Integer getTeacherId() {
         return teacherId;

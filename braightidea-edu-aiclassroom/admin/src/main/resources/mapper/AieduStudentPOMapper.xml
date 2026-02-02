@@ -109,4 +109,9 @@
     from aiedu_student
     where class_id = #{classId,jdbcType=INTEGER}
   </select>
+  <select id="selectByClassId" resultMap="BaseResultMap">
+    select *
+      from aiedu_student
+      where class_id = #{classId,jdbcType=INTEGER}
+  </select>
 </mapper>

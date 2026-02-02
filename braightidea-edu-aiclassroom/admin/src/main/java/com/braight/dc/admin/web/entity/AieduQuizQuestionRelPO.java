@@ -12,9 +12,9 @@ public class AieduQuizQuestionRelPO {
 
     private Integer aiToolId;
     private String toolId;
+    private String source;
 
-    private Integer coursewareId;
-    private Integer classroomId;
+    private String coursewareId;
 
     private Date createdAt;
 
@@ -42,14 +42,6 @@ public class AieduQuizQuestionRelPO {
 
     public void setAiToolId(Integer aiToolId) {
         this.aiToolId = aiToolId;
-    }
-
-    public Integer getCoursewareId() {
-        return coursewareId;
-    }
-
-    public void setCoursewareId(Integer coursewareId) {
-        this.coursewareId = coursewareId;
     }
 
     public Date getCreatedAt() {

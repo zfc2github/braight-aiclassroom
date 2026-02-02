@@ -26,11 +26,18 @@ public class AieduQuizQuestionPO {
 
     private String optionsJsonarray;
     private JSONArray options;
+    private String optionsEnJsonarray;
+    private JSONArray optionsEn;
 
     private String explanation;
     private Boolean customized;
     private String answerJson;
     private Object answer;
+
+    private String coursewareId;
+    private String toolId;
+    private String source;
+    private Boolean isSelected;
 
     public Boolean getCustomized() {
         return customized;

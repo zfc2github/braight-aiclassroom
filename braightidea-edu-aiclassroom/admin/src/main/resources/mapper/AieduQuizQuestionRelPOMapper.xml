@@ -6,8 +6,8 @@
     <result column="quiz_question_id" jdbcType="INTEGER" property="quizQuestionId" />
     <result column="ai_tool_id" jdbcType="INTEGER" property="aiToolId" />
     <result column="tool_id" jdbcType="VARCHAR" property="toolId" />
-    <result column="courseware_id" jdbcType="INTEGER" property="coursewareId" />
-    <result column="classroom_id" jdbcType="INTEGER" property="classroomId" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
+    <result column="courseware_id" jdbcType="VARCHAR" property="coursewareId" />
     <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
     <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
   </resultMap>
@@ -16,11 +16,11 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.braight.dc.admin.web.entity.AieduQuizQuestionRelPO">
-    insert into aiedu_quiz_question_rel (id, quiz_question_id, ai_tool_id, tool_id,
-      courseware_id, classroom_id, created_at, updated_at
+    insert into aiedu_quiz_question_rel (id, quiz_question_id, ai_tool_id, tool_id, source,
+      courseware_id, created_at, updated_at
       )
-    values (#{id,jdbcType=INTEGER}, #{quizQuestionId,jdbcType=INTEGER}, #{aiToolId,jdbcType=INTEGER}, #{toolId,jdbcType=VARCHAR},
-      #{coursewareId,jdbcType=INTEGER}, #{classroomId,jdbcType=INTEGER}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}
+    values (#{id,jdbcType=INTEGER}, #{quizQuestionId,jdbcType=INTEGER}, #{aiToolId,jdbcType=INTEGER}, #{toolId,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR},
+      #{coursewareId,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduQuizQuestionRelPO">
@@ -28,37 +28,59 @@
     set quiz_question_id = #{quizQuestionId,jdbcType=INTEGER},
       ai_tool_id = #{aiToolId,jdbcType=INTEGER},
       tool_id = #{toolId,jdbcType=VARCHAR},
-      courseware_id = #{coursewareId,jdbcType=INTEGER},
-      classroom_id = #{classroomId,jdbcType=INTEGER},
+      source = #{source,jdbcType=VARCHAR},
+      courseware_id = #{coursewareId,jdbcType=VARCHAR},
       created_at = #{createdAt,jdbcType=TIMESTAMP},
       updated_at = #{updatedAt,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select id, quiz_question_id, ai_tool_id, tool_id, courseware_id, classroom_id, created_at, updated_at
+    select *
     from aiedu_quiz_question_rel
     where id = #{id,jdbcType=INTEGER}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select id, quiz_question_id, ai_tool_id, tool_id, courseware_id, classroom_id, created_at, updated_at
+    select *
     from aiedu_quiz_question_rel
   </select>
   <select id="selectList" parameterType="com.braight.dc.admin.web.entity.AieduQuizQuestionRelPO" resultMap="BaseResultMap">
-    select id, quiz_question_id, ai_tool_id, tool_id, courseware_id, classroom_id, created_at, updated_at
+    select *
     from aiedu_quiz_question_rel
     <where>
       <if test="toolId != null and toolId != ''">
-        tool_id = #{toolId}
+        and tool_id = #{toolId}
       </if>
       <if test="aiToolId != null">
-        ai_tool_id = #{aiToolId}
+        and ai_tool_id = #{aiToolId}
       </if>
-      <if test="coursewareId != null">
-        courseware_id = #{coursewareId}
+      <if test="coursewareId != null and coursewareId != ''">
+        and courseware_id = #{coursewareId}
       </if>
-      <if test="classroomId != null">
-        classroom_id = #{classroomId}
+      <if test="source != null and source != ''">
+        and source = #{source}
       </if>
+    </where>
+  </select>
+  <select id="selectRecommendedList" parameterType="com.braight.dc.admin.web.entity.AieduQuizQuestionRelPO" resultMap="BaseResultMap">
+    select *
+    from aiedu_quiz_question_rel
+    <where>
+      <choose>
+        <when test="toolId != null and toolId != ''">
+          or (tool_id = #{toolId} or source = 'ai-tool')
+        </when>
+        <otherwise>
+          or source = 'ai-tool'
+        </otherwise>
+      </choose>
+      <choose>
+        <when test="coursewareId != null and coursewareId != ''">
+          or (courseware_id = #{coursewareId} or source = 'courseware')
+        </when>
+        <otherwise>
+          or source = 'courseware'
+        </otherwise>
+      </choose>
     </where>
   </select>
 </mapper>
