@@ -71,12 +71,14 @@ public class AieduClassroomSessionController extends BaseController {
         po.setTeacherId(teacher.getTeacherId());
         po.setTeacherName(teacher.getName());
 
+        AieduClassroomsPO classroomsPO = aieduClassroomsPOMapper.selectByPrimaryKey(po.getClassroomId());
         // 重复提交校验
-        if (hasActiveSession(po)) {
-            return AjaxResult.warn("请勿重复提交");
+        AieduClassroomSessionPO activeSession = getActiveSession(po);
+        if (!Objects.isNull(activeSession)) {
+            extracted(activeSession, classroomsPO);
+            return AjaxResult.success(activeSession);
         }
 
-        AieduClassroomsPO classroomsPO = aieduClassroomsPOMapper.selectByPrimaryKey(po.getClassroomId());
         po.setClassroomId(classroomsPO.getClassroomId());
         po.setClassroomName(classroomsPO.getName());
         String classCode = RandomUtil.randomNumbers(6);
@@ -94,10 +96,6 @@ public class AieduClassroomSessionController extends BaseController {
 
         aieduClassroomsPOMapper.updateLastUsedAt(po.getClassroomId(), now);
 
-        po.setAiTool(getJsonObject(classroomsPO.getAiToolJson()));
-        po.setCourseware(getJsonObject(classroomsPO.getCoursewareJson()));
-        po.setQuizConfig(getJsonObject(classroomsPO.getQuizConfigJson()));
-
         // 初始化学生任务信息表数据
         List<AieduStudentPO> students = aieduStudentPOMapper.selectBySessionId(po.getClassId());
         students.forEach(student -> {
@@ -111,7 +109,15 @@ public class AieduClassroomSessionController extends BaseController {
             row.setQuizStatus(Constant.ClassroomStatus.WAITING);
             aieduClassroomSessionStudentPOMapper.insert(row);
         });
+
+        extracted(po, classroomsPO);
         return AjaxResult.success(po);
+    }
+
+    private void extracted(AieduClassroomSessionPO po, AieduClassroomsPO classroomsPO) {
+        po.setAiTool(getJsonObject(classroomsPO.getAiToolJson()));
+        po.setCourseware(getJsonObject(classroomsPO.getCoursewareJson()));
+        po.setQuizConfig(getJsonObject(classroomsPO.getQuizConfigJson()));
     }
 
 
@@ -178,8 +184,9 @@ public class AieduClassroomSessionController extends BaseController {
         return AjaxResult.success(literacyClassPO);
     }
 
-    private boolean hasActiveSession(AieduClassroomSessionPO po) {
-        return aieduClassroomSessionPOMapper.selectActiveSession(po).size() > 0;
+    private AieduClassroomSessionPO getActiveSession(AieduClassroomSessionPO po) {
+        List<AieduClassroomSessionPO> list = aieduClassroomSessionPOMapper.selectActiveSession(po);
+        return list.size() > 0 ? list.get(0) : null;
     }
 
     private JSONObject getJsonObject(String jsonString) {
@@ -233,9 +240,8 @@ public class AieduClassroomSessionController extends BaseController {
         return AjaxResult.success(vo);
     }
 
-
     /**
-     * 获取加入课堂的学生列表
+     * 获取课堂的学生列表
      *
      * @param sessionId
      * @return
@@ -244,6 +250,21 @@ public class AieduClassroomSessionController extends BaseController {
     @GetMapping("/{sessionId}/students")
     public AjaxResult getStudents(@PathVariable Integer sessionId) {
         List<AieduClassroomSessionStudentPO> students = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
+        return AjaxResult.success(students);
+    }
+
+    /**
+     * 获取加入课堂的学生列表
+     *
+     * @param sessionId
+     * @return
+     */
+    @Login
+    @GetMapping("/{sessionId}/joinedStudents")
+    public AjaxResult getJoinedStudents(@PathVariable Integer sessionId) {
+        AieduClassroomSessionStudentPO entity = new AieduClassroomSessionStudentPO();
+        entity.setClassroomSessionId(sessionId);
+        List<AieduClassroomSessionStudentPO> students = aieduClassroomSessionStudentPOMapper.selectJoinedByEntity(entity);
         return AjaxResult.success(students);
     }
 
@@ -297,6 +318,13 @@ public class AieduClassroomSessionController extends BaseController {
         po.setContentJson(getJsonString(po.getContent()));
         po.setSubmittedAt(new Date());
         aieduClassroomSessionStudentWorkPOMapper.insert(po);
+        if (po.getFinalSubmit()) {
+            // 更新作业状态为 completed
+            aieduClassroomSessionStudentPOMapper.completedWorkStatusByClassroomSessionIdStudentId(
+                    po.getClassroomSessionId(),
+                    po.getStudentId(),
+                    Constant.ClassroomStatus.COMPLETED);
+        }
         return AjaxResult.success();
     }
 
@@ -818,6 +846,34 @@ public class AieduClassroomSessionController extends BaseController {
                 .map(s -> JSON.parseObject(s.getQuizResultJsonobject(), QuizResult.class))
                 .collect(Collectors.toList());
         return AjaxResult.success(result);
+    }
+
+    /**
+     * 获取会话状态数据
+     *
+     * @param sessionId
+     * @return
+     */
+    @GetMapping("/{sessionId}/sessionData")
+    public AjaxResult sessionData(@PathVariable Integer sessionId) {
+        AieduClassroomSessionPO sessionPO = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
+        if (sessionPO == null) {
+            return AjaxResult.error("会话不存在");
+        }
+        SessionData sessionData = new SessionData();
+        sessionData.setSessionId(sessionPO.getId());
+        sessionData.setCurrentStage(sessionPO.getCurrentStage());
+
+        AieduClassroomSessionStudentPO ss = new AieduClassroomSessionStudentPO();
+        ss.setClassroomSessionId(sessionId);
+        List<AieduClassroomSessionStudentPO> joinedStudents = aieduClassroomSessionStudentPOMapper.selectJoinedByEntity(ss);
+        sessionData.setJoinedStudents(joinedStudents);
+        sessionData.setOnlineStudentCount(joinedStudents.size());
+
+        List<AieduClassroomSessionStudentPO> notJoinedStudents = aieduClassroomSessionStudentPOMapper.selectNotJoinedByEntity(ss);
+        sessionData.setNotJoinedStudents(notJoinedStudents);
+
+        return AjaxResult.success(sessionData);
     }
 
 }

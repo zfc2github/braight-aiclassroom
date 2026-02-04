@@ -15,6 +15,7 @@
     <result column="description_en" jdbcType="LONGVARCHAR" property="descriptionEn" />
     <result column="teaching_goal" jdbcType="LONGVARCHAR" property="teachingGoal" />
     <result column="teaching_goal_en" jdbcType="LONGVARCHAR" property="teachingGoalEn" />
+    <result column="ai_tool_type" jdbcType="VARCHAR" property="aiToolType" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from aiedu_aitool
@@ -24,12 +25,13 @@
     insert into aiedu_aitool (id, tool_id, name, name_en,
       icon, category, recommended,
       created_at, updated_at, description,
-      description_en, teaching_goal, teaching_goal_en
+      description_en, teaching_goal, teaching_goal_en, ai_tool_type
       )
     values (#{id,jdbcType=INTEGER}, #{toolId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameEn,jdbcType=VARCHAR},
       #{icon,jdbcType=VARCHAR}, #{category,jdbcType=VARCHAR}, #{recommended,jdbcType=BIT},
       #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR},
-      #{descriptionEn,jdbcType=LONGVARCHAR}, #{teachingGoal,jdbcType=LONGVARCHAR}, #{teachingGoalEn,jdbcType=LONGVARCHAR}
+      #{descriptionEn,jdbcType=LONGVARCHAR}, #{teachingGoal,jdbcType=LONGVARCHAR}, #{teachingGoalEn,jdbcType=LONGVARCHAR},
+      #{aiToolType,jdbcType=VARCHAR}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduAiToolPO">
@@ -44,23 +46,21 @@
       description = #{description,jdbcType=LONGVARCHAR},
       description_en = #{descriptionEn,jdbcType=LONGVARCHAR},
       teaching_goal = #{teachingGoal,jdbcType=LONGVARCHAR},
-      teaching_goal_en = #{teachingGoalEn,jdbcType=LONGVARCHAR}
+      teaching_goal_en = #{teachingGoalEn,jdbcType=LONGVARCHAR},
+      ai_tool_type = #{aiToolType,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select id, tool_id, name, name_en, icon, category, recommended, created_at, updated_at, description,
-    description_en, teaching_goal, teaching_goal_en
+    select *
     from aiedu_aitool
     where id = #{id,jdbcType=INTEGER}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select id, tool_id, name, name_en, icon, category, recommended, created_at, updated_at, description,
-    description_en, teaching_goal, teaching_goal_en
+    select *
     from aiedu_aitool
   </select>
   <select id="selectListByCategory" resultMap="BaseResultMap">
-    select id, tool_id, name, name_en, icon, category, recommended, created_at, updated_at, description,
-           description_en, teaching_goal, teaching_goal_en
+    select *
     from aiedu_aitool
     <where>
       <if test="category != null and category != ''">

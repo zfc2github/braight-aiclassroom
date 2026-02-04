@@ -34,6 +34,8 @@ public class AieduAiToolPO {
 
     private String teachingGoalEn;
 
+    private String aiToolType;
+
     public String getToolId() {
         return toolId;
     }

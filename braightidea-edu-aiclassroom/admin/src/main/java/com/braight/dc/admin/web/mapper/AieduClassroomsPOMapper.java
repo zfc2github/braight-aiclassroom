@@ -51,4 +51,8 @@ public interface AieduClassroomsPOMapper {
 
     int updateLastUsedAt(@Param("classroomId") Integer classroomId,
                          @Param("lastUsedAt") Date lastUsedAt);
+
+  List<AieduClassroomsPO> selectMyClassrooms(Integer teacherId);
+
+  List<AieduClassroomsPO> selectFeaturedClassroomTemplates();
 }

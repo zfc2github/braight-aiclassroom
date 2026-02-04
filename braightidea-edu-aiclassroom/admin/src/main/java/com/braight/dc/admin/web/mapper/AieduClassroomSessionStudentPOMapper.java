@@ -45,4 +45,10 @@ public interface AieduClassroomSessionStudentPOMapper {
                                                       @Param("quizStatus") String quizStatus);
 
     int updateSelectiveByClassroomSessionIdStudentId(AieduClassroomSessionStudentPO param);
+
+    List<AieduClassroomSessionStudentPO> selectNotJoinedByEntity(AieduClassroomSessionStudentPO ss);
+
+    int completedWorkStatusByClassroomSessionIdStudentId(@Param("classroomSessionId") Integer classroomSessionId,
+                                                         @Param("studentId") String studentId,
+                                                         @Param("workStatus") String workStatus);
 }

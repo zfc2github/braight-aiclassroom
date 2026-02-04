@@ -32,7 +32,7 @@ public class AieduQuizQuestionPO {
     private String explanation;
     private Boolean customized;
     private String answerJson;
-    private Object answer;
+    private JSONArray answer;
 
     private String coursewareId;
     private String toolId;

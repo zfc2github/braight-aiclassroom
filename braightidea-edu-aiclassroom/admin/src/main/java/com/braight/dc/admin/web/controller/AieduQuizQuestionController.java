@@ -76,13 +76,11 @@ public class AieduQuizQuestionController extends BaseController {
         } else {
             po.setOptionsJsonarray(new JSONArray().toJSONString());
         }
-        Object answer = po.getAnswer();
+        JSONArray answer = po.getAnswer();
         if (!Objects.isNull(answer)) {
-            if ("boolean".equals(po.getType())) {
-                po.setAnswerJson(String.valueOf(answer));
-            } else {
-                po.setAnswerJson(JSON.toJSONString(answer));
-            }
+            po.setAnswerJson(JSON.toJSONString(answer));
+        } else {
+            po.setAnswerJson(new JSONArray().toJSONString());
         }
     }
 
@@ -133,14 +131,9 @@ public class AieduQuizQuestionController extends BaseController {
         }
         String answerJson = po.getAnswerJson();
         if (StringUtils.hasLength(answerJson)) {
-            if ("single".equals(po.getType())
-                    ||"multiple".equals(po.getType())) {
-                po.setAnswer(JSON.parseArray(answerJson));
-            } else if ("boolean".equals(po.getType())) {
-                po.setAnswer(JSON.parseObject(answerJson, Integer.class));
-            } else {
-                po.setAnswer(JSON.parseObject(answerJson));
-            }
+            po.setAnswer(JSON.parseArray(answerJson));
+        } else {
+            po.setAnswer(new JSONArray());
         }
     }
 

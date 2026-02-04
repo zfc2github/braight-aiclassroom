@@ -130,6 +130,7 @@ public class AieduClassroomsPO {
      */
     private String quizConfigJson;
     private JSONObject quizConfig;
+    private Boolean isTemplate = false;
 
     public JSONObject getAiTool() {
         return aiTool;

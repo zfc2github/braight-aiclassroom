@@ -110,6 +110,7 @@ public class AieduClassroomsController extends BaseController {
     @Login
     @GetMapping("/list")
     public AjaxResult list() {
+        AieduTeachersPO teacher = aieduTeachersPOMapper.selectByUserId(getUserId());
         List<AieduClassroomsPO> list;
         JSONObject pagination = new JSONObject();
         String pageNumRaw = ServletUtils.getParameter("pageNum");
@@ -120,7 +121,7 @@ public class AieduClassroomsController extends BaseController {
             PageHelper.orderBy(orderBy);
         }
         if (pageNumRaw == null) {
-            list = aieduClassroomsPOMapper.selectAll();
+            list = aieduClassroomsPOMapper.selectMyClassrooms(teacher.getTeacherId());
         } else {
             Integer pageNum = pageDomain.getPageNum();
             Integer pageSize = pageDomain.getPageSize();
@@ -128,7 +129,7 @@ public class AieduClassroomsController extends BaseController {
             pagination.put("pageSize", pageSize);
             Boolean reasonable = pageDomain.getReasonable();
             PageHelper.startPage(pageNum, pageSize).setReasonable(reasonable);
-            list = aieduClassroomsPOMapper.selectAll();
+            list = aieduClassroomsPOMapper.selectMyClassrooms(teacher.getTeacherId());
             PageInfo<AieduClassroomsPO> pageInfo = new PageInfo<>(list);
             pagination.put("total", pageInfo.getTotal());
             pagination.put("totalPages", pageInfo.getPages());
@@ -155,7 +156,7 @@ public class AieduClassroomsController extends BaseController {
             PageHelper.orderBy(orderBy);
         }
         if (pageNumRaw == null) {
-            list = aieduClassroomsPOMapper.selectListFeatured();
+            list = aieduClassroomsPOMapper.selectFeaturedClassroomTemplates();
         } else {
             Integer pageNum = pageDomain.getPageNum();
             Integer pageSize = pageDomain.getPageSize();
@@ -163,7 +164,7 @@ public class AieduClassroomsController extends BaseController {
             pagination.put("pageSize", pageSize);
             Boolean reasonable = pageDomain.getReasonable();
             PageHelper.startPage(pageNum, pageSize).setReasonable(reasonable);
-            list = aieduClassroomsPOMapper.selectListFeatured();
+            list = aieduClassroomsPOMapper.selectFeaturedClassroomTemplates();
             PageInfo<AieduClassroomsPO> pageInfo = new PageInfo<>(list);
             pagination.put("total", pageInfo.getTotal());
             pagination.put("totalPages", pageInfo.getPages());
