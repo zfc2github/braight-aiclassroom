@@ -26,4 +26,6 @@ public interface AieduClassroomSessionPOMapper {
                            @Param("currentStage") String currentStage);
 
     AieduClassroomSessionPO selectActiveByClassId(@Param("classId") Integer classId);
+
+  int updateQuizConfig(AieduClassroomSessionPO po);
 }

@@ -17,4 +17,8 @@ public interface AieduQuizQuestionPOMapper {
     int updateByPrimaryKey(AieduQuizQuestionPO row);
 
     List<AieduQuizQuestionPO> selectListByIds(@Param("ids") List<Integer> ids);
+
+    List<AieduQuizQuestionPO> selectRecommendedList(AieduQuizQuestionPO po);
+
+    List<AieduQuizQuestionPO> selectQuestionBankList();
 }

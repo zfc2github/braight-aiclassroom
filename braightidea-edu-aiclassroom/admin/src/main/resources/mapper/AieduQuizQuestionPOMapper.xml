@@ -14,6 +14,9 @@
     <result column="explanation" jdbcType="LONGVARCHAR" property="explanation" />
     <result column="customized" jdbcType="BOOLEAN" property="customized" />
     <result column="answer_json" jdbcType="LONGVARCHAR" property="answerJson" />
+    <result column="tool_id" jdbcType="VARCHAR" property="toolId" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
+    <result column="courseware_id" jdbcType="VARCHAR" property="coursewareId" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from aiedu_quiz_question
@@ -24,11 +27,13 @@
     insert into aiedu_quiz_question (id, type, points,
       created_at, updated_at, question,
       question_en, options_jsonarray, options_en_jsonarray, explanation, customized, answer_json
+      , tool_id, source, courseware_id
       )
     values (#{id,jdbcType=INTEGER}, #{type,jdbcType=VARCHAR}, #{points,jdbcType=INTEGER},
       #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{question,jdbcType=LONGVARCHAR},
       #{questionEn,jdbcType=LONGVARCHAR}, #{optionsJsonarray,jdbcType=LONGVARCHAR}, #{optionsEnJsonarray,jdbcType=LONGVARCHAR}, #{explanation,jdbcType=LONGVARCHAR},
       #{customized,jdbcType=BOOLEAN}, #{answerJson,jdbcType=LONGVARCHAR}
+      , #{toolId,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, #{coursewareId,jdbcType=VARCHAR}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.braight.dc.admin.web.entity.AieduQuizQuestionPO">
@@ -43,7 +48,10 @@
       options_en_jsonarray = #{optionsEnJsonarray,jdbcType=LONGVARCHAR},
       explanation = #{explanation,jdbcType=LONGVARCHAR},
       customized = #{customized,jdbcType=BOOLEAN},
-      answer = #{answerJson,jdbcType=LONGVARCHAR}
+      answer = #{answerJson,jdbcType=LONGVARCHAR},
+      tool_id = #{toolId,jdbcType=VARCHAR},
+      source = #{source,jdbcType=VARCHAR},
+      courseware_id = #{coursewareId,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -62,5 +70,32 @@
     <foreach item="item" collection="ids" separator="," open="(" close=")" index="index">
       #{item}
     </foreach>
+  </select>
+  <select id="selectRecommendedList" parameterType="com.braight.dc.admin.web.entity.AieduQuizQuestionPO" resultMap="BaseResultMap">
+    select *
+    from aiedu_quiz_question
+    <where>
+      <choose>
+        <when test="toolId != null and toolId != ''">
+          or (tool_id = #{toolId} or source = 'ai-tool')
+        </when>
+        <otherwise>
+          or source = 'ai-tool'
+        </otherwise>
+      </choose>
+      <choose>
+        <when test="coursewareId != null and coursewareId != ''">
+          or (courseware_id = #{coursewareId} or source = 'courseware')
+        </when>
+        <otherwise>
+          or source = 'courseware'
+        </otherwise>
+      </choose>
+    </where>
+  </select>
+  <select id="selectQuestionBankList" resultMap="BaseResultMap">
+    select *
+    from aiedu_quiz_question
+    where source = 'bank'
   </select>
 </mapper>

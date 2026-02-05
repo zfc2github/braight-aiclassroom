@@ -3,9 +3,7 @@ package com.braight.dc.admin.web.controller;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.braight.dc.admin.web.entity.AieduQuizQuestionPO;
-import com.braight.dc.admin.web.entity.AieduQuizQuestionRelPO;
 import com.braight.dc.admin.web.mapper.AieduQuizQuestionPOMapper;
-import com.braight.dc.admin.web.mapper.AieduQuizQuestionRelPOMapper;
 import com.braight.master.common.annotation.Log;
 import com.braight.master.common.annotation.Login;
 import com.braight.master.common.core.controller.BaseController;
@@ -17,8 +15,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 测验题目信息表
@@ -32,8 +32,6 @@ public class AieduQuizQuestionController extends BaseController {
 
     @Resource
     private AieduQuizQuestionPOMapper aieduQuizQuestionPOMapper;
-    @Resource
-    private AieduQuizQuestionRelPOMapper aieduQuizQuestionRelPOMapper;
 
     @Login
     @Log(title = "测验题目信息", businessType = BusinessType.INSERT)
@@ -72,9 +70,9 @@ public class AieduQuizQuestionController extends BaseController {
         }
         JSONArray optionsEn = po.getOptionsEn();
         if (!Objects.isNull(optionsEn)) {
-            po.setOptionsJsonarray(optionsEn.toJSONString());
+            po.setOptionsEnJsonarray(optionsEn.toJSONString());
         } else {
-            po.setOptionsJsonarray(new JSONArray().toJSONString());
+            po.setOptionsEnJsonarray(new JSONArray().toJSONString());
         }
         JSONArray answer = po.getAnswer();
         if (!Objects.isNull(answer)) {
@@ -91,27 +89,14 @@ public class AieduQuizQuestionController extends BaseController {
     //    @PreAuthorize("@ss.hasPermi('cms:aiTools:list')")
     @Login
     @GetMapping("/recommended")
-    public AjaxResult recommended(AieduQuizQuestionRelPO po) {
-        List<AieduQuizQuestionRelPO> rels = aieduQuizQuestionRelPOMapper.selectRecommendedList(po);
-        List<Integer> ids = rels.stream()
-                .map(AieduQuizQuestionRelPO::getQuizQuestionId)
-                .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(ids)) {
+    public AjaxResult recommended(AieduQuizQuestionPO po) {
+        List<AieduQuizQuestionPO> list = aieduQuizQuestionPOMapper.selectRecommendedList(po);
+        if (CollectionUtils.isEmpty(list)) {
             return AjaxResult.success(Collections.emptyList());
         }
-        Map<Integer, List<AieduQuizQuestionRelPO>> quizQuestionIdMap = rels.stream()
-                .collect(Collectors.groupingBy(AieduQuizQuestionRelPO::getQuizQuestionId));
-        List<AieduQuizQuestionPO> list = aieduQuizQuestionPOMapper.selectListByIds(ids);
         list.forEach(p -> {
             transferFieldJsonString2Object(p);
             p.setIsSelected(true);
-            List<AieduQuizQuestionRelPO> rel = quizQuestionIdMap.get(p.getId());
-            if (!CollectionUtils.isEmpty(rel)) {
-                AieduQuizQuestionRelPO relPO = rel.get(0);
-                p.setCoursewareId(relPO.getCoursewareId());
-                p.setToolId(relPO.getToolId());
-                p.setSource(relPO.getSource());
-            }
         });
         return AjaxResult.success(list);
     }
@@ -138,5 +123,23 @@ public class AieduQuizQuestionController extends BaseController {
     }
 
 
+    /**
+     * 获取系统题库题目
+     *
+     * @return
+     */
+    @Login
+    @GetMapping("/questionBank")
+    public AjaxResult questionBank() {
+        List<AieduQuizQuestionPO> list = aieduQuizQuestionPOMapper.selectQuestionBankList();
+        if (CollectionUtils.isEmpty(list)) {
+            return AjaxResult.success(Collections.emptyList());
+        }
+        list.forEach(p -> {
+            transferFieldJsonString2Object(p);
+            p.setIsSelected(false);
+        });
+        return AjaxResult.success(list);
+    }
 }
 

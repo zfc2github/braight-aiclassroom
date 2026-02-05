@@ -876,5 +876,28 @@ public class AieduClassroomSessionController extends BaseController {
         return AjaxResult.success(sessionData);
     }
 
+    /**
+     * 更新课堂会话-测验题目配置
+     *
+     * @param sessionId
+     * @param po
+     * @return
+     */
+    @Login
+    @Log(title = "课堂会话信息", businessType = BusinessType.UPDATE)
+    @PostMapping("/{sessionId}/updateQuizConfig")
+    public AjaxResult updateQuizConfig(@PathVariable Integer sessionId,
+                                  @RequestBody AieduClassroomSessionPO po) {
+        po.setId(sessionId);
+        JSONObject quizConfig = po.getQuizConfig();
+        if (!Objects.isNull(quizConfig)) {
+            po.setQuizConfigJson(quizConfig.toJSONString());
+        } else {
+            po.setQuizConfigJson(new JSONObject().toJSONString());
+        }
+        aieduClassroomSessionPOMapper.updateQuizConfig(po);
+        return AjaxResult.success();
+    }
+
 }
 
