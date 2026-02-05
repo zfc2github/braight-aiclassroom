@@ -1,5 +1,6 @@
 package com.braight.dc.admin.web.dto;
 
+import com.alibaba.fastjson2.JSONArray;
 import lombok.Data;
 
 /**
@@ -11,6 +12,6 @@ public class QuestionResult {
     private Integer questionId;
     private String type;
     private Boolean isCorrect;
-    private Object correctAnswer;
-    private Object studentAnswer;
+    private JSONArray correctAnswer;
+    private JSONArray studentAnswer;
 }

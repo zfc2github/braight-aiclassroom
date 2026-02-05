@@ -186,6 +186,7 @@
       select *
       from aiedu_classroom_session_student
       where classroom_session_id = #{classroomSessionId}
+      order by work_status asc , submitted_at asc
   </select>
     <select id="selectNotJoinedByEntity" parameterType="aieduClassroomSessionStudentPO" resultMap="BaseResultMap">
         select *
@@ -195,6 +196,18 @@
                 and classroom_session_id = #{classroomSessionId}
             </if>
             and joined_at is null
+        </where>
+    </select>
+    <select id="selectNotStartedByEntity"
+            resultType="com.braight.dc.admin.web.entity.AieduClassroomSessionStudentPO" resultMap="BaseResultMap">
+        select *
+        from aiedu_classroom_session_student
+        <where>
+            <if test="classroomSessionId != null">
+                and classroom_session_id = #{classroomSessionId}
+            </if>
+            and joined_at is null
+            and work_status != 'waiting'
         </where>
     </select>
 </mapper>

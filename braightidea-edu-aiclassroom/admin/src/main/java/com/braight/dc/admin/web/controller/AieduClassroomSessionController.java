@@ -1,5 +1,6 @@
 package com.braight.dc.admin.web.controller;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -75,7 +77,7 @@ public class AieduClassroomSessionController extends BaseController {
         // 重复提交校验
         AieduClassroomSessionPO activeSession = getActiveSession(po);
         if (!Objects.isNull(activeSession)) {
-            extracted(activeSession, classroomsPO);
+            getWorks(activeSession, classroomsPO);
             return AjaxResult.success(activeSession);
         }
 
@@ -110,11 +112,11 @@ public class AieduClassroomSessionController extends BaseController {
             aieduClassroomSessionStudentPOMapper.insert(row);
         });
 
-        extracted(po, classroomsPO);
+        getWorks(po, classroomsPO);
         return AjaxResult.success(po);
     }
 
-    private void extracted(AieduClassroomSessionPO po, AieduClassroomsPO classroomsPO) {
+    private void getWorks(AieduClassroomSessionPO po, AieduClassroomsPO classroomsPO) {
         po.setAiTool(getJsonObject(classroomsPO.getAiToolJson()));
         po.setCourseware(getJsonObject(classroomsPO.getCoursewareJson()));
         po.setQuizConfig(getJsonObject(classroomsPO.getQuizConfigJson()));
@@ -300,7 +302,7 @@ public class AieduClassroomSessionController extends BaseController {
         AieduClassroomSessionPO session = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
         aieduClassroomSessionPOMapper.updateCurrentStage(session.getClassroomId(), Constant.ClassroomSessionCurrentStage.QUIZ);
         // 更新测验状态
-        aieduClassroomSessionStudentPOMapper.updateQuizStatusByClassroomSessionId(sessionId, Constant.ClassroomStatus.IN_PROGRESS);
+        aieduClassroomSessionStudentPOMapper.updateQuizStatusByClassroomSessionId(sessionId, Constant.QuizStatus.READY);
         // 发送websocket消息：开始测验
         wsService.publishQuiz(sessionId);
         return AjaxResult.success();
@@ -392,7 +394,7 @@ public class AieduClassroomSessionController extends BaseController {
     }
 
     /**
-     * 批量下载学生作品
+     * 一键下载全部
      *
      * @param sessionId
      * @return
@@ -413,23 +415,14 @@ public class AieduClassroomSessionController extends BaseController {
                     .filter(p -> ids.contains(p.getId()))
                     .collect(Collectors.toList());
         }
-        List<StudentWork> works = finalSubmitWork.stream()
-                .map(p -> {
-                    JSONObject content = getJsonObject(p.getContentJson());
-                    String url = content.getString("url");
-                    if (StringUtils.hasLength(url)) {
-                        StudentWork work = new StudentWork();
-                        work.setStudentId(p.getStudentId());
-                        work.setStudentName(p.getStudentName());
-                        work.setUrl(url);
-                        return work;
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<AieduClassroomSessionStudentPO> allStudents = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
+        List<StudentQuizScore> quizScores = getStudentQuizScores(allStudents);
+        quizScores.sort(Comparator.comparing(StudentQuizScore::getScore).reversed());
+        String language = query.getLanguage();
 
-        // 将所有url下载下来并添加到zip中并返回到前端供直接下载
+        List<StudentWork> works = getWorks(finalSubmitWork);
+
+      // 将所有url下载下来并添加到zip中并返回到前端供直接下载
         try {
             // 设置响应头
             // 设置响应头 - 使用UTF-8编码处理中文文件名
@@ -442,7 +435,7 @@ public class AieduClassroomSessionController extends BaseController {
 
             // 创建ZIP输出流
             try (ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream())) {
-
+                addQuizScoresToZip(quizScores, language, zipOut);
                 for (int i = 0; i < works.size(); i++) {
                     StudentWork work = works.get(i);
                     try {
@@ -490,6 +483,56 @@ public class AieduClassroomSessionController extends BaseController {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 将 quizScores 数据生成 CSV 并添加到 ZIP 输出流中
+     *
+     * @param quizScores 学生成绩列表
+     * @param language   语言（zh 或 en）
+     * @param zipOut     ZIP 输出流
+     * @throws IOException IO 异常
+     */
+    private void addQuizScoresToZip(List<StudentQuizScore> quizScores, String language, ZipOutputStream zipOut) throws IOException {
+        // 确定表头和文件名
+        String[] headers;
+        String fileName;
+        if ("zh".equalsIgnoreCase(language)) {
+            headers = new String[]{"排名", "学号", "得分", "提交时间"};
+            fileName = "学生成绩表.csv";
+        } else {
+            headers = new String[]{"Rank", "StudentId", "StudentName", "Score", "SubmittedAt"};
+            fileName = "student_scores.csv";
+        }
+
+        // 构建 CSV 内容
+        StringBuilder csvContent = new StringBuilder();
+        // 添加表头
+        csvContent.append(String.join(",", headers)).append("\n");
+
+        // 添加数据行
+        for (int i = 0; i < quizScores.size(); i++) {
+            StudentQuizScore score = quizScores.get(i);
+            String rank = String.valueOf(i + 1); // 排名从 1 开始
+            String studentId = score.getStudentId();
+            String studentName = score.getStudentName();
+            String scoreValue = String.valueOf(score.getScore());
+            String submittedAt = score.getSubmittedAt() != null ? DateUtil.formatDateTime(score.getSubmittedAt()) : "";
+
+            if ("zh".equalsIgnoreCase(language)) {
+                csvContent.append(String.join(",", rank, studentId, scoreValue, submittedAt)).append("\n");
+            } else {
+                csvContent.append(String.join(",", rank, studentId, studentName, scoreValue, submittedAt)).append("\n");
+            }
+        }
+
+        // 将 CSV 文件添加到 ZIP 输出流
+        ZipEntry zipEntry = new ZipEntry(fileName);
+        zipOut.putNextEntry(zipEntry);
+        zipOut.write(csvContent.toString().getBytes(StandardCharsets.UTF_8));
+        zipOut.closeEntry();
+    }
+
+
     /**
      * 使用URI类从URL中提取文件名
      * @param urlString URL字符串
@@ -572,7 +615,8 @@ public class AieduClassroomSessionController extends BaseController {
                 if (i < quizAnswers.size()) {
                     JSONObject quizAnswer = quizAnswers.getJSONObject(i);
                     if ("single".equals(type)
-                            || "multiple".equals(type)) {
+                            || "multiple".equals(type)
+                            || "boolean".equals(type)) {
                         JSONArray correctAnswer = JSON.parseArray(answerJson);
                         JSONArray studentAnswer = quizAnswer.getJSONArray("answer");
                         if (studentAnswer == null || studentAnswer.isEmpty()) {
@@ -588,46 +632,27 @@ public class AieduClassroomSessionController extends BaseController {
                         }
                         questionResult.setCorrectAnswer(correctAnswer);
                         questionResult.setStudentAnswer(studentAnswer);
-                    } else if ("boolean".equals(type)) {
-                        Integer correctAnswer = JSON.parseObject(answerJson, Integer.class);
-                        Integer studentAnswer = quizAnswer.getInteger("answer");
-                        if (studentAnswer == null) {
-                            unansweredCount++;
-                        }
-                        if (correctAnswer.equals(studentAnswer)) {
-                            score += points;
-                            correctCount++;
-                            questionResult.setIsCorrect(true);
-                        } else {
-                            questionResult.setIsCorrect(false);
-                        }
-                        questionResult.setCorrectAnswer(correctAnswer);
-                        questionResult.setStudentAnswer(studentAnswer);
                     } else {
                         System.err.println("未知的题型:" + type);
                         questionResult.setIsCorrect(false);
-                        questionResult.setCorrectAnswer(answerJson);
-                        questionResult.setStudentAnswer(quizAnswer.get("answer"));
+                        questionResult.setCorrectAnswer(JSONArray.of(answerJson));
+                        questionResult.setStudentAnswer(JSONArray.of(quizAnswer.get("answer")));
                     }
                 } else {
                     // 未完成
                     unansweredCount++;
                     if ("single".equals(type)
-                            || "multiple".equals(type)) {
+                            || "multiple".equals(type)
+                            || "boolean".equals(type)) {
                         JSONArray correctAnswer = JSON.parseArray(answerJson);
                         questionResult.setIsCorrect(false);
                         questionResult.setCorrectAnswer(correctAnswer);
-                        questionResult.setStudentAnswer("");
-                    } else if ("boolean".equals(type)) {
-                        Integer correctAnswer = JSON.parseObject(answerJson, Integer.class);
-                        questionResult.setIsCorrect(false);
-                        questionResult.setCorrectAnswer(correctAnswer);
-                        questionResult.setStudentAnswer("");
+                        questionResult.setStudentAnswer(new JSONArray());
                     } else {
                         System.err.println("未知的题型:" + type);
                         questionResult.setIsCorrect(false);
-                        questionResult.setCorrectAnswer(answerJson);
-                        questionResult.setStudentAnswer("");
+                        questionResult.setCorrectAnswer(JSONArray.of(answerJson));
+                        questionResult.setStudentAnswer(new JSONArray());
                     }
                 }
                 results.add(questionResult);
@@ -649,7 +674,7 @@ public class AieduClassroomSessionController extends BaseController {
         param.setStudentId(query.getStudentId());
         param.setQuizAnswersJsonarray(quizAnswers.toJSONString());
         param.setQuizResultJsonobject(JSON.toJSONString(quizResult));
-        param.setQuizStatus(Constant.ClassroomStatus.COMPLETED);
+        param.setQuizStatus(Constant.QuizStatus.SUBMITTED);
         param.setSubmittedAt(new Date());
         aieduClassroomSessionStudentPOMapper.updateSelectiveByClassroomSessionIdStudentId(param);
         // 返回测验结果
@@ -715,23 +740,35 @@ public class AieduClassroomSessionController extends BaseController {
      */
     @GetMapping("/{sessionId}/student/apiInvokeStats")
     public AjaxResult studentApiInvokeStats(@PathVariable Integer sessionId) {
+        ApiInvokeStats stats = getApiInvokeStats(sessionId);
+        return AjaxResult.success(stats);
+    }
+
+    private ApiInvokeStats getApiInvokeStats(Integer sessionId) {
         List<AieduClassroomSessionStudentPO> sessionStudents = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
         ApiInvokeStats stats = new ApiInvokeStats();
         stats.setClassroomSessionId(sessionId);
+        List<StudentApiItem> studentApiItems = new ArrayList<>();
         List<String> xAxis = new ArrayList<>();
         List<Integer> seriesData = new ArrayList<>();
         sessionStudents.forEach(s -> {
             xAxis.add(s.getStudentName());
-            seriesData.add(s.getApiCount()==null?0:s.getApiCount());
+            int calls = s.getApiCount() == null ? 0 : s.getApiCount();
+            seriesData.add(calls);
+            StudentApiItem item = new StudentApiItem();
+            item.setStudentName(s.getStudentName());
+            item.setCalls(calls);
+            studentApiItems.add(item);
         });
         stats.setXAxis(xAxis);
         stats.setSeriesData(seriesData);
+        stats.setPerStudentApiCalls(studentApiItems);
         double avg = seriesData.stream()
                 .mapToDouble(Integer::doubleValue)
                 .average()
                 .orElse(0.0);
         stats.setAvgCalls((int) avg);
-        return AjaxResult.success(stats);
+        return stats;
     }
 
     /**
@@ -748,7 +785,7 @@ public class AieduClassroomSessionController extends BaseController {
         stats.setTotalStudents(sessionStudents.size());
         Map<String, List<AieduClassroomSessionStudentPO>> quizStatusMap = sessionStudents.stream()
                 .collect(Collectors.groupingBy(AieduClassroomSessionStudentPO::getQuizStatus));
-        List<AieduClassroomSessionStudentPO> submittedStudents = quizStatusMap.get(Constant.ClassroomStatus.COMPLETED);
+        List<AieduClassroomSessionStudentPO> submittedStudents = quizStatusMap.get(Constant.QuizStatus.SUBMITTED);
         if (CollectionUtils.isEmpty(submittedStudents)) {
             stats.setSubmitted(0);
             stats.setNotSubmitted(sessionStudents.size());
@@ -856,24 +893,117 @@ public class AieduClassroomSessionController extends BaseController {
      */
     @GetMapping("/{sessionId}/sessionData")
     public AjaxResult sessionData(@PathVariable Integer sessionId) {
-        AieduClassroomSessionPO sessionPO = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
-        if (sessionPO == null) {
-            return AjaxResult.error("会话不存在");
-        }
-        SessionData sessionData = new SessionData();
-        sessionData.setSessionId(sessionPO.getId());
-        sessionData.setCurrentStage(sessionPO.getCurrentStage());
+      AieduClassroomSessionPO sessionPO = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
+      if (sessionPO == null) {
+        return AjaxResult.error("会话不存在");
+      }
+      SessionData sessionData = new SessionData();
+      sessionData.setLastUpdated(new Date());
+      sessionData.setSessionId(sessionPO.getId());
+      sessionData.setCurrentStage(sessionPO.getCurrentStage());
+      sessionData.setQuizConfig(getJsonObject(sessionPO.getQuizConfigJson()));
 
-        AieduClassroomSessionStudentPO ss = new AieduClassroomSessionStudentPO();
-        ss.setClassroomSessionId(sessionId);
-        List<AieduClassroomSessionStudentPO> joinedStudents = aieduClassroomSessionStudentPOMapper.selectJoinedByEntity(ss);
-        sessionData.setJoinedStudents(joinedStudents);
-        sessionData.setOnlineStudentCount(joinedStudents.size());
+      AieduClassroomSessionStudentPO ss = new AieduClassroomSessionStudentPO();
+      ss.setClassroomSessionId(sessionId);
+      List<AieduClassroomSessionStudentPO> all = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
+      sessionData.setTotalStudentCount(all.size());
+      sessionData.setAllStudents(all);
 
-        List<AieduClassroomSessionStudentPO> notJoinedStudents = aieduClassroomSessionStudentPOMapper.selectNotJoinedByEntity(ss);
-        sessionData.setNotJoinedStudents(notJoinedStudents);
+      List<AieduClassroomSessionStudentPO> joinedStudents = all.stream()
+              .filter(s -> !Objects.isNull(s.getJoinedAt()))
+              .collect(Collectors.toList());
+      sessionData.setJoinedStudents(joinedStudents);
+      sessionData.setOnlineStudentCount(joinedStudents.size());
+      sessionData.setJoined(joinedStudents.size());
 
-        return AjaxResult.success(sessionData);
+      List<AieduClassroomSessionStudentPO> notJoinedStudents = all.stream()
+              .filter(s -> Objects.isNull(s.getJoinedAt()))
+              .collect(Collectors.toList());
+      sessionData.setNotJoinedStudents(notJoinedStudents);
+
+      List<AieduClassroomSessionStudentPO> notStartedStudents = all.stream()
+              .filter(s -> Objects.isNull(s.getJoinedAt()) && !Constant.ClassroomStatus.WAITING.equals(s.getWorkStatus()))
+              .collect(Collectors.toList());
+      sessionData.setNotStartedStudents(notStartedStudents);
+      sessionData.setStarted(sessionData.getTotalStudentCount() - notStartedStudents.size());
+
+      long count = all.stream()
+              .filter(s -> Constant.ClassroomStatus.COMPLETED.equals(s.getWorkStatus()))
+              .count();
+      sessionData.setSubmitted((int) count);
+
+      ApiInvokeStats apiInvokeStats = getApiInvokeStats(sessionId);
+      sessionData.setApiInvokeStats(apiInvokeStats);
+
+      sessionData.setQuizPublished(checkQuizPublished(sessionPO));
+      List<AieduClassroomSessionStudentPO> quizStartedStudents = all.stream()
+              .filter(s -> !Constant.QuizStatus.READY.equals(s.getQuizStatus()))
+              .collect(Collectors.toList());
+      sessionData.setQuizStarted(quizStartedStudents.size());
+
+      List<AieduClassroomSessionStudentPO> quizCompletedStudents = all.stream()
+              .filter(s -> Constant.QuizStatus.SUBMITTED.equals(s.getQuizStatus()))
+              .collect(Collectors.toList());
+      sessionData.setQuizCompleted(quizCompletedStudents.size());
+
+        List<StudentQuizScore> quizScores = getStudentQuizScores(all);
+        sessionData.setQuizScores(quizScores);
+      double quizAverageScore = quizScores.stream()
+              .map(StudentQuizScore::getScore)
+              .mapToDouble(Integer::doubleValue)
+              .average()
+              .orElse(0);
+      sessionData.setQuizAverageScore((int) quizAverageScore);
+
+      List<AieduClassroomSessionStudentWorkPO> studentWorks = aieduClassroomSessionStudentWorkPOMapper.selectByClassroomSessionId(sessionId);
+      List<AieduClassroomSessionStudentWorkPO> finalSubmittedWorks = studentWorks.stream()
+              .filter(AieduClassroomSessionStudentWorkPO::getFinalSubmit)
+              .collect(Collectors.toList());
+      sessionData.setArtifacts(getWorks(finalSubmittedWorks));
+
+      return AjaxResult.success(sessionData);
+    }
+
+    private List<StudentQuizScore> getStudentQuizScores(List<AieduClassroomSessionStudentPO> all) {
+        List<StudentQuizScore> quizScores = all.stream()
+                .map(s -> {
+                  StudentQuizScore score = new StudentQuizScore();
+                  JSONObject quizResult = getJsonObject(s.getQuizResultJsonobject());
+                  score.setStudentId(s.getStudentId());
+                  score.setStudentName(s.getStudentName());
+                  score.setSubmittedAt(s.getSubmittedAt());
+                  Integer sc = quizResult.getInteger("score");
+                  if (sc == null) {
+                    sc = 0;
+                  }
+                  score.setScore(sc);
+                  return score;
+                })
+                .collect(Collectors.toList());
+        return quizScores;
+    }
+
+    private List<StudentWork> getWorks(List<AieduClassroomSessionStudentWorkPO> finalSubmittedWorks) {
+    return finalSubmittedWorks.stream()
+            .map(p -> {
+              JSONObject content = getJsonObject(p.getContentJson());
+              String url = content.getString("url");
+              if (StringUtils.hasLength(url)) {
+                StudentWork work = new StudentWork();
+                work.setStudentId(p.getStudentId());
+                work.setStudentName(p.getStudentName());
+                work.setUrl(url);
+                return work;
+              }
+              return null;
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+  }
+
+  private Boolean checkQuizPublished(AieduClassroomSessionPO sessionPO) {
+        return Constant.ClassroomSessionCurrentStage.QUIZ.equals(sessionPO.getCurrentStage())
+                || Constant.ClassroomSessionCurrentStage.COMPLETED.equals(sessionPO.getCurrentStage());
     }
 
     /**

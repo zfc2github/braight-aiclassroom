@@ -51,4 +51,6 @@ public interface AieduClassroomSessionStudentPOMapper {
     int completedWorkStatusByClassroomSessionIdStudentId(@Param("classroomSessionId") Integer classroomSessionId,
                                                          @Param("studentId") String studentId,
                                                          @Param("workStatus") String workStatus);
+
+  List<AieduClassroomSessionStudentPO> selectNotStartedByEntity(AieduClassroomSessionStudentPO ss);
 }

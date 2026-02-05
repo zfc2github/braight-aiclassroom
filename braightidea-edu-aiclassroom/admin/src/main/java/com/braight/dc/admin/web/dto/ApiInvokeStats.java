@@ -14,4 +14,5 @@ public class ApiInvokeStats {
     private int avgCalls; // 平均调用次数
     private List<String> xAxis; // 学生名称
     private List<Integer> seriesData; // 学生调用次数
+    private List<StudentApiItem> perStudentApiCalls;
 }

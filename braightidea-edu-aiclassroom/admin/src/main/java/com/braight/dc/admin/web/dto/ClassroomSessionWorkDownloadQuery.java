@@ -11,4 +11,5 @@ import java.util.List;
 @Data
 public class ClassroomSessionWorkDownloadQuery {
     private List<Integer> ids;
+    private String language = "zh";
 }
