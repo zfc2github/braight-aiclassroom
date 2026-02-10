@@ -18,6 +18,7 @@ const {generateMusicFromText} = require("./minimax-text2music");
 const {speechSynthesis, speechGeneration, listVoice} = require('./aliyun-cosyvoice');
 const {ocrImage} = require("./baidu-textRecog");
 const {generateCreativeIdeas, generateText} = require("./aliyun-creativeAssistant");
+const {aliyunObjectDetect} = require("./aliyun-objectdet");
 
 
 /* ========== 中间件 ========== */
@@ -323,6 +324,23 @@ app.post('/learningAssistant', async (req, res) => {
         res.status(status).json(e?.data || { error: e.message });
     }
 })
+
+// 阿里云-物体识别
+app.post('/aliyunObjectDetect', async (req, res) => {
+    try {
+        const { localFilePath } = req.body;
+        const data = await aliyunObjectDetect(localFilePath);
+        res.json({
+            success: true,
+            data: data
+        });
+    } catch (e) {
+        console.log(e);
+        const status = e?.status || 500;
+        res.status(status).json(e?.data || { error: e.message });
+    }
+})
+
 
 // 3. 启动
 app.listen(PORT, () => {
