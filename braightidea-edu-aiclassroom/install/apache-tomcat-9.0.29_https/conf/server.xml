@@ -53,11 +53,20 @@
   <Service name="Catalina">
 
     <Connector
+           port="25172"
            protocol="org.apache.coyote.http11.Http11NioProtocol"
-           port="25172" maxThreads="200"
-           scheme="https" secure="true" SSLEnabled="true"
-           keystoreFile="casserver.keystore" keystorePass="cas123"
-           clientAuth="false" sslProtocol="TLS"/>
+           maxThreads="800"
+           minSpareTheads="10"
+           maxConnections="10000"
+           acceptCount="1000"
+           connectionTimeout="20000"
+           scheme="https"
+           secure="true"
+           SSLEnabled="true"
+           keystoreFile="casserver.keystore"
+           keystorePass="cas123"
+           clientAuth="false"
+           sslProtocol="TLS"/>
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
     <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
