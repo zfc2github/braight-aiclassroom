@@ -218,8 +218,22 @@ public class AieduClassroomSessionController extends BaseController {
         AieduClassroomSessionStudentPO joinedStudent = aieduClassroomSessionStudentPOMapper.selectJoined(classroomSessionId, studentId);
         if (Objects.isNull(joinedStudent)) {
             joinedStudent = aieduClassroomSessionStudentPOMapper.selectStudent(classroomSessionId, studentId);
-            joinedStudent.setJoinedAt(new Date());
-            aieduClassroomSessionStudentPOMapper.updateSelective(joinedStudent);
+            if (Objects.isNull(joinedStudent)) {
+                List<AieduStudentPO> students = aieduStudentPOMapper.selectListByStudentIdAndClassId(studentId, activePo.getClassId());
+                AieduStudentPO student = students.get(0);
+                joinedStudent = new AieduClassroomSessionStudentPO();
+                joinedStudent.setClassroomSessionId(activePo.getId());
+                joinedStudent.setStudentId(student.getStudentId());
+                joinedStudent.setStudentName(student.getName());
+                joinedStudent.setJoinedAt(new Date());
+                joinedStudent.setWorkStatus(Constant.ClassroomStatus.WAITING);
+                joinedStudent.setApiCount(0);
+                joinedStudent.setQuizStatus(Constant.ClassroomStatus.WAITING);
+                aieduClassroomSessionStudentPOMapper.insert(joinedStudent);
+            } else {
+                joinedStudent.setJoinedAt(new Date());
+                aieduClassroomSessionStudentPOMapper.updateSelective(joinedStudent);
+            }
         }
 
 
