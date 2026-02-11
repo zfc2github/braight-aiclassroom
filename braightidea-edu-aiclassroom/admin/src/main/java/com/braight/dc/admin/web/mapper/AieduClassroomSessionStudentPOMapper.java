@@ -17,6 +17,7 @@ public interface AieduClassroomSessionStudentPOMapper {
     int updateByPrimaryKey(AieduClassroomSessionStudentPO row);
 
     List<AieduClassroomSessionStudentPO> selectJoinedByEntity(AieduClassroomSessionStudentPO entity);
+    int selectJoinedCountByEntity(AieduClassroomSessionStudentPO entity);
 
     int updateSelective(AieduClassroomSessionStudentPO studentPO);
 

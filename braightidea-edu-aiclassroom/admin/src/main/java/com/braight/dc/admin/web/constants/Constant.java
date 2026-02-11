@@ -5,6 +5,11 @@ package com.braight.dc.admin.web.constants;
  * @date 2026/1/15
  */
 public class Constant {
+    public static class RedisCacheKey {
+
+        public static final String SESSION_DATA = "AiEducation:Session_Data:";
+    }
+
     public static class QuizStatus {
         public static final String READY = "ready";
         public static final String ANSWERING = "answering";

@@ -9,6 +9,8 @@ import com.braight.dc.admin.web.constants.Constant;
 import com.braight.dc.admin.web.dto.*;
 import com.braight.dc.admin.web.entity.*;
 import com.braight.dc.admin.web.mapper.*;
+import com.braight.dc.admin.web.service.AieduClassroomSessionService;
+import com.braight.dc.admin.web.utils.ControllerUtil;
 import com.braight.dc.admin.websocket.WsService;
 import com.braight.master.common.annotation.Log;
 import com.braight.master.common.annotation.Login;
@@ -16,6 +18,7 @@ import com.braight.master.common.core.controller.BaseController;
 import com.braight.master.common.core.domain.AjaxResult;
 import com.braight.master.common.core.page.PageDomain;
 import com.braight.master.common.core.page.TableSupport;
+import com.braight.master.common.core.redis.RedisCache;
 import com.braight.master.common.enums.BusinessType;
 import com.braight.master.common.utils.sql.SqlUtil;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -32,6 +35,7 @@ import java.io.InputStream;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -63,6 +67,8 @@ public class AieduClassroomSessionController extends BaseController {
     private WsService wsService;
     @Resource
     private AieduClassroomSessionStudentWorkPOMapper aieduClassroomSessionStudentWorkPOMapper;
+    @Resource
+    private AieduClassroomSessionService aieduClassroomSessionService;
 
 
     @Login
@@ -117,9 +123,9 @@ public class AieduClassroomSessionController extends BaseController {
     }
 
     private void getWorks(AieduClassroomSessionPO po, AieduClassroomsPO classroomsPO) {
-        po.setAiTool(getJsonObject(classroomsPO.getAiToolJson()));
-        po.setCourseware(getJsonObject(classroomsPO.getCoursewareJson()));
-        po.setQuizConfig(getJsonObject(classroomsPO.getQuizConfigJson()));
+        po.setAiTool(ControllerUtil.getJsonObject(classroomsPO.getAiToolJson()));
+        po.setCourseware(ControllerUtil.getJsonObject(classroomsPO.getCoursewareJson()));
+        po.setQuizConfig(ControllerUtil.getJsonObject(classroomsPO.getQuizConfigJson()));
     }
 
 
@@ -174,7 +180,7 @@ public class AieduClassroomSessionController extends BaseController {
     public AjaxResult getCoursewareInfo(@PathVariable Integer sessionId) {
         AieduClassroomSessionPO po = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
         AieduClassroomsPO classroomsPO = aieduClassroomsPOMapper.selectByPrimaryKey(po.getClassroomId());
-        JSONObject courseware = getJsonObject(classroomsPO.getCoursewareJson());
+        JSONObject courseware = ControllerUtil.getJsonObject(classroomsPO.getCoursewareJson());
         String id = courseware.getString("id");
         if (!StringUtils.hasLength(id)) {
             return AjaxResult.error("未查询到课件");
@@ -189,13 +195,6 @@ public class AieduClassroomSessionController extends BaseController {
     private AieduClassroomSessionPO getActiveSession(AieduClassroomSessionPO po) {
         List<AieduClassroomSessionPO> list = aieduClassroomSessionPOMapper.selectActiveSession(po);
         return list.size() > 0 ? list.get(0) : null;
-    }
-
-    private JSONObject getJsonObject(String jsonString) {
-        if (StringUtils.hasLength(jsonString)) {
-            return JSONObject.parseObject(jsonString);
-        }
-        return new JSONObject();
     }
 
     /**
@@ -246,12 +245,12 @@ public class AieduClassroomSessionController extends BaseController {
         vo.setClassroomName(activePo.getClassroomName());
         vo.setCurrentStage(activePo.getCurrentStage());
         vo.setJoinedAt(joinedStudent.getJoinedAt());
-        vo.setAiTool(getJsonObject(activePo.getAiToolJson()));
+        vo.setAiTool(ControllerUtil.getJsonObject(activePo.getAiToolJson()));
 
         AieduClassroomSessionStudentPO param = new AieduClassroomSessionStudentPO();
         param.setClassroomSessionId(classroomSessionId);
-        List<AieduClassroomSessionStudentPO> list = aieduClassroomSessionStudentPOMapper.selectJoinedByEntity(param);
-        vo.setOnlineStudentCount(list.size());
+        int count = aieduClassroomSessionStudentPOMapper.selectJoinedCountByEntity(param);
+        vo.setOnlineStudentCount(count);
 
         return AjaxResult.success(vo);
     }
@@ -331,7 +330,7 @@ public class AieduClassroomSessionController extends BaseController {
     @PostMapping("/submitWork")
     public AjaxResult submitWork(@Validated @RequestBody AieduClassroomSessionStudentWorkPO po) {
         // todo Shine 是否限制提交次数
-        po.setContentJson(getJsonString(po.getContent()));
+        po.setContentJson(ControllerUtil.getJsonString(po.getContent()));
         po.setSubmittedAt(new Date());
         aieduClassroomSessionStudentWorkPOMapper.insert(po);
         if (po.getFinalSubmit()) {
@@ -361,11 +360,7 @@ public class AieduClassroomSessionController extends BaseController {
         return AjaxResult.success();
     }
 
-    private String getJsonString(JSONObject content) {
-        return Objects.isNull(content)
-                ? new JSONObject().toJSONString()
-                : content.toJSONString();
-    }
+
 
     /**
      * 获取学生作品列表
@@ -395,7 +390,7 @@ public class AieduClassroomSessionController extends BaseController {
             List<AieduClassroomSessionStudentWork> works = workList.stream()
                     .map(p-> {
                         AieduClassroomSessionStudentWork jsonObject = new AieduClassroomSessionStudentWork();
-                        jsonObject.setContent(getJsonObject(p.getContentJson()));
+                        jsonObject.setContent(ControllerUtil.getJsonObject(p.getContentJson()));
                         jsonObject.setSubmittedAt(p.getSubmittedAt());
                         jsonObject.setFinalSubmit(p.getFinalSubmit());
                         return jsonObject;
@@ -430,11 +425,11 @@ public class AieduClassroomSessionController extends BaseController {
                     .collect(Collectors.toList());
         }
         List<AieduClassroomSessionStudentPO> allStudents = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
-        List<StudentQuizScore> quizScores = getStudentQuizScores(allStudents);
+        List<StudentQuizScore> quizScores = aieduClassroomSessionService.getStudentQuizScores(allStudents);
         quizScores.sort(Comparator.comparing(StudentQuizScore::getScore).reversed());
         String language = query.getLanguage();
 
-        List<StudentWork> works = getWorks(finalSubmitWork);
+        List<StudentWork> works = aieduClassroomSessionService.getWorks(finalSubmitWork);
 
       // 将所有url下载下来并添加到zip中并返回到前端供直接下载
         try {
@@ -579,7 +574,7 @@ public class AieduClassroomSessionController extends BaseController {
     @GetMapping("/{sessionId}/quiz/questions")
     public AjaxResult quizQuestions(@PathVariable Integer sessionId) {
         AieduClassroomSessionPO sessionPO = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
-        JSONObject quizConfig = getJsonObject(sessionPO.getQuizConfigJson());
+        JSONObject quizConfig = ControllerUtil.getJsonObject(sessionPO.getQuizConfigJson());
         Boolean enabled = quizConfig.getBoolean("enabled");
         if (!enabled) {
             return AjaxResult.success(new ArrayList<>());
@@ -605,8 +600,7 @@ public class AieduClassroomSessionController extends BaseController {
         // 生成测验结果
         QuizResult quizResult = new QuizResult();
         quizResult.setStudentId(query.getStudentId());
-        AieduClassroomSessionStudentPO selectStudent = aieduClassroomSessionStudentPOMapper.selectStudent(sessionId, query.getStudentId());
-        quizResult.setStudentName(selectStudent.getStudentName());
+        quizResult.setStudentName(query.getStudentName());
 
         int score = 0;
         int totalQuestions = 0;
@@ -615,7 +609,7 @@ public class AieduClassroomSessionController extends BaseController {
         List<QuestionResult> results = new ArrayList<>();
         try {
             AieduClassroomSessionPO sessionPO = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
-            JSONObject quizConfig = getJsonObject(sessionPO.getQuizConfigJson());
+            JSONObject quizConfig = ControllerUtil.getJsonObject(sessionPO.getQuizConfigJson());
             JSONArray questions = quizConfig.getJSONArray("questions");
             totalQuestions = questions.size();
             for (int i = 0; i < questions.size(); i++) {
@@ -754,7 +748,7 @@ public class AieduClassroomSessionController extends BaseController {
      */
     @GetMapping("/{sessionId}/student/apiInvokeStats")
     public AjaxResult studentApiInvokeStats(@PathVariable Integer sessionId) {
-        ApiInvokeStats stats = getApiInvokeStats(sessionId);
+        ApiInvokeStats stats = aieduClassroomSessionService.getApiInvokeStats(sessionId);
         return AjaxResult.success(stats);
     }
 
@@ -911,114 +905,14 @@ public class AieduClassroomSessionController extends BaseController {
       if (sessionPO == null) {
         return AjaxResult.error("会话不存在");
       }
-      SessionData sessionData = new SessionData();
-      sessionData.setLastUpdated(new Date());
-      sessionData.setSessionId(sessionPO.getId());
-      sessionData.setCurrentStage(sessionPO.getCurrentStage());
-      sessionData.setQuizConfig(getJsonObject(sessionPO.getQuizConfigJson()));
-
-      AieduClassroomSessionStudentPO ss = new AieduClassroomSessionStudentPO();
-      ss.setClassroomSessionId(sessionId);
-      List<AieduClassroomSessionStudentPO> all = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
-      sessionData.setTotalStudentCount(all.size());
-      sessionData.setAllStudents(all);
-
-      List<AieduClassroomSessionStudentPO> joinedStudents = all.stream()
-              .filter(s -> !Objects.isNull(s.getJoinedAt()))
-              .collect(Collectors.toList());
-      sessionData.setJoinedStudents(joinedStudents);
-      sessionData.setOnlineStudentCount(joinedStudents.size());
-      sessionData.setJoined(joinedStudents.size());
-
-      List<AieduClassroomSessionStudentPO> notJoinedStudents = all.stream()
-              .filter(s -> Objects.isNull(s.getJoinedAt()))
-              .collect(Collectors.toList());
-      sessionData.setNotJoinedStudents(notJoinedStudents);
-
-      List<AieduClassroomSessionStudentPO> notStartedStudents = all.stream()
-              .filter(s -> Objects.isNull(s.getJoinedAt()) && !Constant.ClassroomStatus.WAITING.equals(s.getWorkStatus()))
-              .collect(Collectors.toList());
-      sessionData.setNotStartedStudents(notStartedStudents);
-      sessionData.setStarted(sessionData.getTotalStudentCount() - notStartedStudents.size());
-
-      long count = all.stream()
-              .filter(s -> Constant.ClassroomStatus.COMPLETED.equals(s.getWorkStatus()))
-              .count();
-      sessionData.setSubmitted((int) count);
-
-      ApiInvokeStats apiInvokeStats = getApiInvokeStats(sessionId);
-      sessionData.setApiInvokeStats(apiInvokeStats);
-
-      sessionData.setQuizPublished(checkQuizPublished(sessionPO));
-      List<AieduClassroomSessionStudentPO> quizStartedStudents = all.stream()
-              .filter(s -> !Constant.QuizStatus.READY.equals(s.getQuizStatus()))
-              .collect(Collectors.toList());
-      sessionData.setQuizStarted(quizStartedStudents.size());
-
-      List<AieduClassroomSessionStudentPO> quizCompletedStudents = all.stream()
-              .filter(s -> Constant.QuizStatus.SUBMITTED.equals(s.getQuizStatus()))
-              .collect(Collectors.toList());
-      sessionData.setQuizCompleted(quizCompletedStudents.size());
-
-        List<StudentQuizScore> quizScores = getStudentQuizScores(all);
-        sessionData.setQuizScores(quizScores);
-      double quizAverageScore = quizScores.stream()
-              .map(StudentQuizScore::getScore)
-              .mapToDouble(Integer::doubleValue)
-              .average()
-              .orElse(0);
-      sessionData.setQuizAverageScore((int) quizAverageScore);
-
-      List<AieduClassroomSessionStudentWorkPO> studentWorks = aieduClassroomSessionStudentWorkPOMapper.selectByClassroomSessionId(sessionId);
-      List<AieduClassroomSessionStudentWorkPO> finalSubmittedWorks = studentWorks.stream()
-              .filter(AieduClassroomSessionStudentWorkPO::getFinalSubmit)
-              .collect(Collectors.toList());
-      sessionData.setArtifacts(getWorks(finalSubmittedWorks));
-
-      return AjaxResult.success(sessionData);
+      Object result = aieduClassroomSessionService.getSessionData(sessionId, sessionPO);
+      return AjaxResult.success(result);
     }
 
-    private List<StudentQuizScore> getStudentQuizScores(List<AieduClassroomSessionStudentPO> all) {
-        List<StudentQuizScore> quizScores = all.stream()
-                .map(s -> {
-                  StudentQuizScore score = new StudentQuizScore();
-                  JSONObject quizResult = getJsonObject(s.getQuizResultJsonobject());
-                  score.setStudentId(s.getStudentId());
-                  score.setStudentName(s.getStudentName());
-                  score.setSubmittedAt(s.getSubmittedAt());
-                  Integer sc = quizResult.getInteger("score");
-                  if (sc == null) {
-                    sc = 0;
-                  }
-                  score.setScore(sc);
-                  return score;
-                })
-                .collect(Collectors.toList());
-        return quizScores;
-    }
 
-    private List<StudentWork> getWorks(List<AieduClassroomSessionStudentWorkPO> finalSubmittedWorks) {
-    return finalSubmittedWorks.stream()
-            .map(p -> {
-              JSONObject content = getJsonObject(p.getContentJson());
-              String url = content.getString("url");
-              if (StringUtils.hasLength(url)) {
-                StudentWork work = new StudentWork();
-                work.setStudentId(p.getStudentId());
-                work.setStudentName(p.getStudentName());
-                work.setUrl(url);
-                return work;
-              }
-              return null;
-            })
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-  }
 
-  private Boolean checkQuizPublished(AieduClassroomSessionPO sessionPO) {
-        return Constant.ClassroomSessionCurrentStage.QUIZ.equals(sessionPO.getCurrentStage())
-                || Constant.ClassroomSessionCurrentStage.COMPLETED.equals(sessionPO.getCurrentStage());
-    }
+
+
 
     /**
      * 更新课堂会话-测验题目配置

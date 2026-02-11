@@ -210,4 +210,20 @@
             and work_status != 'waiting'
         </where>
     </select>
+    <select id="selectJoinedCountByEntity" resultType="java.lang.Integer">
+        select count(*)
+        from aiedu_classroom_session_student
+        <where>
+            <if test="classroomSessionId != null">
+                and classroom_session_id = #{classroomSessionId}
+            </if>
+            <if test="studentId != null and studentId != ''">
+                and student_id = #{studentId}
+            </if>
+            <if test="studentName != null and studentName != ''">
+                and student_name = #{studentName}
+            </if>
+            and joined_at is not null
+        </where>
+    </select>
 </mapper>

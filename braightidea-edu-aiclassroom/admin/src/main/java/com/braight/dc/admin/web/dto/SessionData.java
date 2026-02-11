@@ -19,13 +19,13 @@ public class SessionData {
   private JSONObject quizConfig;
   private Integer totalStudentCount;
   private Integer onlineStudentCount;
-  private List<AieduClassroomSessionStudentPO> joinedStudents;
+//  private List<ClassroomSessionStudentVO> joinedStudents;
   private Integer joined;
-  private List<AieduClassroomSessionStudentPO> notJoinedStudents;
-  private List<AieduClassroomSessionStudentPO> notStartedStudents; // 未开始任务的学生（not joined and work_status is not waiting）
+  private List<ClassroomSessionStudentVO> notJoinedStudents;
+  private List<ClassroomSessionStudentVO> notStartedStudents; // 未开始任务的学生（not joined and work_status is not waiting）
   private Integer started; // 开始任务的学生数量
   private Integer submitted; // 完成任务的学生数量
-  private List<AieduClassroomSessionStudentPO> allStudents; // 排序后的所有学生：(work_status = 'completed', submittedAt asc) + others
+  private List<ClassroomSessionStudentVO> allStudents; // 排序后的所有学生：(work_status = 'completed', submittedAt asc) + others
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
   private Date lastUpdated;
   private ApiInvokeStats apiInvokeStats;
