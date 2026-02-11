@@ -53,6 +53,7 @@ app.post('/text-to-image', async (req, res) => {
     }
 });
 
+// 文生图
 // 图生图
 app.post('/image-to-image', async (req, res) => {
     try {
