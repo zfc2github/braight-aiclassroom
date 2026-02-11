@@ -27,7 +27,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({limit: '20mb'}));
 
 
-/* ========== 唯一对外接口：语音识别 ========== */
+// 语音识别
 app.post('/baidu-recognize', async (req, res) => {
     try {
         const result = await recognizeSpeech(req.body);
