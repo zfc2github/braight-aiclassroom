@@ -19,6 +19,7 @@ const {speechSynthesis, speechGeneration, listVoice} = require('./aliyun-cosyvoi
 const {ocrImage} = require("./baidu-textRecog");
 const {generateCreativeIdeas, generateText} = require("./aliyun-creativeAssistant");
 const {aliyunObjectDetect} = require("./aliyun-objectdet");
+const {baiduObjectDetect} = require("./baidu-objectdet");
 
 
 /* ========== 中间件 ========== */
@@ -331,6 +332,24 @@ app.post('/aliyunObjectDetect', async (req, res) => {
     try {
         const { localFilePath } = req.body;
         const data = await aliyunObjectDetect(localFilePath);
+        res.json({
+            success: true,
+            data: data
+        });
+    } catch (e) {
+        console.log(e);
+        const status = e?.status || 500;
+        res.status(status).json(e?.data || { error: e.message });
+    }
+})
+
+// 百度智能云-通用物体和场景识别
+app.post('/baiduObjectDetect', async (req, res) => {
+    try {
+        const { localFilePath } = req.body;
+        // 读取文件内容并转换为base64编码
+        const base64 = fs.readFileSync(localFilePath).toString('base64');
+        const data = await baiduObjectDetect({base64});
         res.json({
             success: true,
             data: data
