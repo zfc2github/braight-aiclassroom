@@ -65,7 +65,7 @@
   <update id="updateCurrentStage">
     update aiedu_classroom_session
     set current_stage = #{currentStage,jdbcType=VARCHAR}
-    where classroom_id = #{classroomId,jdbcType=INTEGER}
+    where id = #{sessionId,jdbcType=INTEGER}
   </update>
     <update id="updateQuizConfig" parameterType="aieduClassroomSessionPO">
       update aiedu_classroom_session

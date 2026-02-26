@@ -293,8 +293,8 @@ public class AieduClassroomSessionController extends BaseController {
     @GetMapping("/{sessionId}/startToolExperience")
     public AjaxResult startToolExperience(@PathVariable Integer sessionId) {
         // 更新当前阶段
-        AieduClassroomSessionPO session = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
-        aieduClassroomSessionPOMapper.updateCurrentStage(session.getClassroomId(), Constant.ClassroomSessionCurrentStage.TOOL_EXPERIENCE);
+//        AieduClassroomSessionPO session = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
+        aieduClassroomSessionPOMapper.updateCurrentStage(sessionId, Constant.ClassroomSessionCurrentStage.TOOL_EXPERIENCE);
         // 更新作业状态
         aieduClassroomSessionStudentPOMapper.updateWorkStatusByClassroomSessionId(sessionId, Constant.ClassroomStatus.IN_PROGRESS);
         // 发送websocket消息：开始学生实验
@@ -312,8 +312,8 @@ public class AieduClassroomSessionController extends BaseController {
     @GetMapping("/{sessionId}/startQuiz")
     public AjaxResult startQuiz(@PathVariable Integer sessionId) {
         // 更新当前阶段
-        AieduClassroomSessionPO session = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
-        aieduClassroomSessionPOMapper.updateCurrentStage(session.getClassroomId(), Constant.ClassroomSessionCurrentStage.QUIZ);
+//        AieduClassroomSessionPO session = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
+        aieduClassroomSessionPOMapper.updateCurrentStage(sessionId, Constant.ClassroomSessionCurrentStage.QUIZ);
         // 更新测验状态
         aieduClassroomSessionStudentPOMapper.updateQuizStatusByClassroomSessionId(sessionId, Constant.QuizStatus.READY);
         // 发送websocket消息：开始测验
@@ -934,6 +934,21 @@ public class AieduClassroomSessionController extends BaseController {
             po.setQuizConfigJson(new JSONObject().toJSONString());
         }
         aieduClassroomSessionPOMapper.updateQuizConfig(po);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 学生开始测验
+     *
+     * @param sessionId
+     * @param studentId
+     * @return
+     */
+    @GetMapping("/{sessionId}/studentStartQuiz")
+    public AjaxResult studentStartQuiz(@PathVariable Integer sessionId,
+                                       @RequestParam String studentId) {
+        // 更新测验状态
+        aieduClassroomSessionStudentPOMapper.updateQuizStatusByClassroomSessionIdStudentId(sessionId, studentId, Constant.QuizStatus.ANSWERING);
         return AjaxResult.success();
     }
 

@@ -22,7 +22,7 @@ public interface AieduClassroomSessionPOMapper {
 
     AieduClassroomSessionPO selectActiveByClassCode(String classCode);
 
-    int updateCurrentStage(@Param("classroomId") Integer classroomId,
+    int updateCurrentStage(@Param("sessionId") Integer sessionId,
                            @Param("currentStage") String currentStage);
 
     AieduClassroomSessionPO selectActiveByClassId(@Param("classId") Integer classId);
