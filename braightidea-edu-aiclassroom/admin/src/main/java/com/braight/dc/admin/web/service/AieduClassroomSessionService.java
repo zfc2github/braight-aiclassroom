@@ -128,7 +128,7 @@ public class AieduClassroomSessionService {
       redisCache.setCacheObject(Constant.RedisCacheKey.SESSION_DATA+ sessionId, sessionData, 5, TimeUnit.SECONDS);
     }
 
-    return new SessionData();
+    return sessionData;
   }
 
   public ApiInvokeStats getApiInvokeStats(Integer sessionId) {
