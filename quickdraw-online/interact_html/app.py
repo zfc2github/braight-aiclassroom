@@ -12,7 +12,8 @@ model = Model('deeper_cnn')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret_key'
 socketio = SocketIO(app, cors_allowed_origins=[
-    "https://education.braightidea.com"
+    "https://education.braightidea.com",
+    "https://quickdraw.aiclassroom.braightidea.com"
 ])
 
 @app.route('/', methods=["POST", "GET"])
