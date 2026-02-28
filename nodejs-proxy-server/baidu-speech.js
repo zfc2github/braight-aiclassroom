@@ -3,8 +3,8 @@ const axios = require('axios');
 
 // 百度语音识别配置
 const BAIDU_API = {
-    appKey: 'TZfyNwfI7B9MIbNPlS5GEn6h',
-    secretKey: 'MrkEwLFOtodcjQmPuvcuvgUNTbEjPIFW',
+    appKey: 'ngGe21KKbXpAXnnPPTimnXGo',
+    secretKey: 'PMtFBaMY8TBTJWqKe8SbDoysqlvzf3es',
     cuid: 'scratch_extension_' + Date.now()
 };
 

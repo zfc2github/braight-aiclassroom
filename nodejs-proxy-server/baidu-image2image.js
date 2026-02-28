@@ -1,8 +1,8 @@
 const axios = require('axios');
 const {json} = require("express");
 // 百度凭证（仅服务器可见）
-const AK = 'u3NajmsS2LzH00X5w0oSdV5t';
-const SK = 'Y10xJvVZl1EPeulLbF4lgFxWfWtmaTSX';
+const AK = 'ngGe21KKbXpAXnnPPTimnXGo';
+const SK = 'PMtFBaMY8TBTJWqKe8SbDoysqlvzf3es';
 
 // 获取 access_token
 async function getAccessToken() {
@@ -81,7 +81,7 @@ async function generateImageFromImage({  prompt, width, height, image, change_de
                     });
                 }
             }, 1500);
-           
+
         } else {
             reject({
                 status: 200,
@@ -89,7 +89,7 @@ async function generateImageFromImage({  prompt, width, height, image, change_de
             });
         }
     });
-    
+
 }
 
 module.exports = {
