@@ -389,9 +389,9 @@
 
 <script>
     // API配置
-    const UPLOAD_URL = 'https://aiclassroom.braightidea.com/nodejsProxy/files/upload';
-    const CLONE_URL = 'https://aiclassroom.braightidea.com/nodejsProxy/speech_synthesis';
-    const SPEECH_GENERATION_URL = 'https://aiclassroom.braightidea.com/nodejsProxy/speech_generation';
+    const UPLOAD_URL = 'https://education.braightidea.com/nodejsProxy/files/upload';
+    const CLONE_URL = 'https://education.braightidea.com/nodejsProxy/speech_synthesis';
+    const SPEECH_GENERATION_URL = 'https://education.braightidea.com/nodejsProxy/speech_generation';
 
     // 状态管理
     let selectedFile = null;
@@ -513,7 +513,7 @@
                 showStatus('正在生成音频...', '声音克隆成功，正在生成音频', 'warning');
                 url = await generateAudio(voiceId, text);
             }
-            
+
             // 显示成功结果
             showSuccessResult(voiceId, url);
 

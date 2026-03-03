@@ -8,7 +8,7 @@ const fs = require('fs');
 
 const app = express();
 const PORT = 8602;   // 随便改，别占 8601 即可
-const AICLASSROOM_URL_CONTEXT = 'https://aiclassroom.braightidea.com/nodejsProxy';
+const AICLASSROOM_URL_CONTEXT = 'https://education.braightidea.com/nodejsProxy';
 
 const { recognizeSpeech} = require('./baidu-speech');
 const { generateImageFromText } = require('./bigmodel-text2image');

@@ -782,7 +782,7 @@
             this.currentImage = null;
             this.generationStartTime = null;
             // 添加后端服务基础URL常量
-            this.backendUrl = 'https://aiclassroom.braightidea.com/nodejsProxy';
+            this.backendUrl = 'https://education.braightidea.com/nodejsProxy';
             // this.backendUrl = 'http://localhost:8602';
 
             this.initializeElements();
@@ -946,7 +946,7 @@
             const change_degree = this.changeDegree.value;
 
             const base64 = await this.fileToBase64(file);
-            
+
             const requestBody = {
                 prompt: prompt,
                 width: new Number(width),
@@ -962,7 +962,7 @@
                 },
                 body: JSON.stringify(requestBody)
             });
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }

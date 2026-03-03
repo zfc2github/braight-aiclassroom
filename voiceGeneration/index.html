@@ -396,7 +396,7 @@
             width: 30%;
             margin-right: 30px;
         }
-        
+
         .voice-filter input {
             width: 30%;
             padding: 8px 15px;
@@ -561,8 +561,8 @@
         constructor() {
             this.voices = [];
             this.customVoices = [];
-            this.listVoiceUrl = 'https://aiclassroom.braightidea.com/nodejsProxy/listVoice';
-            this.speechGenerationUrl = 'https://aiclassroom.braightidea.com/nodejsProxy/speech_generation';
+            this.listVoiceUrl = 'https://education.braightidea.com/nodejsProxy/listVoice';
+            this.speechGenerationUrl = 'https://education.braightidea.com/nodejsProxy/speech_generation';
 
             this.init();
         }
@@ -582,7 +582,7 @@
 
             // 文本输入限制
             document.getElementById('text').addEventListener('input', () => this.updateTextCounter());
-            
+
         }
 
         async loadVoices() {
@@ -953,26 +953,26 @@
             .hidden {
                 display: none !important;
             }
-            
+
             .fade-in {
                 animation: fadeIn 0.5s ease-in;
             }
-            
+
             @keyframes fadeIn {
                 from { opacity: 0; transform: translateY(20px); }
                 to { opacity: 1; transform: translateY(0); }
             }
-            
+
             .pulse {
                 animation: pulse 2s infinite;
             }
-            
+
             @keyframes pulse {
                 0% { transform: scale(1); }
                 50% { transform: scale(1.02); }
                 100% { transform: scale(1); }
             }
-            
+
             .loading {
                 display: inline-block;
                 width: 20px;
@@ -983,7 +983,7 @@
                 animation: spin 1s ease-in-out infinite;
                 margin-right: 10px;
             }
-            
+
             @keyframes spin {
                 to { transform: rotate(360deg); }
             }

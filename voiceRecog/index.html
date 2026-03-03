@@ -255,7 +255,7 @@
     let sampleIndex = 0;
 
     // 后台代理配置
-    const SERVER_PROXY_URL = 'https://aiclassroom.braightidea.com/nodejsProxy';
+    const SERVER_PROXY_URL = 'https://education.braightidea.com/nodejsProxy';
 
     // DOM
     const languageSel = document.getElementById('language');
@@ -267,7 +267,7 @@
     const statusDiv = document.getElementById('status');
     const sampleText = document.getElementById('sampleText');
     const changeBtn = document.getElementById('changeBtn');
-    
+
 
     // 调用语音识别
     async function recognize({base64, len, fileExtension}) {
@@ -318,7 +318,7 @@
     audioFile.addEventListener('change', async e => {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         statusDiv.textContent = '正在识别……';
         const data = await getfileBase64(file);
         await recognize(data);
@@ -327,7 +327,7 @@
 
     async function convertToPCM(chunks) {
         const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-        
+
         // 将blob转换为ArrayBuffer
         const arrayBuffer = await audioBlob.arrayBuffer();
 
@@ -393,7 +393,7 @@
 
         return output;
     }
-    
+
     // 录音
     let mediaRecorder, chunks = [], recordStartTime;
     recordBtn.addEventListener('click', async () => {
@@ -407,7 +407,7 @@
         mimeTypes.forEach(type => {
             console.log(`${type}: ${MediaRecorder.isTypeSupported(type)}`);
         });
-        
+
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
         chunks = [];
@@ -416,12 +416,12 @@
             // 转换为PCM数据格式
             const pcmFile = await convertToPCM(chunks);
             console.log('pcmFile', pcmFile);
-            
+
             let data = await getfileBase64(pcmFile);
             statusDiv.textContent = '正在识别……';
             await recognize(data);
             statusDiv.textContent = '';
-            
+
             stream.getTracks().forEach(t => t.stop());
         };
         mediaRecorder.start();
