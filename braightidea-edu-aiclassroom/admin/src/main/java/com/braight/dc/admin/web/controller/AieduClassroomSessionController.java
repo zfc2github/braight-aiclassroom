@@ -252,6 +252,8 @@ public class AieduClassroomSessionController extends BaseController {
         int count = aieduClassroomSessionStudentPOMapper.selectJoinedCountByEntity(param);
         vo.setOnlineStudentCount(count);
 
+        // 推送websocket消息：学生加入课堂
+        wsService.studentJoinClassroomSession(classroomSessionId);
         return AjaxResult.success(vo);
     }
 

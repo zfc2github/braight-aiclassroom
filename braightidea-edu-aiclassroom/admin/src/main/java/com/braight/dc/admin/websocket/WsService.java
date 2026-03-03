@@ -20,6 +20,19 @@ public class WsService {
     // 存储课堂和学生对应关系
     private final Map<Integer, Set<String>> classroomSessionStudents = new ConcurrentHashMap<>();
 
+
+    /**
+     * 广播：学生加入课堂
+     *
+     * @param classroomSessionId
+     */
+    public void studentJoinClassroomSession(Integer classroomSessionId) {
+        WsEvent evt = new WsEvent(WsEvent.JOIN_CLASS,
+                null,
+                System.currentTimeMillis());
+        template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+    }
+
     /**
      * 广播：开始实验通知
      *

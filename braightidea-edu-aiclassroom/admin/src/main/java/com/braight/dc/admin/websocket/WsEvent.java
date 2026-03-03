@@ -16,6 +16,7 @@ public class WsEvent {
     private Object payload;
     private Long timestamp;
 
+    public static final String JOIN_CLASS = "join-class";
     public static final String START_TOOL_EXPERIENCE = "start-tool-experience";
     public static final String TYPE_START_QUIZ = "start-quiz";
     public static final String TYPE_END_QUIZ = "end-quiz";
