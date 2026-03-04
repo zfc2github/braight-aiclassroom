@@ -111,11 +111,11 @@ async function speechGeneration({ voice_id, text }) {
                         });
                         break;
                     case 'task-failed':
-                        console.error('任务失败：', message.header.error_message);
+                        console.error('任务失败：', message?.header?.error_message);
                         ws.close();
                         fileStream.end(() => {
                             console.log('文件流已关闭');
-                            throw new Error('任务失败');
+                            throw new Error('任务失败:'+message?.header?.error_message);
                         });
                         break;
                     default:

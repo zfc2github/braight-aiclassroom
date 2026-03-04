@@ -64,10 +64,7 @@ async function generateImageFromImage({  prompt, width, height, image, change_de
 
                             resolve(imageDataURI);
                         } else {
-                            reject({
-                                status: 200,
-                                message: '异常：API返回数据格式异常'
-                            });
+                            resolve('异常：API返回数据格式异常');
                         }
                     }
                 } else  if (task_progress === 0){
@@ -75,18 +72,12 @@ async function generateImageFromImage({  prompt, width, height, image, change_de
                 } else {
                     // 异常
                     clearInterval(poll);
-                    reject({
-                        status: 200,
-                        message: '异常：API返回数据格式异常'
-                    });
+                    resolve('异常：API返回数据格式异常');
                 }
             }, 1500);
 
         } else {
-            reject({
-                status: 200,
-                message: '异常：' + response?.data?.error_msg
-            });
+            resolve('异常：' + response?.data?.error_msg);
         }
     });
 

@@ -28,7 +28,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({limit: '20mb'}));
 
 
-// 语音识别
+// 语音识别 deprecated
 app.post('/baidu-recognize', async (req, res) => {
     try {
         const result = await recognizeSpeech(req.body);
@@ -39,7 +39,7 @@ app.post('/baidu-recognize', async (req, res) => {
     }
 });
 
-// 文生图
+// 文生图 deprecated
 app.post('/text-to-image', async (req, res) => {
     try {
         const { prompt, size, quality } = req.body;
@@ -121,7 +121,7 @@ app.get('/files/retrieve', async (req, res) => {
     }
 });
 
-// 文生音乐
+// 文生音乐 deprecated
 app.post('/music_generation', async (req, res) => {
     try {
         const { prompt, lyrics } = req.body;
@@ -189,7 +189,7 @@ app.post('/files/upload', upload.single('file'), async (req, res) => {
     }
 });
 
-// 声音复刻
+// 声音复刻 deprecated
 app.post('/speech_synthesis', async (req, res) => {
     try {
         const { url } = req.body;
@@ -327,7 +327,7 @@ app.post('/learningAssistant', async (req, res) => {
     }
 })
 
-// 阿里云-物体识别
+// 阿里云-物体识别 deprecated
 app.post('/aliyunObjectDetect', async (req, res) => {
     try {
         const { localFilePath } = req.body;
