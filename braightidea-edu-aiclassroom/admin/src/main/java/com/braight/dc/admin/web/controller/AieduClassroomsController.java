@@ -38,8 +38,6 @@ public class AieduClassroomsController extends BaseController {
     private AieduTeachersPOMapper aieduTeachersPOMapper;
     @Resource
     private AieduClassroomsPOMapper aieduClassroomsPOMapper;
-    @Resource
-    private AieduClassroomSessionPOMapper aieduClassroomSessionPOMapper;
 
 
     //    @PreAuthorize("@ss.hasPermi('cms:aieduClassrooms:add')")
@@ -108,6 +106,7 @@ public class AieduClassroomsController extends BaseController {
 
     //    @PreAuthorize("@ss.hasPermi('cms:aieduClassrooms:list')")
     @Login
+    @Log(title = "课堂配置信息列表", businessType = BusinessType.QUERY)
     @GetMapping("/list")
     public AjaxResult list() {
         AieduTeachersPO teacher = aieduTeachersPOMapper.selectByUserId(getUserId());
@@ -144,6 +143,7 @@ public class AieduClassroomsController extends BaseController {
 
     //    @PreAuthorize("@ss.hasPermi('cms:aieduClassrooms:list')")
     @Login
+    @Log(title = "课堂配置信息-课程精选", businessType = BusinessType.QUERY)
     @GetMapping("/featured")
     public AjaxResult featured() {
         List<AieduClassroomsPO> list;

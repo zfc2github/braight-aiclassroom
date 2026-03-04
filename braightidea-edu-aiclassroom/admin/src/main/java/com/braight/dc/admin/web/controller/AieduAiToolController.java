@@ -50,6 +50,7 @@ public class AieduAiToolController extends BaseController {
 
     //    @PreAuthorize("@ss.hasPermi('cms:aiTools:list')")
     @Login
+    @Log(title = "AI 工具信息", businessType = BusinessType.QUERY)
     @GetMapping("/list")
     public AjaxResult list(@RequestParam(required = false) String category) {
         List<AieduAiToolPO> list = aieduAiToolPOMapper.selectListByCategory(category);

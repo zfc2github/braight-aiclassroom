@@ -4,8 +4,10 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.braight.dc.admin.web.entity.AieduHomeConfigPO;
 import com.braight.dc.admin.web.mapper.AieduHomeConfigPOMapper;
+import com.braight.master.common.annotation.Log;
 import com.braight.master.common.core.controller.BaseController;
 import com.braight.master.common.core.domain.AjaxResult;
+import com.braight.master.common.enums.BusinessType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -22,6 +24,7 @@ public class AieduHomeConfigController extends BaseController {
     private AieduHomeConfigPOMapper aieduHomeConfigPOMapper;
 
 
+    @Log(title = "首页配置信息", businessType = BusinessType.QUERY)
     @GetMapping("/api/aieduHomeConfig/{id}")
     public AjaxResult getById(@PathVariable Integer id) {
         AieduHomeConfigPO aieduHomeConfigPO = aieduHomeConfigPOMapper.selectByPrimaryKey(id);
@@ -32,6 +35,7 @@ public class AieduHomeConfigController extends BaseController {
         return success(aieduHomeConfigPO);
     }
 
+    @Log(title = "首页配置信息", businessType = BusinessType.UPDATE)
     @PostMapping("/api/aieduHomeConfig/edit")
     public AjaxResult edit(@RequestBody AieduHomeConfigPO aieduHomeConfigPO) {
         JSONObject solutionDetail = aieduHomeConfigPO.getHomeConfig();

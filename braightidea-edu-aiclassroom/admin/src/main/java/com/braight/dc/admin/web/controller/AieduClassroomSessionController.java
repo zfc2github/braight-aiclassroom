@@ -136,6 +136,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @return
      */
     @Login
+    @Log(title = "课堂会话信息", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}")
     public AjaxResult getInfo(@PathVariable Integer sessionId) {
         AieduClassroomSessionPO po = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
@@ -143,7 +144,7 @@ public class AieduClassroomSessionController extends BaseController {
     }
 
     @Login
-    @Log(title = "课堂会话信息", businessType = BusinessType.UPDATE)
+    @Log(title = "课堂会话信息-状态更新", businessType = BusinessType.OTHER)
     @PostMapping("/{sessionId}/stage")
     public AjaxResult updateStage(@PathVariable Integer sessionId,
                                   @RequestBody AieduClassroomSessionPO po) {
@@ -162,7 +163,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @return
      */
     @Login
-    @Log(title = "课堂会话信息", businessType = BusinessType.UPDATE)
+    @Log(title = "课堂会话信息-结束课堂", businessType = BusinessType.OTHER)
     @PostMapping("/{sessionId}/end")
     public AjaxResult endSession(@PathVariable Integer sessionId) {
         AieduClassroomSessionPO po = new AieduClassroomSessionPO();
@@ -176,6 +177,7 @@ public class AieduClassroomSessionController extends BaseController {
     }
 
     @Login
+    @Log(title = "课堂会话信息-课件信息", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}/courseware")
     public AjaxResult getCoursewareInfo(@PathVariable Integer sessionId) {
         AieduClassroomSessionPO po = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
@@ -203,6 +205,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param query
      * @return
      */
+    @Log(title = "课堂会话信息-学生加入课堂", businessType = BusinessType.OTHER)
     @PostMapping("/join")
     public AjaxResult joinSession(@Validated @RequestBody ClassroomSessionJoinQuery query) {
         // 校验课堂码是否处于激活状态
@@ -264,6 +267,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @return
      */
     @Login
+    @Log(title = "课堂会话信息-课堂学生列表", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}/students")
     public AjaxResult getStudents(@PathVariable Integer sessionId) {
         List<AieduClassroomSessionStudentPO> students = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
@@ -277,6 +281,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @return
      */
     @Login
+    @Log(title = "课堂会话信息-加入课堂的学生列表", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}/joinedStudents")
     public AjaxResult getJoinedStudents(@PathVariable Integer sessionId) {
         AieduClassroomSessionStudentPO entity = new AieduClassroomSessionStudentPO();
@@ -292,6 +297,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @return
      */
     @Login
+    @Log(title = "课堂会话信息-开始学生实验", businessType = BusinessType.OTHER)
     @GetMapping("/{sessionId}/startToolExperience")
     public AjaxResult startToolExperience(@PathVariable Integer sessionId) {
         // 更新当前阶段
@@ -311,6 +317,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @return
      */
     @Login
+    @Log(title = "课堂会话信息-开始测验", businessType = BusinessType.OTHER)
     @GetMapping("/{sessionId}/startQuiz")
     public AjaxResult startQuiz(@PathVariable Integer sessionId) {
         // 更新当前阶段
@@ -329,6 +336,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param po
      * @return
      */
+    @Log(title = "课堂会话信息-学生提交作品", businessType = BusinessType.OTHER)
     @PostMapping("/submitWork")
     public AjaxResult submitWork(@Validated @RequestBody AieduClassroomSessionStudentWorkPO po) {
         // todo Shine 是否限制提交次数
@@ -351,6 +359,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param studentId
      * @return
      */
+    @Log(title = "课堂会话信息-API调用记数", businessType = BusinessType.OTHER)
     @GetMapping("/{sessionId}/apiInvokeCounter")
     public AjaxResult apiInvokeCounter(@PathVariable Integer sessionId,
                                      @RequestParam String studentId) {
@@ -371,6 +380,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @return
      */
     @Login
+    @Log(title = "课堂会话信息-学生作品列表", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}/submissions")
     @JsonView(Views.Frontend.class)
     public AjaxResult list(@PathVariable Integer sessionId) {
@@ -411,6 +421,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @return
      */
     @Login
+    @Log(title = "课堂会话信息-一键下载全部", businessType = BusinessType.OTHER)
     @PostMapping("/{sessionId}/submissions/download")
     public void downloadSubmissions(@PathVariable Integer sessionId,
                                     @RequestBody ClassroomSessionWorkDownloadQuery query,
@@ -573,6 +584,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param sessionId
      * @return
      */
+    @Log(title = "课堂会话信息-测验题目列表", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}/quiz/questions")
     public AjaxResult quizQuestions(@PathVariable Integer sessionId) {
         AieduClassroomSessionPO sessionPO = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
@@ -592,6 +604,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param query
      * @return
      */
+    @Log(title = "课堂会话信息-学生提交测验", businessType = BusinessType.OTHER)
     @PostMapping("/{sessionId}/quiz/submit")
     public AjaxResult submitQuiz(@PathVariable Integer sessionId,
                                  @Validated @RequestBody AieduClassroomSessionStudentPO query) {
@@ -714,6 +727,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param sessionId
      * @return
      */
+    @Log(title = "课堂会话信息-学生参与情况", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}/student/participationStats")
     public AjaxResult studentParticipationStats(@PathVariable Integer sessionId) {
         List<AieduClassroomSessionStudentPO> sessionStudents = aieduClassroomSessionStudentPOMapper.selectStudentsByClassroomSessionId(sessionId);
@@ -748,6 +762,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param sessionId
      * @return
      */
+    @Log(title = "课堂会话信息-学生API调用情况", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}/student/apiInvokeStats")
     public AjaxResult studentApiInvokeStats(@PathVariable Integer sessionId) {
         ApiInvokeStats stats = aieduClassroomSessionService.getApiInvokeStats(sessionId);
@@ -787,6 +802,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param sessionId
      * @return
      */
+    @Log(title = "课堂会话信息-学生测验情况", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}/student/quizStats")
     public AjaxResult studentQuizStats(@PathVariable Integer sessionId) {
         QuizStats stats = new QuizStats();
@@ -878,6 +894,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param sessionId
      * @return
      */
+    @Log(title = "课堂会话信息-测验答案列表", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}/quiz/submissions")
     public AjaxResult quizSubmissions(@PathVariable Integer sessionId) {
         List<AieduClassroomSessionStudentPO> list;
@@ -901,6 +918,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param sessionId
      * @return
      */
+    @Log(title = "课堂会话信息-会话状态数据", businessType = BusinessType.QUERY)
     @GetMapping("/{sessionId}/sessionData")
     public AjaxResult sessionData(@PathVariable Integer sessionId) {
       AieduClassroomSessionPO sessionPO = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
@@ -924,7 +942,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @return
      */
     @Login
-    @Log(title = "课堂会话信息", businessType = BusinessType.UPDATE)
+    @Log(title = "课堂会话信息-测验题目配置", businessType = BusinessType.UPDATE)
     @PostMapping("/{sessionId}/updateQuizConfig")
     public AjaxResult updateQuizConfig(@PathVariable Integer sessionId,
                                   @RequestBody AieduClassroomSessionPO po) {
@@ -946,6 +964,7 @@ public class AieduClassroomSessionController extends BaseController {
      * @param studentId
      * @return
      */
+    @Log(title = "课堂会话信息-学生开始测验", businessType = BusinessType.OTHER)
     @GetMapping("/{sessionId}/studentStartQuiz")
     public AjaxResult studentStartQuiz(@PathVariable Integer sessionId,
                                        @RequestParam String studentId) {

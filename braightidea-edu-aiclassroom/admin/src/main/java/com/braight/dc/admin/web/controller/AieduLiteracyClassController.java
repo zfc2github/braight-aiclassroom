@@ -2,8 +2,10 @@ package com.braight.dc.admin.web.controller;
 
 import com.braight.dc.admin.web.entity.AieduLiteracyClassPO;
 import com.braight.dc.admin.web.mapper.AieduLiteracyClassPOMapper;
+import com.braight.master.common.annotation.Log;
 import com.braight.master.common.core.controller.BaseController;
 import com.braight.master.common.core.domain.AjaxResult;
+import com.braight.master.common.enums.BusinessType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +24,7 @@ public class AieduLiteracyClassController extends BaseController {
     @Resource
     private AieduLiteracyClassPOMapper aieduLiteracyClassPOMapper;
 
+    @Log(title = "AI素养课程列表", businessType = BusinessType.QUERY)
     @PostMapping("/api/aiLiteracyClass/list")
     public AjaxResult list() {
         List<AieduLiteracyClassPO> all = aieduLiteracyClassPOMapper.selectAll();

@@ -32,6 +32,7 @@ public class AieduResourceController extends BaseController {
 
 
 //    @PreAuthorize("@ss.hasPermi('cms:aieduResource:list')")
+    @Log(title = "资源信息列表", businessType = BusinessType.QUERY)
     @GetMapping("/list")
     public TableDataInfo list(AieduResourcePO po)
     {
@@ -45,6 +46,7 @@ public class AieduResourceController extends BaseController {
      * 最新动态
      * @return
      */
+    @Log(title = "资源信息-最新动态列表", businessType = BusinessType.QUERY)
     @GetMapping("/latest")
     public AjaxResult getLatest()
     {
@@ -65,6 +67,7 @@ public class AieduResourceController extends BaseController {
     }
 
     //    @PreAuthorize("@ss.hasPermi('cms:aieduResource:query')")
+    @Log(title = "资源信息", businessType = BusinessType.QUERY)
     @GetMapping("/{id}" )
     public AjaxResult getInfo(@PathVariable("id") Integer id)
     {
@@ -74,7 +77,7 @@ public class AieduResourceController extends BaseController {
     }
 
 //    @PreAuthorize("@ss.hasPermi('cms:aieduResource:add')")
-    @Log(title = "资源中心", businessType = BusinessType.INSERT)
+    @Log(title = "资源信息", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult add(@Validated @RequestBody AieduResourcePO po)
     {
@@ -101,7 +104,7 @@ public class AieduResourceController extends BaseController {
     }
 
     //    @PreAuthorize("@ss.hasPermi('cms:aieduResource:edit')")
-    @Log(title = "资源中心", businessType = BusinessType.UPDATE)
+    @Log(title = "资源信息", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     public AjaxResult edit(@Validated @RequestBody AieduResourcePO po)
     {
@@ -111,7 +114,7 @@ public class AieduResourceController extends BaseController {
     }
 
 //    @PreAuthorize("@ss.hasPermi('cms:aieduResource:remove')")
-    @Log(title = "资源中心", businessType = BusinessType.DELETE)
+    @Log(title = "资源信息", businessType = BusinessType.DELETE)
     @PostMapping("/delete/{id}")
     public AjaxResult remove(@PathVariable Integer id)
     {

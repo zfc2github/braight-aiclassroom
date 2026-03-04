@@ -88,6 +88,7 @@ public class AieduQuizQuestionController extends BaseController {
      */
     //    @PreAuthorize("@ss.hasPermi('cms:aiTools:list')")
     @Login
+    @Log(title = "测验题目信息-推荐题目列表", businessType = BusinessType.QUERY)
     @GetMapping("/recommended")
     public AjaxResult recommended(AieduQuizQuestionPO po) {
         List<AieduQuizQuestionPO> list = aieduQuizQuestionPOMapper.selectRecommendedList(po);
@@ -129,6 +130,7 @@ public class AieduQuizQuestionController extends BaseController {
      * @return
      */
     @Login
+    @Log(title = "测验题目信息-系统题库列表", businessType = BusinessType.QUERY)
     @GetMapping("/questionBank")
     public AjaxResult questionBank() {
         List<AieduQuizQuestionPO> list = aieduQuizQuestionPOMapper.selectQuestionBankList();

@@ -70,6 +70,7 @@ public class AieduClassController extends BaseController {
 
     //    @PreAuthorize("@ss.hasPermi('cms:aieduClass:list')")
     @Login
+    @Log(title = "班级列表", businessType = BusinessType.QUERY)
     @GetMapping("/list")
     public AjaxResult list() {
         List<AieduClassPO> list;
@@ -108,6 +109,7 @@ public class AieduClassController extends BaseController {
      * @return
      */
     @Login
+    @Log(title = "班级学生列表", businessType = BusinessType.QUERY)
     @GetMapping("/{classId}/students")
     public AjaxResult studentList(@PathVariable Integer classId, @RequestParam(required = false) String search) {
         AieduClassPO classPO = aieduClassPOMapper.selectByPrimaryKey(classId);
@@ -144,6 +146,7 @@ public class AieduClassController extends BaseController {
 
     //    @PreAuthorize("@ss.hasPermi('cms:aieduClass:query')")
     @Login
+    @Log(title = "班级信息", businessType = BusinessType.QUERY)
     @GetMapping("/{classId}")
     public AjaxResult getInfo(@PathVariable("classId") Integer classId) {
         AieduClassPO po = aieduClassPOMapper.selectByPrimaryKey(classId);
@@ -184,7 +187,7 @@ public class AieduClassController extends BaseController {
 
     //    @PreAuthorize("@ss.hasPermi('cms:aieduClass:upload')")
     @Login
-    @Log(title = "班级学生信息", businessType = BusinessType.IMPORT)
+    @Log(title = "班级学生列表", businessType = BusinessType.IMPORT)
     @PostMapping("/{classId}/students/import")
     public AjaxResult studentsImport(@PathVariable Integer classId,
                                      @RequestParam("file") MultipartFile file) {
@@ -221,9 +224,9 @@ public class AieduClassController extends BaseController {
      * @return
      */
     @Login
-    @Log(title = "班级学生信息-删除学生", businessType = BusinessType.DELETE)
+    @Log(title = "班级学生信息", businessType = BusinessType.DELETE)
     @PostMapping("/{classId}/students/delete/{id}")
-    public AjaxResult studentsImport(@PathVariable Integer classId,
+    public AjaxResult studentsDelete(@PathVariable Integer classId,
                                      @PathVariable Integer id) {
         try {
             aieduStudentPOMapper.deleteByPrimaryKey(id);
@@ -236,6 +239,7 @@ public class AieduClassController extends BaseController {
         }
     }
 
+    @Log(title = "班级学生信息-导入模板下载", businessType = BusinessType.OTHER)
     @GetMapping("/students/template")
     public void downloadTemplate(HttpServletResponse response) {
         try {
@@ -264,6 +268,7 @@ public class AieduClassController extends BaseController {
      * @param studentId
      * @return
      */
+    @Log(title = "班级学生信息", businessType = BusinessType.QUERY)
     @GetMapping("/students/{studentId}")
     public AjaxResult getStudentInfo(@PathVariable String studentId) {
         AieduStudentPO po = aieduStudentPOMapper.selectByStudentId(studentId);

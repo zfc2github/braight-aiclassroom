@@ -1,8 +1,10 @@
 package com.braight.dc.admin.web.controller;
 
+import com.braight.master.common.annotation.Log;
 import com.braight.master.common.config.DataVizConfig;
 import com.braight.master.common.core.controller.BaseController;
 import com.braight.master.common.core.domain.AjaxResult;
+import com.braight.master.common.enums.BusinessType;
 import com.braight.master.common.utils.file.FileUploadUtils;
 import com.braight.master.common.utils.file.FileUtils;
 import com.braight.master.framework.config.ServerConfig;
@@ -25,6 +27,7 @@ public class ApiCommonController extends BaseController {
   /**
    * 通用上传请求（单个）
    */
+  @Log(title = "通用文件上传", businessType = BusinessType.OTHER)
   @PostMapping("/upload")
   public AjaxResult uploadFile(MultipartFile file) throws Exception
   {

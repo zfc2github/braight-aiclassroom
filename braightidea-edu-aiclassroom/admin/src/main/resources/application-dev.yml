@@ -14,11 +14,11 @@ swagger:
 spring:
     datasource:
         dynamic:
-          primary: braightidea_edu_aiclassroom
+          primary: primary-db
           strict: false
           datasource:
             # 数据源-数智文遗（本项目）数据库
-            braight_idea:
+            primary-db:
               url: jdbc:mysql://8.133.19.252:3306/braightidea_edu_aiclassroom?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
               username: braightidea
               password: LuckyTable910!@#
@@ -46,3 +46,18 @@ spring:
                 max-active: 8
                 # #连接池最大阻塞等待时间（使用负值表示没有限制）
                 max-wait: -1ms
+server:
+  tomcat:
+    max-connections: 8192
+    threads:
+      max: 400
+      min-spare: 10
+    accept-count: 100
+
+# 飞书开放平台配置（和光教育-AI素养课程库）
+feishu:
+  app-id: cli_a9c1294cd0f9dbb6
+  app-secret: rcM6lK2Y2I2oit05216geh28ckV2334S
+  app-token: UHvbb3HjUaN1MZs32yJcXDiqnMb
+  table-id: tblqi3Hhe4uzAaFS
+

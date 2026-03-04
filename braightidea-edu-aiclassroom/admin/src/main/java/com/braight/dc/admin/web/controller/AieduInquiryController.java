@@ -4,9 +4,11 @@ import cn.hutool.core.util.ArrayUtil;
 import com.alibaba.fastjson2.JSON;
 import com.braight.dc.admin.web.entity.AieduInquiryPO;
 import com.braight.dc.admin.web.mapper.AieduInquiryPOMapper;
+import com.braight.master.common.annotation.Log;
 import com.braight.master.common.core.controller.BaseController;
 import com.braight.master.common.core.domain.AjaxResult;
 import com.braight.master.common.core.page.TableDataInfo;
+import com.braight.master.common.enums.BusinessType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +27,7 @@ public class AieduInquiryController extends BaseController {
     private AieduInquiryPOMapper aieduInquiryPOMapper;
 
 
+    @Log(title = "联系我们-咨询信息列表", businessType = BusinessType.QUERY)
     @GetMapping("/api/aieduInquiry/list")
     public TableDataInfo list() {
         startPage();
@@ -52,6 +55,7 @@ public class AieduInquiryController extends BaseController {
         return getDataTable(all);
     }
 
+    @Log(title = "联系我们-咨询信息", businessType = BusinessType.QUERY)
     @GetMapping("/api/aieduInquiry/{id}")
     public AjaxResult getById(@PathVariable Integer id) {
         AieduInquiryPO aieduInquiryPO = aieduInquiryPOMapper.selectByPrimaryKey(id);
@@ -76,6 +80,7 @@ public class AieduInquiryController extends BaseController {
         return success(aieduInquiryPO);
     }
 
+    @Log(title = "联系我们-咨询信息", businessType = BusinessType.INSERT)
     @PostMapping("/api/aieduInquiry/add")
     public AjaxResult add(@RequestBody AieduInquiryPO aieduInquiryPO) {
         String[] interests = aieduInquiryPO.getInterests();
