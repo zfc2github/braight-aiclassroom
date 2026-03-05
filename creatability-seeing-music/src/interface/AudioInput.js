@@ -32,7 +32,7 @@ export class AudioInput {
 		 * The microphone input
 		 */
 		this.mic = new Microphone(mic)
-		this.mic.on('open', () => this._select('None'))		
+		this.mic.on('open', () => this._select('None'))
 		this.mic.connect(this.output)
 
 		/**
@@ -63,7 +63,7 @@ export class AudioInput {
 
 	async _select(item){
 
-		if (item === 'None'){
+		if (item === 'None' || item === '无'){
 			this.file.stop()
 			this.mic.open()
 			this.select.selectedIndex = 0
