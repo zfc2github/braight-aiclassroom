@@ -18,7 +18,6 @@ import com.braight.master.common.core.controller.BaseController;
 import com.braight.master.common.core.domain.AjaxResult;
 import com.braight.master.common.core.page.PageDomain;
 import com.braight.master.common.core.page.TableSupport;
-import com.braight.master.common.core.redis.RedisCache;
 import com.braight.master.common.enums.BusinessType;
 import com.braight.master.common.utils.sql.SqlUtil;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -35,7 +34,6 @@ import java.io.InputStream;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -350,6 +348,7 @@ public class AieduClassroomSessionController extends BaseController {
                     po.getStudentId(),
                     Constant.ClassroomStatus.COMPLETED);
         }
+        wsService.submitWork(po.getClassroomSessionId());
         return AjaxResult.success();
     }
 
@@ -700,6 +699,8 @@ public class AieduClassroomSessionController extends BaseController {
         param.setQuizStatus(Constant.QuizStatus.SUBMITTED);
         param.setSubmittedAt(new Date());
         aieduClassroomSessionStudentPOMapper.updateSelectiveByClassroomSessionIdStudentId(param);
+
+        wsService.submitQuiz(sessionId);
         // 返回测验结果
         return AjaxResult.success(quizResult);
     }

@@ -58,12 +58,12 @@ public class WsService {
     }
 
     /**
-     * 广播：结束测验通知
+     * 广播：学生提交测验
      *
      * @param classroomSessionId
      */
-    public void endQuiz(Integer classroomSessionId) {
-        WsEvent evt = new WsEvent(WsEvent.TYPE_END_QUIZ,
+    public void submitQuiz(Integer classroomSessionId) {
+        WsEvent evt = new WsEvent(WsEvent.TYPE_SUBMIT_QUIZ,
                 null,
                 System.currentTimeMillis());
         template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
@@ -91,5 +91,17 @@ public class WsService {
         classroomSessionStudents.computeIfAbsent(message.getClassroomSessionId(),
                 k -> new CopyOnWriteArraySet<>())
                 .add(message.getStudentId());
+    }
+
+    /**
+     * 广播：学生提交作业
+     *
+     * @param classroomSessionId
+     */
+    public void submitWork(Integer classroomSessionId) {
+        WsEvent evt = new WsEvent(WsEvent.TYPE_SUBMIT_WORK,
+                null,
+                System.currentTimeMillis());
+        template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
     }
 }
