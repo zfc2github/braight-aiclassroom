@@ -21894,7 +21894,7 @@ class Microphone extends events__WEBPACK_IMPORTED_MODULE_1__["EventEmitter"] {
   async open() {
     if (this.state !== 'started' && tone__WEBPACK_IMPORTED_MODULE_0__["UserMedia"].supported && !this.disabled && this._initialized) {
       try {
-        document.querySelector('acc-snackbar').setAttribute('message', 'Please allow access to your microphone.');
+        document.querySelector('acc-snackbar').setAttribute('message', '请允许使用您的麦克风。');
         await wait(100);
         await this.userMedia.open();
         if (!this.element.checked) {
@@ -21907,7 +21907,7 @@ class Microphone extends events__WEBPACK_IMPORTED_MODULE_1__["EventEmitter"] {
         this.element.checked = false;
         document.querySelector('acc-snackbar').hide();
         setTimeout(() => {
-          document.querySelector('#error-snack').setAttribute('message', 'Could not open microphone. You may have denied access.');
+          document.querySelector('#error-snack').setAttribute('message', '无法打开麦克风。你可能拒绝了访问。');
         }, 500);
       }
     } else {
@@ -22484,7 +22484,7 @@ class Model extends events__WEBPACK_IMPORTED_MODULE_3__["EventEmitter"] {
       if (!fallbackTester.hasWebGL()) {
         setTimeout(() => {
           this.emit('error', e);
-          document.querySelector('acc-snackbar').setAttribute('message', 'Cannot open WebGL context on this device.');
+          document.querySelector('acc-snackbar').setAttribute('message', '无法在这台设备上打开WebGL上下文。');
         }, 100);
         return;
       }
@@ -22511,7 +22511,7 @@ class Model extends events__WEBPACK_IMPORTED_MODULE_3__["EventEmitter"] {
           this.loading = false;
           this.emit('error', e);
           console.log(e);
-          document.querySelector('#error-snack').setAttribute('message', 'Transcription not supported');
+          document.querySelector('#error-snack').setAttribute('message', '不支持转录');
         }
       }).bind(null, __webpack_require__)).catch(__webpack_require__.oe);
     }

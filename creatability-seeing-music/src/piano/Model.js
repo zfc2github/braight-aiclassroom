@@ -76,7 +76,7 @@ export class Model extends EventEmitter {
 			if (!fallbackTester.hasWebGL()){
 				setTimeout(() => {
 					this.emit('error', e)
-					document.querySelector('acc-snackbar').setAttribute('message', 'Cannot open WebGL context on this device.')
+					document.querySelector('acc-snackbar').setAttribute('message', '无法在这台设备上打开WebGL上下文。')
 				}, 100)
 				return
 			}
@@ -102,7 +102,7 @@ export class Model extends EventEmitter {
 					this.loading = false
 					this.emit('error', e)
 					console.log(e)
-					document.querySelector('#error-snack').setAttribute('message', 'Transcription not supported')
+					document.querySelector('#error-snack').setAttribute('message', '不支持转录')
 				}
 			})
 		}

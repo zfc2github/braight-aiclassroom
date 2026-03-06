@@ -53,7 +53,7 @@ export class Microphone extends EventEmitter {
 				} else {
 					this.disabled = true
 				}
-			} 
+			}
 		})
 
 	}
@@ -61,7 +61,7 @@ export class Microphone extends EventEmitter {
 	async open(){
 		if (this.state !== 'started' && UserMedia.supported && !this.disabled && this._initialized){
 			try {
-				document.querySelector('acc-snackbar').setAttribute('message', 'Please allow access to your microphone.')
+				document.querySelector('acc-snackbar').setAttribute('message', '请允许使用您的麦克风。')
 				await wait(100)
 				await this.userMedia.open()
 				if (!this.element.checked){
@@ -74,7 +74,7 @@ export class Microphone extends EventEmitter {
 				this.element.checked = false
 				document.querySelector('acc-snackbar').hide()
 				setTimeout(() => {
-					document.querySelector('#error-snack').setAttribute('message', 'Could not open microphone. You may have denied access.')
+					document.querySelector('#error-snack').setAttribute('message', '无法打开麦克风。你可能拒绝了访问。')
 				}, 500)
 			}
 		} else {
@@ -95,7 +95,7 @@ export class Microphone extends EventEmitter {
 			this.element.disabled = true
 		} else {
 			if (this.element.checked){
-				this.open()				
+				this.open()
 			}
 			this.element.disabled = false
 		}
