@@ -1,5 +1,6 @@
 package com.braight.dc.admin.web.service;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.braight.dc.admin.web.constants.Constant;
 import com.braight.dc.admin.web.dto.*;
@@ -9,16 +10,12 @@ import com.braight.dc.admin.web.entity.AieduClassroomSessionStudentWorkPO;
 import com.braight.dc.admin.web.mapper.AieduClassroomSessionStudentPOMapper;
 import com.braight.dc.admin.web.mapper.AieduClassroomSessionStudentWorkPOMapper;
 import com.braight.dc.admin.web.utils.ControllerUtil;
-import com.braight.master.common.core.domain.AjaxResult;
 import com.braight.master.common.core.redis.RedisCache;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -120,10 +117,9 @@ public class AieduClassroomSessionService {
       sessionData.setQuizAverageScore((int) quizAverageScore);
 
       List<AieduClassroomSessionStudentWorkPO> studentWorks = aieduClassroomSessionStudentWorkPOMapper.selectByClassroomSessionId(sessionId);
-      List<AieduClassroomSessionStudentWorkPO> finalSubmittedWorks = studentWorks.stream()
-              .filter(AieduClassroomSessionStudentWorkPO::getFinalSubmit)
-              .collect(Collectors.toList());
-      sessionData.setArtifacts(getWorks(finalSubmittedWorks));
+      Map<String, List<AieduClassroomSessionStudentWorkPO>> listMap = studentWorks.stream()
+              .collect(Collectors.groupingBy(AieduClassroomSessionStudentWorkPO::getStudentId));
+      sessionData.setArtifacts(getWorks(listMap));
 
       redisCache.setCacheObject(Constant.RedisCacheKey.SESSION_DATA+ sessionId, sessionData, 5, TimeUnit.SECONDS);
     }
@@ -180,19 +176,65 @@ public class AieduClassroomSessionService {
   public List<StudentWork> getWorks(List<AieduClassroomSessionStudentWorkPO> finalSubmittedWorks) {
     return finalSubmittedWorks.stream()
             .map(p -> {
-              JSONObject content = ControllerUtil.getJsonObject(p.getContentJson());
-              String url = content.getString("url");
-              if (StringUtils.hasLength(url)) {
                 StudentWork work = new StudentWork();
                 work.setStudentId(p.getStudentId());
                 work.setStudentName(p.getStudentName());
-                work.setUrl(url);
+                work.setSubmitType("final_only");
+                work.setFinalAttempt(handleSubmitWork(p));
+                work.setAllAttempts(Collections.singletonList(handleSubmitWork(p)));
+                work.setSubmittedAt(p.getSubmittedAt());
                 return work;
-              }
-              return null;
             })
-            .filter(Objects::nonNull)
             .collect(Collectors.toList());
+  }
+
+  public List<StudentWork> getWorks(Map<String, List<AieduClassroomSessionStudentWorkPO>> listMap) {
+    List<StudentWork> results = new ArrayList<>();
+    listMap.forEach((studentId, v) -> {
+      if (v.size() == 1) {
+        AieduClassroomSessionStudentWorkPO workPO = v.get(0);
+        StudentWork work = new StudentWork();
+        work.setStudentId(studentId);
+        work.setStudentName(workPO.getStudentName());
+        work.setSubmitType("final_only");
+        SubmitWork submitWork = handleSubmitWork(workPO);
+        work.setFinalAttempt(submitWork);
+        work.setAllAttempts(Collections.singletonList(submitWork));
+        work.setSubmittedAt(workPO.getSubmittedAt());
+        results.add(work);
+      } else {
+        AieduClassroomSessionStudentWorkPO workPO = v.stream()
+                .filter(AieduClassroomSessionStudentWorkPO::getFinalSubmit)
+                .findAny()
+                .orElse(v.get(0));
+        StudentWork work = new StudentWork();
+        work.setStudentId(studentId);
+        work.setStudentName(workPO.getStudentName());
+        work.setSubmitType("with_process");
+        SubmitWork submitWork = handleSubmitWork(workPO);
+        work.setFinalAttempt(submitWork);
+        List<SubmitWork> allAttempts = v.stream()
+                .map(this::handleSubmitWork)
+                .collect(Collectors.toList());
+        work.setAllAttempts(allAttempts);
+        work.setSubmittedAt(workPO.getSubmittedAt());
+        results.add(work);
+      }
+    });
+    return results;
+  }
+
+  private SubmitWork handleSubmitWork(AieduClassroomSessionStudentWorkPO workPO) {
+    SubmitWork submitWork = new SubmitWork();
+    submitWork.setId(workPO.getId());
+    String contentJson = workPO.getContentJson();
+    if (StringUtils.hasLength(contentJson)) {
+      submitWork.setContent(JSON.parseObject(contentJson));
+    } else {
+      submitWork.setContent(new JSONObject());
+    }
+    submitWork.setSubmittedAt(workPO.getSubmittedAt());
+    return submitWork;
   }
 
   private Boolean checkQuizPublished(AieduClassroomSessionPO sessionPO) {

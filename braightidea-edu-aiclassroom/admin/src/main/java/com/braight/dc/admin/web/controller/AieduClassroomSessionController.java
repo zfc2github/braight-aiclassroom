@@ -339,14 +339,36 @@ public class AieduClassroomSessionController extends BaseController {
     public AjaxResult submitWork(@Validated @RequestBody AieduClassroomSessionStudentWorkPO po) {
         // todo Shine 是否限制提交次数
         po.setContentJson(ControllerUtil.getJsonString(po.getContent()));
-        po.setSubmittedAt(new Date());
+        po.setSubmittedAt(po.getSubmittedAt() != null ? po.getSubmittedAt() : new Date());
         aieduClassroomSessionStudentWorkPOMapper.insert(po);
-        if (po.getFinalSubmit()) {
-            // 更新作业状态为 completed
-            aieduClassroomSessionStudentPOMapper.completedWorkStatusByClassroomSessionIdStudentId(
-                    po.getClassroomSessionId(),
-                    po.getStudentId(),
-                    Constant.ClassroomStatus.COMPLETED);
+        // 更新作业状态为 completed
+        aieduClassroomSessionStudentPOMapper.completedWorkStatusByClassroomSessionIdStudentId(
+                po.getClassroomSessionId(),
+                po.getStudentId(),
+                Constant.ClassroomStatus.COMPLETED);
+        if (!po.getFinalSubmit()) {
+            // 包含过程
+            List<AieduClassroomSessionStudentWork> submissions = po.getSubmissions();
+            if (!CollectionUtils.isEmpty(submissions)) {
+                for (AieduClassroomSessionStudentWork submission : submissions) {
+                    if (submission.getFinalSubmit()) {
+                        continue;
+                    }
+                    AieduClassroomSessionStudentWorkPO submissionPO = new AieduClassroomSessionStudentWorkPO();
+                    submissionPO.setClassroomSessionId(po.getClassroomSessionId());
+                    submissionPO.setStudentId(po.getStudentId());
+                    submissionPO.setStudentName(po.getStudentName());
+                    submissionPO.setAiToolType(po.getAiToolType());
+                    submissionPO.setSubmissionType(po.getSubmissionType());
+                    submissionPO.setFinalSubmit(false);
+                    JSONObject content = submission.getContent();
+                    submissionPO.setContent(content);
+                    submissionPO.setContentJson(ControllerUtil.getJsonString(content));
+                    String submittedAt = content.getString("submittedAt");
+                    submissionPO.setSubmittedAt(StringUtils.hasLength(submittedAt) ? DateUtil.parseDateTime(submittedAt) : new Date());
+                    aieduClassroomSessionStudentWorkPOMapper.insert(submissionPO);
+                }
+            }
         }
         wsService.submitWork(po.getClassroomSessionId());
         return AjaxResult.success();
@@ -459,9 +481,17 @@ public class AieduClassroomSessionController extends BaseController {
                 addQuizScoresToZip(quizScores, language, zipOut);
                 for (int i = 0; i < works.size(); i++) {
                     StudentWork work = works.get(i);
+                    SubmitWork finalAttempt = work.getFinalAttempt();
+                    if (Objects.isNull(finalAttempt)) {
+                        continue;
+                    }
+                    String url1 = finalAttempt.getContent().getString("url");
+                    if (StringUtils.hasLength(url1)) {
+                        continue;
+                    }
                     try {
                         // 使用HttpClient或OkHttp等库进行更可靠的下载
-                        URL url = new URL(work.getUrl());
+                        URL url = new URL(url1);
                         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                         connection.setRequestMethod("GET");
                         connection.setConnectTimeout(10000); // 10秒连接超时
@@ -470,7 +500,7 @@ public class AieduClassroomSessionController extends BaseController {
                         try (InputStream inputStream = connection.getInputStream()) {
 
                             // 确保文件名唯一，避免冲突
-                            String uniqueFileName = work.getStudentId() + "_" + work.getStudentName() + "_" + extractFileNameUsingUri(work.getUrl());
+                            String uniqueFileName = work.getStudentId() + "_" + work.getStudentName() + "_" + extractFileNameUsingUri(url1);
 
                             ZipEntry zipEntry = new ZipEntry(uniqueFileName);
                             zipOut.putNextEntry(zipEntry);
@@ -487,13 +517,13 @@ public class AieduClassroomSessionController extends BaseController {
 
                     } catch (IOException e) {
                         // 记录错误但继续处理其他文件
-                        System.err.println("无法下载文件: " + work.getUrl() + ", 错误: " + e.getMessage());
+                        System.err.println("无法下载文件: " + url1 + ", 错误: " + e.getMessage());
 
                         // 可以创建一个错误说明文件放入ZIP中
                         String errorFileName = work.getStudentId() + "_error.txt";
                         ZipEntry errorEntry = new ZipEntry(errorFileName);
                         zipOut.putNextEntry(errorEntry);
-                        String errorMessage = "Error downloading file from: " + work.getUrl() + "\nError: " + e.getMessage();
+                        String errorMessage = "Error downloading file from: " + url1 + "\nError: " + e.getMessage();
                         zipOut.write(errorMessage.getBytes());
                         zipOut.closeEntry();
                     }

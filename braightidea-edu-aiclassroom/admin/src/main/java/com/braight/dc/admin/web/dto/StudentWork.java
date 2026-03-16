@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Shine
@@ -13,7 +14,10 @@ import java.util.Date;
 public class StudentWork {
     private String studentId;
     private String studentName;
-    private String url;
+    private String submitType;
+    private SubmitWork finalAttempt;
+    private List<SubmitWork> allAttempts;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date submittedAt;
+
 }

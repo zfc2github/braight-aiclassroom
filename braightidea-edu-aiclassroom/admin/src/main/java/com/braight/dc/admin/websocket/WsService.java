@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.*;
 
 /**
  * @author Shine
@@ -19,7 +18,8 @@ public class WsService {
     private SimpMessagingTemplate template;
     // 存储课堂和学生对应关系
     private final Map<Integer, Set<String>> classroomSessionStudents = new ConcurrentHashMap<>();
-
+    // 创建单例调度线程池
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     /**
      * 广播：学生加入课堂
@@ -30,7 +30,14 @@ public class WsService {
         WsEvent evt = new WsEvent(WsEvent.JOIN_CLASS,
                 null,
                 System.currentTimeMillis());
-        template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        Runnable runnable = () -> template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        schedulerDo(runnable);
+    }
+
+    private void schedulerDo(Runnable runnable) {
+        scheduler.schedule(runnable,
+                2,
+                TimeUnit.SECONDS);
     }
 
     /**
@@ -42,7 +49,8 @@ public class WsService {
         WsEvent evt = new WsEvent(WsEvent.START_TOOL_EXPERIENCE,
                 null,
                 System.currentTimeMillis());
-        template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        Runnable runnable = () -> template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        schedulerDo(runnable);
     }
 
     /**
@@ -54,7 +62,8 @@ public class WsService {
         WsEvent evt = new WsEvent(WsEvent.TYPE_START_QUIZ,
                 null,
                 System.currentTimeMillis());
-        template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        Runnable runnable = () -> template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        schedulerDo(runnable);
     }
 
     /**
@@ -66,7 +75,8 @@ public class WsService {
         WsEvent evt = new WsEvent(WsEvent.TYPE_SUBMIT_QUIZ,
                 null,
                 System.currentTimeMillis());
-        template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        Runnable runnable = () -> template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        schedulerDo(runnable);
     }
 
     /**
@@ -78,7 +88,8 @@ public class WsService {
         WsEvent evt = new WsEvent(WsEvent.TYPE_END_CLASSROOM_SESSION,
                 null,
                 System.currentTimeMillis());
-        template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        Runnable runnable = () -> template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        schedulerDo(runnable);
         // 删除所有学生连接信息
         removeStudentFromClassroomSession(classroomSessionId);
     }
@@ -102,6 +113,7 @@ public class WsService {
         WsEvent evt = new WsEvent(WsEvent.TYPE_SUBMIT_WORK,
                 null,
                 System.currentTimeMillis());
-        template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        Runnable runnable = () -> template.convertAndSend("/topic/classroomSession/" + classroomSessionId, evt);
+        schedulerDo(runnable);
     }
 }

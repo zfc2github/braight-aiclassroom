@@ -52,5 +52,6 @@
     submitted_at, content_json, final_submit
     from aiedu_classroom_session_student_work
     where classroom_session_id = #{classroomSessionId,jdbcType=INTEGER}
+    order by submitted_at desc
   </select>
 </mapper>
