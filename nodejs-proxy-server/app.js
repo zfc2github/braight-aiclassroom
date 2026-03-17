@@ -17,7 +17,7 @@ const {generateVideoFromText, queryVideoGeneration, queryFilesRetrieve} = requir
 const {generateMusicFromText} = require("./minimax-text2music");
 const {speechSynthesis, speechGeneration, listVoice} = require('./aliyun-cosyvoice');
 const {ocrImage} = require("./baidu-textRecog");
-const {generateCreativeIdeas, generateText} = require("./aliyun-creativeAssistant");
+const {generateCreativeIdeas, generateText, generateCreativeIdeasFromAgent} = require("./aliyun-creativeAssistant");
 const {aliyunObjectDetect} = require("./aliyun-objectdet");
 const {baiduObjectDetect} = require("./baidu-objectdet");
 
@@ -298,8 +298,10 @@ app.post('/ocr', async (req, res) => {
 // 创意助手-创意方案生成（阿里云百炼-文本生成）
 app.post('/creativeAssistant', async (req, res) => {
     try {
-        const { prompt } = req.body;
-        const data = await generateCreativeIdeas({ prompt });
+        const { prompt, filePaths } = req.body;
+        console.log(prompt, filePaths);
+        // const data = await generateCreativeIdeas({ prompt });
+        const data = await generateCreativeIdeasFromAgent({ prompt, filePaths });
         res.json({
             success: true,
             data: data
@@ -363,6 +365,8 @@ app.post('/baiduObjectDetect', async (req, res) => {
 
 
 // 3. 启动
-app.listen(PORT, () => {
+let server = app.listen(PORT, () => {
     console.log(`✅ CORS-Proxy 已启动 → http://localhost:${PORT}`);
 });
+server.timeout = 1000 * 60 * 3;
+server.keepAliveTimeout = 1000 * 60 * 3;
