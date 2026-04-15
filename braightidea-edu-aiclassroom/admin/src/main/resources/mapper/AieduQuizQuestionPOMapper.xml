@@ -77,7 +77,7 @@
     <where>
       <choose>
         <when test="toolId != null and toolId != ''">
-          or (tool_id = #{toolId} or source = 'ai-tool')
+          or (tool_id = #{toolId} or (source = 'ai-tool' and tool_id is null))
         </when>
         <otherwise>
           or source = 'ai-tool'
@@ -85,7 +85,7 @@
       </choose>
       <choose>
         <when test="coursewareId != null and coursewareId != ''">
-          or (courseware_id = #{coursewareId} or source = 'courseware')
+          or (courseware_id = #{coursewareId} or (source = 'courseware' and courseware_id is null))
         </when>
         <otherwise>
           or source = 'courseware'
