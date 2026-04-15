@@ -226,7 +226,7 @@ public class AieduClassroomSessionController extends BaseController {
                 joinedStudent.setStudentId(student.getStudentId());
                 joinedStudent.setStudentName(student.getName());
                 joinedStudent.setJoinedAt(new Date());
-                joinedStudent.setWorkStatus(Constant.ClassroomStatus.WAITING);
+                joinedStudent.setWorkStatus(Constant.ClassroomStatus.IN_PROGRESS);
                 joinedStudent.setApiCount(0);
                 joinedStudent.setQuizStatus(Constant.ClassroomStatus.WAITING);
                 aieduClassroomSessionStudentPOMapper.insert(joinedStudent);

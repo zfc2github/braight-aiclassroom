@@ -82,7 +82,7 @@ public class AieduClassroomSessionService {
       sessionData.setNotJoinedStudents(notJoinedStudents);
 
       List<ClassroomSessionStudentVO> notStartedStudents = all.stream()
-              .filter(s -> Objects.isNull(s.getJoinedAt()) && !Constant.ClassroomStatus.WAITING.equals(s.getWorkStatus()))
+              .filter(s -> Constant.ClassroomStatus.WAITING.equals(s.getWorkStatus()))
               .map(AieduClassroomSessionService::apply)
               .collect(Collectors.toList());
       sessionData.setNotStartedStudents(notStartedStudents);
