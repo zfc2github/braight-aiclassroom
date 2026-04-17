@@ -22,7 +22,7 @@ async function generateImageFromImage({  prompt, width, height, image, change_de
     return new Promise(async (resolve, reject) => {
         // 调用原始API
         const token = await getAccessToken();
-        const response = await axios.post(`https://aip.baidubce.com/rpc/2.0/wenxin/v1/extreme/textToImage?access_token=${token}`, {
+        const response = await axios.post(`https://aip.baidubce.com/rpc/2.0/ernievilg/v1/txt2imgv2?access_token=${token}`, {
             prompt,
             width,
             height,
@@ -40,7 +40,7 @@ async function generateImageFromImage({  prompt, width, height, image, change_de
             const poll = setInterval(async () => {
                 const token = await getAccessToken();
                 const { data } = await axios.post(
-                    `https://aip.baidubce.com/rpc/2.0/wenxin/v1/extreme/getImg?access_token=${token}`,
+                    `https://aip.baidubce.com/rpc/2.0/ernievilg/v1/getImgv2?access_token=${token}`,
                     { task_id },
                     { headers: { 'Content-Type': 'application/json' } }
                 );
