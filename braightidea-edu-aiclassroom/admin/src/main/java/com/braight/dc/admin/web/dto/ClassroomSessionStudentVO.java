@@ -16,6 +16,7 @@ public class ClassroomSessionStudentVO {
   private String studentId;
   private String studentName;
   private String workStatus;
+  private String quizStatus;
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
   private Date submittedAt;
 }

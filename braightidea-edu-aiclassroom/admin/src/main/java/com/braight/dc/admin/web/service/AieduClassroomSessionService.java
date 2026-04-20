@@ -39,6 +39,7 @@ public class AieduClassroomSessionService {
     vo.setStudentName(s.getStudentName());
     vo.setWorkStatus(s.getWorkStatus());
     vo.setSubmittedAt(s.getSubmittedAt());
+    vo.setQuizStatus(s.getQuizStatus());
     return vo;
   }
 
@@ -201,6 +202,9 @@ public class AieduClassroomSessionService {
         work.setFinalAttempt(submitWork);
         work.setAllAttempts(Collections.singletonList(submitWork));
         work.setSubmittedAt(workPO.getSubmittedAt());
+        work.setType(submitWork.getContent().getString("type"));
+        work.setUrl(submitWork.getContent().getString("url"));
+        work.setTrainingData(getTrainingData(submitWork));
         results.add(work);
       } else {
         AieduClassroomSessionStudentWorkPO workPO = v.stream()
@@ -218,10 +222,19 @@ public class AieduClassroomSessionService {
                 .collect(Collectors.toList());
         work.setAllAttempts(allAttempts);
         work.setSubmittedAt(workPO.getSubmittedAt());
+        work.setType(submitWork.getContent().getString("type"));
+        work.setUrl(submitWork.getContent().getString("url"));
+        work.setTrainingData(getTrainingData(submitWork));
         results.add(work);
       }
     });
     return results;
+  }
+
+  private JSONObject getTrainingData(SubmitWork workPO) {
+    JSONObject content = workPO.getContent();
+    JSONObject trainingData = content.getJSONObject("trainingData");
+    return trainingData == null ? new JSONObject() : trainingData;
   }
 
   private SubmitWork handleSubmitWork(AieduClassroomSessionStudentWorkPO workPO) {

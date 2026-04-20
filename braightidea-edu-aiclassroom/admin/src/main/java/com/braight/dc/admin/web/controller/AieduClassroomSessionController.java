@@ -486,7 +486,7 @@ public class AieduClassroomSessionController extends BaseController {
                         continue;
                     }
                     String url1 = finalAttempt.getContent().getString("url");
-                    if (StringUtils.hasLength(url1)) {
+                    if (!StringUtils.hasLength(url1)) {
                         continue;
                     }
                     try {
