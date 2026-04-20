@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.Base64;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -489,42 +490,29 @@ public class AieduClassroomSessionController extends BaseController {
                     if (!StringUtils.hasLength(url1)) {
                         continue;
                     }
+                    
+                    // 确保文件名唯一，避免冲突
+                    String uniqueFileName = work.getStudentId() + "_" + work.getStudentName() + "_file";
+                    
                     try {
-                        // 使用HttpClient或OkHttp等库进行更可靠的下载
-                        URL url = new URL(url1);
-                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                        connection.setRequestMethod("GET");
-                        connection.setConnectTimeout(10000); // 10秒连接超时
-                        connection.setReadTimeout(30000);   // 30秒读取超时
-
-                        try (InputStream inputStream = connection.getInputStream()) {
-
-                            // 确保文件名唯一，避免冲突
-                            String uniqueFileName = work.getStudentId() + "_" + work.getStudentName() + "_" + extractFileNameUsingUri(url1);
-
-                            ZipEntry zipEntry = new ZipEntry(uniqueFileName);
-                            zipOut.putNextEntry(zipEntry);
-
-                            // 将文件内容复制到ZIP输出流
-                            byte[] buffer = new byte[8192]; // 增大缓冲区提高性能
-                            int bytesRead;
-                            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                zipOut.write(buffer, 0, bytesRead);
-                            }
-
-                            zipOut.closeEntry();
+                        // 判断是否为 Base64 数据 URI
+                        if (url1.startsWith("data:")) {
+                            handleBase64Image(zipOut, url1, uniqueFileName);
+                        } else {
+                            // 原有的 HTTP URL 下载逻辑
+                            handleHttpUrlDownload(zipOut, url1, uniqueFileName);
                         }
 
                     } catch (IOException e) {
                         // 记录错误但继续处理其他文件
-                        System.err.println("无法下载文件: " + url1 + ", 错误: " + e.getMessage());
+                        System.err.println("无法处理文件: " + url1 + ", 错误: " + e.getMessage());
 
                         // 可以创建一个错误说明文件放入ZIP中
                         String errorFileName = work.getStudentId() + "_error.txt";
                         ZipEntry errorEntry = new ZipEntry(errorFileName);
                         zipOut.putNextEntry(errorEntry);
-                        String errorMessage = "Error downloading file from: " + url1 + "\nError: " + e.getMessage();
-                        zipOut.write(errorMessage.getBytes());
+                        String errorMessage = "Error processing file from: " + url1 + "\nError: " + e.getMessage();
+                        zipOut.write(errorMessage.getBytes(StandardCharsets.UTF_8));
                         zipOut.closeEntry();
                     }
                 }
@@ -605,6 +593,97 @@ public class AieduClassroomSessionController extends BaseController {
             System.err.println("Invalid URL: " + e.getMessage());
         }
         return "";
+    }
+
+    /**
+     * 处理 Base64 图片数据并写入 ZIP
+     *
+     * @param zipOut ZIP 输出流
+     * @param dataUri Base64 数据 URI
+     * @param baseFileName 基础文件名
+     * @throws IOException IO 异常
+     */
+    private void handleBase64Image(ZipOutputStream zipOut, String dataUri, String baseFileName) throws IOException {
+        // 解析 Data URI: data:[<mediatype>][;base64],<data>
+        int commaIndex = dataUri.indexOf(',');
+        if (commaIndex == -1) {
+            throw new IOException("Invalid Base64 data URI format");
+        }
+
+        String header = dataUri.substring(0, commaIndex);
+        String base64Data = dataUri.substring(commaIndex + 1);
+
+        // 提取文件扩展名
+        String extension = getFileExtensionFromMimeType(header);
+        String fileName = baseFileName + (extension != null ? extension : ".png"); // 默认 png
+
+        // 解码 Base64
+        byte[] fileBytes = Base64.getDecoder().decode(base64Data);
+
+        // 写入 ZIP
+        ZipEntry zipEntry = new ZipEntry(fileName);
+        zipOut.putNextEntry(zipEntry);
+        zipOut.write(fileBytes);
+        zipOut.closeEntry();
+    }
+
+    /**
+     * 处理 HTTP URL 下载并写入 ZIP
+     *
+     * @param zipOut ZIP 输出流
+     * @param urlString URL 字符串
+     * @param baseFileName 基础文件名
+     * @throws IOException IO 异常
+     */
+    private void handleHttpUrlDownload(ZipOutputStream zipOut, String urlString, String baseFileName) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setConnectTimeout(10000); // 10秒连接超时
+        connection.setReadTimeout(30000);   // 30秒读取超时
+
+        try (InputStream inputStream = connection.getInputStream()) {
+            // 尝试从 URL 路径中提取文件名，如果提取失败则使用默认名
+            String extractedName = extractFileNameUsingUri(urlString);
+            String fileName = StringUtils.hasLength(extractedName) ?
+                    baseFileName.substring(0, baseFileName.lastIndexOf('_') + 1) + extractedName :
+                    baseFileName + ".jpg"; // 默认给个后缀
+
+            // 确保文件名合法且唯一
+            if (!fileName.contains(".")) {
+                fileName += ".jpg";
+            }
+
+            ZipEntry zipEntry = new ZipEntry(fileName);
+            zipOut.putNextEntry(zipEntry);
+
+            // 将文件内容复制到ZIP输出流
+            byte[] buffer = new byte[8192]; // 增大缓冲区提高性能
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                zipOut.write(buffer, 0, bytesRead);
+            }
+            zipOut.closeEntry();
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    /**
+     * 从 MIME Type 头部获取文件扩展名
+     * 例如: data:image/png;base64 -> .png
+     *
+     * @param header 数据 URI 的头部部分
+     * @return 文件扩展名（包含点号）
+     */
+    private String getFileExtensionFromMimeType(String header) {
+        if (header.contains("image/png")) return ".png";
+        if (header.contains("image/jpeg") || header.contains("image/jpg")) return ".jpg";
+        if (header.contains("image/gif")) return ".gif";
+        if (header.contains("image/webp")) return ".webp";
+        if (header.contains("image/svg+xml")) return ".svg";
+        // 可以根据需要添加更多类型
+        return null;
     }
 
     /**
