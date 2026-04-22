@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 /**
  * 删除 /uploadsTemp 目录下创建时间超过 7 天的文件
- * 用法：
- *   node cleanupUploads.js         # 手动跑
- *   pm2 start cleanupUploads.js --cron "0 3 * * *"  # 每天 03:00 定时
+ * 用法：设置crontab定时任务
+ * # m h  dom mon dow   command
+ * 0 0 * * 0 /usr/bin/node /var/www/braight-aiclassroom/nodejs-proxy-server/uploadsTempClean.js >> /var/www/braight-aiclassroom/nodejs-proxy-server/uploadsTempClean.log 2>&1
  */
 const fs   = require('fs');
 const path = require('path');
 
 const TARGET_DIR = path.resolve(__dirname, 'uploadsTemp');
-const MAX_AGE_DAY = 7;
+const MAX_AGE_DAY = 90;
 
 function walk(dir, cb) {
     for (const name of fs.readdirSync(dir)) {
