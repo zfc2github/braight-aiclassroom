@@ -233,6 +233,7 @@ public class AieduClassroomSessionController extends BaseController {
                 aieduClassroomSessionStudentPOMapper.insert(joinedStudent);
             } else {
                 joinedStudent.setJoinedAt(new Date());
+                joinedStudent.setWorkStatus(Constant.ClassroomStatus.IN_PROGRESS);
                 aieduClassroomSessionStudentPOMapper.updateSelective(joinedStudent);
             }
         }
@@ -414,6 +415,7 @@ public class AieduClassroomSessionController extends BaseController {
 
         // 按学生studentId分组合并
         Map<String, List<AieduClassroomSessionStudentWorkPO>> collect = list.stream()
+                .sorted(Comparator.comparing(AieduClassroomSessionStudentWorkPO::getSubmittedAt).reversed())
                 .collect(Collectors.groupingBy(AieduClassroomSessionStudentWorkPO::getStudentId));
 
         List<AieduClassroomSessionStudentWorkPO> result = new ArrayList<>();
@@ -449,6 +451,7 @@ public class AieduClassroomSessionController extends BaseController {
         List<Integer> ids = query.getIds();
         List<AieduClassroomSessionStudentWorkPO> all = aieduClassroomSessionStudentWorkPOMapper.selectByClassroomSessionId(sessionId);
         List<AieduClassroomSessionStudentWorkPO> finalSubmitWork = all.stream()
+                .sorted(Comparator.comparing(AieduClassroomSessionStudentWorkPO::getSubmittedAt).reversed())
                 .filter(AieduClassroomSessionStudentWorkPO::getFinalSubmit)
                 .collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(ids)) {

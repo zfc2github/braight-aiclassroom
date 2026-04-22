@@ -119,6 +119,7 @@ public class AieduClassroomSessionService {
 
       List<AieduClassroomSessionStudentWorkPO> studentWorks = aieduClassroomSessionStudentWorkPOMapper.selectByClassroomSessionId(sessionId);
       Map<String, List<AieduClassroomSessionStudentWorkPO>> listMap = studentWorks.stream()
+              .sorted(Comparator.comparing(AieduClassroomSessionStudentWorkPO::getSubmittedAt).reversed())
               .collect(Collectors.groupingBy(AieduClassroomSessionStudentWorkPO::getStudentId));
       sessionData.setArtifacts(getWorks(listMap));
 
