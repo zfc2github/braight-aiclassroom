@@ -490,10 +490,10 @@ public class AieduClassroomSessionController extends BaseController {
                     if (!StringUtils.hasLength(url1)) {
                         continue;
                     }
-                    
+
                     // 确保文件名唯一，避免冲突
-                    String uniqueFileName = work.getStudentId() + "_" + work.getStudentName() + "_file";
-                    
+                    String uniqueFileName = work.getStudentId() + "_" + work.getStudentName() + "_file_"+(i+1);
+
                     try {
                         // 判断是否为 Base64 数据 URI
                         if (url1.startsWith("data:")) {
