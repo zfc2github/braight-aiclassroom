@@ -302,8 +302,6 @@ public class AieduClassroomSessionController extends BaseController {
         // 更新当前阶段
 //        AieduClassroomSessionPO session = aieduClassroomSessionPOMapper.selectByPrimaryKey(sessionId);
         aieduClassroomSessionPOMapper.updateCurrentStage(sessionId, Constant.ClassroomSessionCurrentStage.TOOL_EXPERIENCE);
-        // 更新作业状态
-        aieduClassroomSessionStudentPOMapper.updateWorkStatusByClassroomSessionId(sessionId, Constant.ClassroomStatus.IN_PROGRESS);
         // 发送websocket消息：开始学生实验
         wsService.startToolExperience(sessionId);
         return AjaxResult.success();
