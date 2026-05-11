@@ -108,7 +108,9 @@ public class RegisterService {
                 }
                 userService.insertUserAuth(sysUser.getUserId(), roleIds);
                 // 同步创建 aiedu_teachers 表记录：先根据唯一索引（email）删除，再插入
-                aieduTeachersPOMapper.deleteByEmail(email);
+                if (StringUtils.isNotEmpty(email)) {
+                    aieduTeachersPOMapper.deleteByEmail(email);
+                }
                 AieduTeachersPO po = new AieduTeachersPO();
                 po.setName(registerBody.getUsername());
                 po.setSchool(registerBody.getSchool());
